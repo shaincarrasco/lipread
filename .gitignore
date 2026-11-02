@@ -1,0 +1,26 @@
+# Python
+.venv/
+venv/
+__pycache__/
+*.pyc
+*.egg-info/
+build/
+dist/
+.pytest_cache/
+.ruff_cache/
+
+# Model weights and runtime data (downloaded, never committed)
+*.onnx
+*.tflite
+*.task
+models/
+jobs/
+out/
+
+# Media (test fixtures are the exception)
+*.mp4
+!tests/fixtures/**/*.mp4
+
+# macOS
+.DS_Store
+*.iconset/
