@@ -27,6 +27,7 @@ export const CONFIG = {
   // in the model cache on first use. If it's missing the app falls back to greedy decoding.
   lmUrl: new URL("./assets/lm.bin", import.meta.url).href,
   context: true,
+  rustDecoder: true,     // use the Rust (WebAssembly) decoder; false = the identical JS decoder
 
   fps: 25,               // model frame rate
   maxSeconds: 30,        // longest window processed on a phone

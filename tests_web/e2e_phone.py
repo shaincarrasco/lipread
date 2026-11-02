@@ -43,10 +43,15 @@ def main(clip: str) -> int:
             str(root / "profile"), viewport={"width": 393, "height": 852}, device_scale_factor=3,
             is_mobile=True, has_touch=True,
             user_agent="Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1")
-        ctx.add_init_script("self.LIPREAD_CONFIG = { modelUrl: location.origin + '/dev-model/lipread_ctc.int8.onnx' };")
+        want = os.environ.get("LIPREAD_E2E_DECODER", "rust")   # "js" checks the fallback decoder
+        ctx.add_init_script("self.LIPREAD_CONFIG = { modelUrl: location.origin + '/dev-model/lipread_ctc.int8.onnx', "
+                            f"rustDecoder: {'true' if want == 'rust' else 'false'} }};")
         pg = ctx.new_page()
         errors: list[str] = []
-        pg.on("console", lambda m: errors.append(m.text) if m.type == "error" else None)
+        pg.on("console", lambda m: errors.append(m.text)
+              if m.type == "error" or (m.type == "warning" and "decoder unavailable" in m.text) else None)
+        infos: list[str] = []
+        pg.on("console", lambda m: infos.append(m.text) if m.text.startswith("LipRead decoder:") else None)
         pg.on("pageerror", lambda e: errors.append(str(e)))
         pg.goto(url)
         pg.wait_for_timeout(2500)   # service worker installs and reloads once for cross-origin isolation
@@ -72,9 +77,11 @@ def main(clip: str) -> int:
         failures.append("no face rows on the results screen")
     if words < 3:
         failures.append(f"only {words} transcript words rendered")
+    if f"LipRead decoder: {want}" not in infos:
+        failures.append(f"{want} decoder not used: {infos}")
     if errors:
         failures.append(f"console errors: {errors[:5]}")
-    print(f"processed in {took:.1f}s, {faces} face(s), {words} words; screenshot {root / 'results.png'}")
+    print(f"processed in {took:.1f}s, {faces} face(s), {words} words, {infos}; screenshot {root / 'results.png'}")
     for f in failures:
         print("FAIL:", f)
     return 1 if failures else 0

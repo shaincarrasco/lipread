@@ -84,14 +84,32 @@ export class LipRead {
       setGeometry(geometry);
     }
     if (withPieces && !this._assets.pieces) this._assets.pieces = await json("spm_pieces.json");
-    if (CONFIG.context && this._assets.lm === undefined) {
-      try {
-        const buf = await store.ensureLm();
-        this._assets.lm = buf ? new NgramLM(buf) : null;
-      } catch (err) {
+    if (CONFIG.context && this._assets.decoder === undefined) {
+      this._assets.decoder = null;
+      let buf = null;
+      try { buf = await store.ensureLm(); } catch (err) {
         console.warn("LipRead: language model unavailable, using greedy decoding", err);
-        this._assets.lm = null;
       }
+      if (buf) {
+        // Rust (WebAssembly) decoder first; the identical JS decoder if it can't load.
+        if (CONFIG.rustDecoder) {
+          try {
+            const { createRustDecoder } = await import("./rust-decoder.js");
+            this._assets.decoder = await createRustDecoder(buf, this._assets.tokens);
+          } catch (err) {
+            console.warn("LipRead: Rust decoder unavailable, using the JS decoder", err);
+          }
+        }
+        if (!this._assets.decoder) {
+          try {
+            const lm = new NgramLM(buf), tokens = this._assets.tokens;
+            this._assets.decoder = { kind: "js", decode: (lp, T, V, t0, opts) => new BeamDecoder(tokens, lm, opts).decode(lp, T, V, t0) };
+          } catch (err) {
+            console.warn("LipRead: language model unreadable, using greedy decoding", err);
+          }
+        }
+      }
+      console.info(`LipRead decoder: ${this._assets.decoder?.kind || "greedy"}`);
     }
     return this._assets;
   }
@@ -265,8 +283,8 @@ export class LipRead {
         const { logprobs, T, V } = await this._call("lips", { crops, T: t.T }, [crops.buffer]);
         // Context-aware decoding: keep several candidate transcripts and let the word language model
         // pick the most plausible one; every word carries alternatives. Greedy if the LM is missing.
-        let words = assets.lm
-          ? new BeamDecoder(assets.tokens, assets.lm, { names }).decode(logprobs, T, V, t0).words
+        let words = assets.decoder
+          ? assets.decoder.decode(logprobs, T, V, t0, { names }).words
           : greedyWords(logprobs, T, V, assets.tokens, t0);
         if (Booster) words = new Booster(names, assets.tokens, assets.pieces).apply(words, logprobs, T, V, t0);
         item.utterances = segment(words, t0, tEnd);
@@ -277,7 +295,7 @@ export class LipRead {
     lap("lips");
     out.sort((a, b) => (a.skipped - b.skipped) || b.facePx - a.facePx);
     return { duration: vid.duration, width: vid.width, height: vid.height, start, end: stop,
-             tracks: out, model: this.model, disclaimer: "AI lip-reading estimate. Words can be wrong. Don't treat as a quote." };
+             tracks: out, model: this.model, decoder: assets.decoder?.kind || "greedy", disclaimer: "AI lip-reading estimate. Words can be wrong. Don't treat as a quote." };
   }
 
   // ---------------------------------------------------------------- exports
