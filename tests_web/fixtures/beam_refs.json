@@ -1,0 +1,5892 @@
+{
+ "K": 32,
+ "fill": -50.0,
+ "V": 5049,
+ "option_sets": {
+  "plain": {
+   "beam": 16,
+   "alpha": 0.3,
+   "beta": 1.0,
+   "posterior_scale": 0.2,
+   "temperature": 1.0
+  },
+  "names_t2": {
+   "beam": 16,
+   "alpha": 0.3,
+   "beta": 1.0,
+   "posterior_scale": 0.2,
+   "temperature": 2.0,
+   "names": [
+    "Mahomes",
+    "Kelce"
+   ]
+  }
+ },
+ "clips": [
+  {
+   "id": "lrs3_00",
+   "source": "lrs3",
+   "index": 0,
+   "file": "beam_lrs3_00.bin",
+   "T": 65,
+   "t0": 0.0,
+   "label": "the first lesson is about humility",
+   "results": {
+    "plain": {
+     "words": [
+      {
+       "text": "THE",
+       "start": 0.2,
+       "end": 0.24,
+       "confidence": 0.9974436112758907,
+       "tier": "high",
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "text": "FIRST",
+       "start": 0.4,
+       "end": 0.44,
+       "confidence": 0.999543056014579,
+       "tier": "high",
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "text": "LESSON",
+       "start": 0.64,
+       "end": 0.68,
+       "confidence": 0.880774957955678,
+       "tier": "medium",
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "text": "IS",
+       "start": 1.28,
+       "end": 1.32,
+       "confidence": 0.9963445879695735,
+       "tier": "high",
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "text": "ABOUT",
+       "start": 1.6,
+       "end": 1.64,
+       "confidence": 0.9979840598888227,
+       "tier": "high",
+       "p": 0.955,
+       "alternatives": [
+        {
+         "text": "ABOUTITY",
+         "p": 0.0232
+        },
+        {
+         "text": "ABOUTHUMAN",
+         "p": 0.0218
+        }
+       ]
+      },
+      {
+       "text": "HUMAN",
+       "start": 2.04,
+       "end": 2.08,
+       "confidence": 0.6913281855882473,
+       "tier": "low",
+       "p": 0.3832,
+       "alternatives": [
+        {
+         "text": "HUMANITY",
+         "p": 0.1145
+        },
+        {
+         "text": "NORMAL",
+         "p": 0.1043
+        },
+        {
+         "text": "HUM",
+         "p": 0.0447
+        }
+       ]
+      }
+     ],
+     "alternatives": [
+      {
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "p": 0.955,
+       "alternatives": [
+        {
+         "text": "ABOUTITY",
+         "p": 0.0232
+        },
+        {
+         "text": "ABOUTHUMAN",
+         "p": 0.0218
+        }
+       ]
+      },
+      {
+       "p": 0.3832,
+       "alternatives": [
+        {
+         "text": "HUMANITY",
+         "p": 0.1145
+        },
+        {
+         "text": "NORMAL",
+         "p": 0.1043
+        },
+        {
+         "text": "HUM",
+         "p": 0.0447
+        }
+       ]
+      }
+     ]
+    },
+    "names_t2": {
+     "words": [
+      {
+       "text": "THE",
+       "start": 0.2,
+       "end": 0.24,
+       "confidence": 0.9974436112758907,
+       "tier": "high",
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "text": "FIRST",
+       "start": 0.4,
+       "end": 0.44,
+       "confidence": 0.999543056014579,
+       "tier": "high",
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "text": "LESSON",
+       "start": 0.64,
+       "end": 0.68,
+       "confidence": 0.880774957955678,
+       "tier": "medium",
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "text": "IS",
+       "start": 1.28,
+       "end": 1.32,
+       "confidence": 0.9963445879695735,
+       "tier": "high",
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "text": "ABOUT",
+       "start": 1.6,
+       "end": 1.64,
+       "confidence": 0.9979840598888227,
+       "tier": "high",
+       "p": 0.95,
+       "alternatives": [
+        {
+         "text": "ABOUTITY",
+         "p": 0.0259
+        },
+        {
+         "text": "ABOUTHUMAN",
+         "p": 0.0241
+        }
+       ]
+      },
+      {
+       "text": "A",
+       "start": 2.0,
+       "end": 2.04,
+       "confidence": 0.00013343781418447866,
+       "tier": "low",
+       "p": 0.3874,
+       "alternatives": [
+        {
+         "text": "HUMAN",
+         "p": 0.1415
+        },
+        {
+         "text": "HUMANITY",
+         "p": 0.0668
+        },
+        {
+         "text": "NORMAL",
+         "p": 0.0538
+        }
+       ]
+      },
+      {
+       "text": "HUMAN",
+       "start": 2.04,
+       "end": 2.08,
+       "confidence": 0.6913281855882473,
+       "tier": "low",
+       "p": 0.2951,
+       "alternatives": [
+        {
+         "text": "HUMANITY",
+         "p": 0.1251
+        },
+        {
+         "text": "NORMAL",
+         "p": 0.118
+        },
+        {
+         "text": "HUM",
+         "p": 0.0984
+        }
+       ]
+      }
+     ],
+     "alternatives": [
+      {
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "p": 0.95,
+       "alternatives": [
+        {
+         "text": "ABOUTITY",
+         "p": 0.0259
+        },
+        {
+         "text": "ABOUTHUMAN",
+         "p": 0.0241
+        }
+       ]
+      },
+      {
+       "p": 0.3874,
+       "alternatives": [
+        {
+         "text": "HUMAN",
+         "p": 0.1415
+        },
+        {
+         "text": "HUMANITY",
+         "p": 0.0668
+        },
+        {
+         "text": "NORMAL",
+         "p": 0.0538
+        }
+       ]
+      },
+      {
+       "p": 0.2951,
+       "alternatives": [
+        {
+         "text": "HUMANITY",
+         "p": 0.1251
+        },
+        {
+         "text": "NORMAL",
+         "p": 0.118
+        },
+        {
+         "text": "HUM",
+         "p": 0.0984
+        }
+       ]
+      }
+     ]
+    }
+   }
+  },
+  {
+   "id": "lrs3_01",
+   "source": "lrs3",
+   "index": 60,
+   "file": "beam_lrs3_01.bin",
+   "T": 149,
+   "t0": 0.5,
+   "label": "this meant that the movements demanding change knew what they were against crushing poverty widening",
+   "results": {
+    "plain": {
+     "words": [
+      {
+       "text": "THIS",
+       "start": 0.66,
+       "end": 0.7,
+       "confidence": 0.5436905695130004,
+       "tier": "low",
+       "p": 0.7876,
+       "alternatives": [
+        {
+         "text": "THEY",
+         "p": 0.1453
+        }
+       ]
+      },
+      {
+       "text": "MEANT",
+       "start": 0.94,
+       "end": 0.98,
+       "confidence": 0.8295352718481677,
+       "tier": "medium",
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "text": "THAT",
+       "start": 1.22,
+       "end": 1.26,
+       "confidence": 0.9093440729922854,
+       "tier": "high",
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "text": "THE",
+       "start": 1.3399999999999999,
+       "end": 1.38,
+       "confidence": 0.8622643719218623,
+       "tier": "medium",
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "text": "MOVEMENTS",
+       "start": 1.54,
+       "end": 1.9,
+       "confidence": 0.5731299475614388,
+       "tier": "low",
+       "p": 0.6204,
+       "alternatives": [
+        {
+         "text": "MOVEMENT",
+         "p": 0.2461
+        },
+        {
+         "text": "IMPROVEMENTS",
+         "p": 0.1335
+        }
+       ]
+      },
+      {
+       "text": "DEMANDING",
+       "start": 2.1399999999999997,
+       "end": 2.38,
+       "confidence": 0.8505250541521601,
+       "tier": "medium",
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "text": "CHANGE",
+       "start": 2.66,
+       "end": 2.7,
+       "confidence": 0.88454608481789,
+       "tier": "medium",
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "text": "KNEW",
+       "start": 3.5,
+       "end": 3.54,
+       "confidence": 0.9918849131875969,
+       "tier": "high",
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "text": "WHAT",
+       "start": 3.66,
+       "end": 3.7,
+       "confidence": 0.8865459131893586,
+       "tier": "medium",
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "text": "THEY",
+       "start": 3.78,
+       "end": 3.82,
+       "confidence": 0.9983838756969929,
+       "tier": "high",
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "text": "WERE",
+       "start": 3.9,
+       "end": 3.94,
+       "confidence": 0.9988448144696132,
+       "tier": "high",
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "text": "AGAINST",
+       "start": 4.220000000000001,
+       "end": 4.26,
+       "confidence": 0.9973789293011404,
+       "tier": "high",
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "text": "CRUSHING",
+       "start": 4.98,
+       "end": 5.22,
+       "confidence": 0.7894507441853986,
+       "tier": "medium",
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "text": "POVERTY",
+       "start": 5.42,
+       "end": 5.46,
+       "confidence": 0.9997607755745987,
+       "tier": "high",
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "text": "AND",
+       "start": 5.86,
+       "end": 5.9,
+       "confidence": 0.6826070342357493,
+       "tier": "low",
+       "p": 0.8048,
+       "alternatives": []
+      },
+      {
+       "text": "WHY",
+       "start": 6.02,
+       "end": 6.06,
+       "confidence": 0.6451758124577329,
+       "tier": "low",
+       "p": 0.8467,
+       "alternatives": [
+        {
+         "text": "WIND",
+         "p": 0.0546
+        },
+        {
+         "text": "WIDE",
+         "p": 0.0518
+        },
+        {
+         "text": "WHYNING",
+         "p": 0.0468
+        }
+       ]
+      }
+     ],
+     "alternatives": [
+      {
+       "p": 0.7876,
+       "alternatives": [
+        {
+         "text": "THEY",
+         "p": 0.1453
+        }
+       ]
+      },
+      {
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "p": 0.6204,
+       "alternatives": [
+        {
+         "text": "MOVEMENT",
+         "p": 0.2461
+        },
+        {
+         "text": "IMPROVEMENTS",
+         "p": 0.1335
+        }
+       ]
+      },
+      {
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "p": 0.8048,
+       "alternatives": []
+      },
+      {
+       "p": 0.8467,
+       "alternatives": [
+        {
+         "text": "WIND",
+         "p": 0.0546
+        },
+        {
+         "text": "WIDE",
+         "p": 0.0518
+        },
+        {
+         "text": "WHYNING",
+         "p": 0.0468
+        }
+       ]
+      }
+     ]
+    },
+    "names_t2": {
+     "words": [
+      {
+       "text": "AND",
+       "start": 0.62,
+       "end": 0.66,
+       "confidence": 0.0009445105038643562,
+       "tier": "low",
+       "p": 0.7763,
+       "alternatives": [
+        {
+         "text": "THIS",
+         "p": 0.2237
+        }
+       ]
+      },
+      {
+       "text": "THIS",
+       "start": 0.66,
+       "end": 0.7,
+       "confidence": 0.5436905695130004,
+       "tier": "low",
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "text": "MEANT",
+       "start": 0.94,
+       "end": 0.98,
+       "confidence": 0.8295352718481677,
+       "tier": "medium",
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "text": "THAT",
+       "start": 1.22,
+       "end": 1.26,
+       "confidence": 0.9093440729922854,
+       "tier": "high",
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "text": "THE",
+       "start": 1.3399999999999999,
+       "end": 1.38,
+       "confidence": 0.8622643719218623,
+       "tier": "medium",
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "text": "MOVEMENTS",
+       "start": 1.54,
+       "end": 1.9,
+       "confidence": 0.5731299475614388,
+       "tier": "low",
+       "p": 0.5543,
+       "alternatives": [
+        {
+         "text": "MOVEMENT",
+         "p": 0.3721
+        },
+        {
+         "text": "IMPROVEMENTS",
+         "p": 0.0736
+        }
+       ]
+      },
+      {
+       "text": "DEMANDING",
+       "start": 2.1399999999999997,
+       "end": 2.38,
+       "confidence": 0.8505250541521601,
+       "tier": "medium",
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "text": "CHANGE",
+       "start": 2.66,
+       "end": 2.7,
+       "confidence": 0.88454608481789,
+       "tier": "medium",
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "text": "KNEW",
+       "start": 3.5,
+       "end": 3.54,
+       "confidence": 0.9918849131875969,
+       "tier": "high",
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "text": "WHAT",
+       "start": 3.66,
+       "end": 3.7,
+       "confidence": 0.8865459131893586,
+       "tier": "medium",
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "text": "THEY",
+       "start": 3.78,
+       "end": 3.82,
+       "confidence": 0.9983838756969929,
+       "tier": "high",
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "text": "WERE",
+       "start": 3.9,
+       "end": 3.94,
+       "confidence": 0.9988448144696132,
+       "tier": "high",
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "text": "AGAINST",
+       "start": 4.220000000000001,
+       "end": 4.26,
+       "confidence": 0.9973789293011404,
+       "tier": "high",
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "text": "CRUSHING",
+       "start": 4.98,
+       "end": 5.22,
+       "confidence": 0.7894507441853986,
+       "tier": "medium",
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "text": "POVERTY",
+       "start": 5.42,
+       "end": 5.46,
+       "confidence": 0.9997607755745987,
+       "tier": "high",
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "text": "AND",
+       "start": 5.86,
+       "end": 5.9,
+       "confidence": 0.6826070342357493,
+       "tier": "low",
+       "p": 0.8022,
+       "alternatives": []
+      },
+      {
+       "text": "WHY",
+       "start": 6.02,
+       "end": 6.06,
+       "confidence": 0.6451758124577329,
+       "tier": "low",
+       "p": 0.6084,
+       "alternatives": [
+        {
+         "text": "WIND",
+         "p": 0.1197
+        },
+        {
+         "text": "WIDE",
+         "p": 0.1139
+        },
+        {
+         "text": "WHAT",
+         "p": 0.0778
+        }
+       ]
+      }
+     ],
+     "alternatives": [
+      {
+       "p": 0.7763,
+       "alternatives": [
+        {
+         "text": "THIS",
+         "p": 0.2237
+        }
+       ]
+      },
+      {
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "p": 0.5543,
+       "alternatives": [
+        {
+         "text": "MOVEMENT",
+         "p": 0.3721
+        },
+        {
+         "text": "IMPROVEMENTS",
+         "p": 0.0736
+        }
+       ]
+      },
+      {
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "p": 0.8022,
+       "alternatives": []
+      },
+      {
+       "p": 0.6084,
+       "alternatives": [
+        {
+         "text": "WIND",
+         "p": 0.1197
+        },
+        {
+         "text": "WIDE",
+         "p": 0.1139
+        },
+        {
+         "text": "WHAT",
+         "p": 0.0778
+        }
+       ]
+      }
+     ]
+    }
+   }
+  },
+  {
+   "id": "lrs3_02",
+   "source": "lrs3",
+   "index": 120,
+   "file": "beam_lrs3_02.bin",
+   "T": 26,
+   "t0": 1.0,
+   "label": "where would it go",
+   "results": {
+    "plain": {
+     "words": [
+      {
+       "text": "AND",
+       "start": 1.16,
+       "end": 1.2,
+       "confidence": 5.3913750568331754e-05,
+       "tier": "low",
+       "p": 0.5013,
+       "alternatives": [
+        {
+         "text": "WHERE",
+         "p": 0.4987
+        }
+       ]
+      },
+      {
+       "text": "WHERE",
+       "start": 1.24,
+       "end": 1.28,
+       "confidence": 0.9885230940473245,
+       "tier": "high",
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "text": "WE'RE",
+       "start": 1.44,
+       "end": 1.56,
+       "confidence": 0.6373221281175766,
+       "tier": "low",
+       "p": 0.5736,
+       "alternatives": [
+        {
+         "text": "WE",
+         "p": 0.2773
+        },
+        {
+         "text": "WERE",
+         "p": 0.0874
+        },
+        {
+         "text": "WE'",
+         "p": 0.0617
+        }
+       ]
+      },
+      {
+       "text": "GOING",
+       "start": 1.56,
+       "end": 1.6,
+       "confidence": 0.2553208281558348,
+       "tier": "low",
+       "p": 0.3123,
+       "alternatives": [
+        {
+         "text": "TO",
+         "p": 0.2633
+        },
+        {
+         "text": "WE",
+         "p": 0.1546
+        },
+        {
+         "text": "WE'RE",
+         "p": 0.1207
+        }
+       ]
+      },
+      {
+       "text": "TO",
+       "start": 1.6,
+       "end": 1.6400000000000001,
+       "confidence": 0.4158455314735012,
+       "tier": "low",
+       "p": 0.4663,
+       "alternatives": [
+        {
+         "text": "GO",
+         "p": 0.2164
+        },
+        {
+         "text": "WE'RE",
+         "p": 0.1207
+        },
+        {
+         "text": "GOING",
+         "p": 0.1093
+        }
+       ]
+      },
+      {
+       "text": "GO",
+       "start": 1.72,
+       "end": 1.76,
+       "confidence": 0.986729766518762,
+       "tier": "high",
+       "p": 1.0,
+       "alternatives": []
+      }
+     ],
+     "alternatives": [
+      {
+       "p": 0.5013,
+       "alternatives": [
+        {
+         "text": "WHERE",
+         "p": 0.4987
+        }
+       ]
+      },
+      {
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "p": 0.5736,
+       "alternatives": [
+        {
+         "text": "WE",
+         "p": 0.2773
+        },
+        {
+         "text": "WERE",
+         "p": 0.0874
+        },
+        {
+         "text": "WE'",
+         "p": 0.0617
+        }
+       ]
+      },
+      {
+       "p": 0.3123,
+       "alternatives": [
+        {
+         "text": "TO",
+         "p": 0.2633
+        },
+        {
+         "text": "WE",
+         "p": 0.1546
+        },
+        {
+         "text": "WE'RE",
+         "p": 0.1207
+        }
+       ]
+      },
+      {
+       "p": 0.4663,
+       "alternatives": [
+        {
+         "text": "GO",
+         "p": 0.2164
+        },
+        {
+         "text": "WE'RE",
+         "p": 0.1207
+        },
+        {
+         "text": "GOING",
+         "p": 0.1093
+        }
+       ]
+      },
+      {
+       "p": 1.0,
+       "alternatives": []
+      }
+     ]
+    },
+    "names_t2": {
+     "words": [
+      {
+       "text": "AND",
+       "start": 1.08,
+       "end": 1.12,
+       "confidence": 0.3668032465977846,
+       "tier": "low",
+       "p": 0.7218,
+       "alternatives": []
+      },
+      {
+       "text": "WHERE",
+       "start": 1.24,
+       "end": 1.28,
+       "confidence": 0.9885230940473245,
+       "tier": "high",
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "text": "WE'RE",
+       "start": 1.44,
+       "end": 1.56,
+       "confidence": 0.6373221281175766,
+       "tier": "low",
+       "p": 0.4761,
+       "alternatives": [
+        {
+         "text": "WE",
+         "p": 0.4321
+        },
+        {
+         "text": "WERE",
+         "p": 0.0918
+        }
+       ]
+      },
+      {
+       "text": "GOING",
+       "start": 1.56,
+       "end": 1.6,
+       "confidence": 0.2553208281558348,
+       "tier": "low",
+       "p": 0.3144,
+       "alternatives": [
+        {
+         "text": "TO",
+         "p": 0.3147
+        },
+        {
+         "text": "WE",
+         "p": 0.1601
+        },
+        {
+         "text": "WE'RE",
+         "p": 0.1189
+        }
+       ]
+      },
+      {
+       "text": "TO",
+       "start": 1.6,
+       "end": 1.6400000000000001,
+       "confidence": 0.4158455314735012,
+       "tier": "low",
+       "p": 0.4788,
+       "alternatives": [
+        {
+         "text": "GO",
+         "p": 0.1601
+        },
+        {
+         "text": "GOING",
+         "p": 0.1504
+        },
+        {
+         "text": "WE'RE",
+         "p": 0.1189
+        }
+       ]
+      },
+      {
+       "text": "GO",
+       "start": 1.72,
+       "end": 1.76,
+       "confidence": 0.986729766518762,
+       "tier": "high",
+       "p": 0.8557,
+       "alternatives": [
+        {
+         "text": "TO",
+         "p": 0.0523
+        },
+        {
+         "text": "GOING",
+         "p": 0.0449
+        }
+       ]
+      }
+     ],
+     "alternatives": [
+      {
+       "p": 0.7218,
+       "alternatives": []
+      },
+      {
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "p": 0.4761,
+       "alternatives": [
+        {
+         "text": "WE",
+         "p": 0.4321
+        },
+        {
+         "text": "WERE",
+         "p": 0.0918
+        }
+       ]
+      },
+      {
+       "p": 0.3144,
+       "alternatives": [
+        {
+         "text": "TO",
+         "p": 0.3147
+        },
+        {
+         "text": "WE",
+         "p": 0.1601
+        },
+        {
+         "text": "WE'RE",
+         "p": 0.1189
+        }
+       ]
+      },
+      {
+       "p": 0.4788,
+       "alternatives": [
+        {
+         "text": "GO",
+         "p": 0.1601
+        },
+        {
+         "text": "GOING",
+         "p": 0.1504
+        },
+        {
+         "text": "WE'RE",
+         "p": 0.1189
+        }
+       ]
+      },
+      {
+       "p": 0.8557,
+       "alternatives": [
+        {
+         "text": "TO",
+         "p": 0.0523
+        },
+        {
+         "text": "GOING",
+         "p": 0.0449
+        }
+       ]
+      }
+     ]
+    }
+   }
+  },
+  {
+   "id": "lrs3_03",
+   "source": "lrs3",
+   "index": 180,
+   "file": "beam_lrs3_03.bin",
+   "T": 35,
+   "t0": 1.5,
+   "label": "you know they do polls right",
+   "results": {
+    "plain": {
+     "words": [
+      {
+       "text": "THEY",
+       "start": 1.8599999999999999,
+       "end": 1.9,
+       "confidence": 0.8523227246591231,
+       "tier": "medium",
+       "p": 0.8813,
+       "alternatives": [
+        {
+         "text": "DO",
+         "p": 0.1187
+        }
+       ]
+      },
+      {
+       "text": "DO",
+       "start": 1.98,
+       "end": 2.02,
+       "confidence": 0.6596699630606897,
+       "tier": "low",
+       "p": 0.7585,
+       "alternatives": [
+        {
+         "text": "ARE",
+         "p": 0.1316
+        },
+        {
+         "text": "NEW",
+         "p": 0.0658
+        },
+        {
+         "text": "THEY",
+         "p": 0.0441
+        }
+       ]
+      },
+      {
+       "text": "PARTICLES",
+       "start": 2.18,
+       "end": 2.2199999999999998,
+       "confidence": 0.9142413854480974,
+       "tier": "high",
+       "p": 0.9751,
+       "alternatives": [
+        {
+         "text": "PARTICLESS",
+         "p": 0.0249
+        }
+       ]
+      },
+      {
+       "text": "RIGHT",
+       "start": 2.62,
+       "end": 2.66,
+       "confidence": 0.9120120732513322,
+       "tier": "high",
+       "p": 0.5858,
+       "alternatives": [
+        {
+         "text": "PARTICLESS",
+         "p": 0.0249
+        }
+       ]
+      }
+     ],
+     "alternatives": [
+      {
+       "p": 0.8813,
+       "alternatives": [
+        {
+         "text": "DO",
+         "p": 0.1187
+        }
+       ]
+      },
+      {
+       "p": 0.7585,
+       "alternatives": [
+        {
+         "text": "ARE",
+         "p": 0.1316
+        },
+        {
+         "text": "NEW",
+         "p": 0.0658
+        },
+        {
+         "text": "THEY",
+         "p": 0.0441
+        }
+       ]
+      },
+      {
+       "p": 0.9751,
+       "alternatives": [
+        {
+         "text": "PARTICLESS",
+         "p": 0.0249
+        }
+       ]
+      },
+      {
+       "p": 0.5858,
+       "alternatives": [
+        {
+         "text": "PARTICLESS",
+         "p": 0.0249
+        }
+       ]
+      }
+     ]
+    },
+    "names_t2": {
+     "words": [
+      {
+       "text": "THEY",
+       "start": 1.8599999999999999,
+       "end": 1.9,
+       "confidence": 0.8523227246591231,
+       "tier": "medium",
+       "p": 0.8718,
+       "alternatives": [
+        {
+         "text": "DO",
+         "p": 0.1282
+        }
+       ]
+      },
+      {
+       "text": "DO",
+       "start": 1.98,
+       "end": 2.02,
+       "confidence": 0.6596699630606897,
+       "tier": "low",
+       "p": 0.7005,
+       "alternatives": [
+        {
+         "text": "THEY",
+         "p": 0.2995
+        }
+       ]
+      },
+      {
+       "text": "PARTICLES",
+       "start": 2.18,
+       "end": 2.2199999999999998,
+       "confidence": 0.9142413854480974,
+       "tier": "high",
+       "p": 0.8772,
+       "alternatives": [
+        {
+         "text": "PARTICLESS",
+         "p": 0.1228
+        }
+       ]
+      }
+     ],
+     "alternatives": [
+      {
+       "p": 0.8718,
+       "alternatives": [
+        {
+         "text": "DO",
+         "p": 0.1282
+        }
+       ]
+      },
+      {
+       "p": 0.7005,
+       "alternatives": [
+        {
+         "text": "THEY",
+         "p": 0.2995
+        }
+       ]
+      },
+      {
+       "p": 0.8772,
+       "alternatives": [
+        {
+         "text": "PARTICLESS",
+         "p": 0.1228
+        }
+       ]
+      }
+     ]
+    }
+   }
+  },
+  {
+   "id": "lrs3_04",
+   "source": "lrs3",
+   "index": 240,
+   "file": "beam_lrs3_04.bin",
+   "T": 62,
+   "t0": 0.0,
+   "label": "it told us about hormone replacement therapy",
+   "results": {
+    "plain": {
+     "words": [
+      {
+       "text": "TALK",
+       "start": 0.44,
+       "end": 0.48,
+       "confidence": 0.1449102599578041,
+       "tier": "low",
+       "p": 0.7342,
+       "alternatives": [
+        {
+         "text": "TO",
+         "p": 0.2658
+        }
+       ]
+      },
+      {
+       "text": "ABOUT",
+       "start": 0.88,
+       "end": 0.92,
+       "confidence": 0.21291228619240427,
+       "tier": "low",
+       "p": 0.6506,
+       "alternatives": [
+        {
+         "text": "MY",
+         "p": 0.3494
+        }
+       ]
+      },
+      {
+       "text": "HORMONE",
+       "start": 1.08,
+       "end": 1.28,
+       "confidence": 0.9257486450468501,
+       "tier": "high",
+       "p": 0.6963,
+       "alternatives": [
+        {
+         "text": "HORMONEMENT",
+         "p": 0.3037
+        }
+       ]
+      },
+      {
+       "text": "REPLACEMENT",
+       "start": 1.56,
+       "end": 1.88,
+       "confidence": 0.44269280305018277,
+       "tier": "low",
+       "p": 0.2706,
+       "alternatives": [
+        {
+         "text": "HORMONEMENT",
+         "p": 0.3037
+        },
+        {
+         "text": "MYMENT",
+         "p": 0.0945
+        },
+        {
+         "text": "REPLACE",
+         "p": 0.0878
+        }
+       ]
+      }
+     ],
+     "alternatives": [
+      {
+       "p": 0.7342,
+       "alternatives": [
+        {
+         "text": "TO",
+         "p": 0.2658
+        }
+       ]
+      },
+      {
+       "p": 0.6506,
+       "alternatives": [
+        {
+         "text": "MY",
+         "p": 0.3494
+        }
+       ]
+      },
+      {
+       "p": 0.6963,
+       "alternatives": [
+        {
+         "text": "HORMONEMENT",
+         "p": 0.3037
+        }
+       ]
+      },
+      {
+       "p": 0.2706,
+       "alternatives": [
+        {
+         "text": "HORMONEMENT",
+         "p": 0.3037
+        },
+        {
+         "text": "MYMENT",
+         "p": 0.0945
+        },
+        {
+         "text": "REPLACE",
+         "p": 0.0878
+        }
+       ]
+      }
+     ]
+    },
+    "names_t2": {
+     "words": [
+      {
+       "text": "TO",
+       "start": 0.44,
+       "end": 0.48,
+       "confidence": 0.030079654981385682,
+       "tier": "low",
+       "p": 0.4247,
+       "alternatives": [
+        {
+         "text": "TALK",
+         "p": 0.5753
+        }
+       ]
+      },
+      {
+       "text": "MY",
+       "start": 0.88,
+       "end": 0.92,
+       "confidence": 0.6378149841110228,
+       "tier": "low",
+       "p": 0.4247,
+       "alternatives": [
+        {
+         "text": "ABOUT",
+         "p": 0.5753
+        }
+       ]
+      },
+      {
+       "text": "HORMONE",
+       "start": 1.08,
+       "end": 1.28,
+       "confidence": 0.9257486450468501,
+       "tier": "high",
+       "p": 0.3222,
+       "alternatives": [
+        {
+         "text": "HORMONEMENT",
+         "p": 0.2256
+        },
+        {
+         "text": "HORMONEALMENT",
+         "p": 0.1038
+        },
+        {
+         "text": "HORMONEASMENT",
+         "p": 0.1014
+        }
+       ]
+      }
+     ],
+     "alternatives": [
+      {
+       "p": 0.4247,
+       "alternatives": [
+        {
+         "text": "TALK",
+         "p": 0.5753
+        }
+       ]
+      },
+      {
+       "p": 0.4247,
+       "alternatives": [
+        {
+         "text": "ABOUT",
+         "p": 0.5753
+        }
+       ]
+      },
+      {
+       "p": 0.3222,
+       "alternatives": [
+        {
+         "text": "HORMONEMENT",
+         "p": 0.2256
+        },
+        {
+         "text": "HORMONEALMENT",
+         "p": 0.1038
+        },
+        {
+         "text": "HORMONEASMENT",
+         "p": 0.1014
+        }
+       ]
+      }
+     ]
+    }
+   }
+  },
+  {
+   "id": "lrs3_05",
+   "source": "lrs3",
+   "index": 300,
+   "file": "beam_lrs3_05.bin",
+   "T": 72,
+   "t0": 0.5,
+   "label": "maybe i did an experiment on myself without even knowing it",
+   "results": {
+    "plain": {
+     "words": [
+      {
+       "text": "MY",
+       "start": 0.74,
+       "end": 0.78,
+       "confidence": 0.7132732978989903,
+       "tier": "medium",
+       "p": 0.8855,
+       "alternatives": []
+      },
+      {
+       "text": "EXPERIMENT",
+       "start": 1.5,
+       "end": 1.54,
+       "confidence": 0.9743787406082348,
+       "tier": "high",
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "text": "ON",
+       "start": 1.78,
+       "end": 1.82,
+       "confidence": 0.9050252089572759,
+       "tier": "high",
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "text": "MYSELF",
+       "start": 2.2199999999999998,
+       "end": 2.26,
+       "confidence": 0.9763730693089409,
+       "tier": "high",
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "text": "WITHOUT",
+       "start": 2.54,
+       "end": 2.58,
+       "confidence": 0.9880706876415689,
+       "tier": "high",
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "text": "EVEN",
+       "start": 2.7,
+       "end": 2.74,
+       "confidence": 0.9918622110034069,
+       "tier": "high",
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "text": "KNOWING",
+       "start": 2.94,
+       "end": 2.98,
+       "confidence": 0.5642456204690209,
+       "tier": "low",
+       "p": 0.8704,
+       "alternatives": [
+        {
+         "text": "SHOWING",
+         "p": 0.1296
+        }
+       ]
+      },
+      {
+       "text": "IT",
+       "start": 3.18,
+       "end": 3.22,
+       "confidence": 0.7553926655388176,
+       "tier": "medium",
+       "p": 0.7438,
+       "alternatives": []
+      }
+     ],
+     "alternatives": [
+      {
+       "p": 0.8855,
+       "alternatives": []
+      },
+      {
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "p": 0.8704,
+       "alternatives": [
+        {
+         "text": "SHOWING",
+         "p": 0.1296
+        }
+       ]
+      },
+      {
+       "p": 0.7438,
+       "alternatives": []
+      }
+     ]
+    },
+    "names_t2": {
+     "words": [
+      {
+       "text": "MY",
+       "start": 0.74,
+       "end": 0.78,
+       "confidence": 0.7132732978989903,
+       "tier": "medium",
+       "p": 0.9262,
+       "alternatives": []
+      },
+      {
+       "text": "EXPERIMENT",
+       "start": 1.5,
+       "end": 1.54,
+       "confidence": 0.9743787406082348,
+       "tier": "high",
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "text": "ON",
+       "start": 1.78,
+       "end": 1.82,
+       "confidence": 0.9050252089572759,
+       "tier": "high",
+       "p": 0.6613,
+       "alternatives": []
+      },
+      {
+       "text": "MYSELF",
+       "start": 2.2199999999999998,
+       "end": 2.26,
+       "confidence": 0.9763730693089409,
+       "tier": "high",
+       "p": 0.8674,
+       "alternatives": []
+      },
+      {
+       "text": "WITHOUT",
+       "start": 2.54,
+       "end": 2.58,
+       "confidence": 0.9880706876415689,
+       "tier": "high",
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "text": "EVEN",
+       "start": 2.7,
+       "end": 2.74,
+       "confidence": 0.9918622110034069,
+       "tier": "high",
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "text": "KNOWING",
+       "start": 2.94,
+       "end": 2.98,
+       "confidence": 0.5642456204690209,
+       "tier": "low",
+       "p": 0.8144,
+       "alternatives": [
+        {
+         "text": "SHOWING",
+         "p": 0.1495
+        },
+        {
+         "text": "KNOWINGING",
+         "p": 0.0183
+        },
+        {
+         "text": "SHOWINGING",
+         "p": 0.0178
+        }
+       ]
+      },
+      {
+       "text": "IT",
+       "start": 3.18,
+       "end": 3.22,
+       "confidence": 0.7553926655388176,
+       "tier": "medium",
+       "p": 0.5014,
+       "alternatives": [
+        {
+         "text": "THAT",
+         "p": 0.0634
+        },
+        {
+         "text": "ANY",
+         "p": 0.0501
+        },
+        {
+         "text": "KNOWINGING",
+         "p": 0.0183
+        }
+       ]
+      }
+     ],
+     "alternatives": [
+      {
+       "p": 0.9262,
+       "alternatives": []
+      },
+      {
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "p": 0.6613,
+       "alternatives": []
+      },
+      {
+       "p": 0.8674,
+       "alternatives": []
+      },
+      {
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "p": 0.8144,
+       "alternatives": [
+        {
+         "text": "SHOWING",
+         "p": 0.1495
+        },
+        {
+         "text": "KNOWINGING",
+         "p": 0.0183
+        },
+        {
+         "text": "SHOWINGING",
+         "p": 0.0178
+        }
+       ]
+      },
+      {
+       "p": 0.5014,
+       "alternatives": [
+        {
+         "text": "THAT",
+         "p": 0.0634
+        },
+        {
+         "text": "ANY",
+         "p": 0.0501
+        },
+        {
+         "text": "KNOWINGING",
+         "p": 0.0183
+        }
+       ]
+      }
+     ]
+    }
+   }
+  },
+  {
+   "id": "lrs3_06",
+   "source": "lrs3",
+   "index": 360,
+   "file": "beam_lrs3_06.bin",
+   "T": 62,
+   "t0": 1.0,
+   "label": "we mourn women complicated",
+   "results": {
+    "plain": {
+     "words": [
+      {
+       "text": "ONE",
+       "start": 1.24,
+       "end": 1.28,
+       "confidence": 0.3029050352845373,
+       "tier": "low",
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "text": "MORE",
+       "start": 1.48,
+       "end": 1.52,
+       "confidence": 0.6074197834133571,
+       "tier": "low",
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "text": "WOMEN",
+       "start": 2.0,
+       "end": 2.04,
+       "confidence": 0.26214245869880437,
+       "tier": "low",
+       "p": 0.6964,
+       "alternatives": [
+        {
+         "text": "WE",
+         "p": 0.2523
+        },
+        {
+         "text": "WOMENCOMLICANT",
+         "p": 0.0513
+        }
+       ]
+      },
+      {
+       "text": "APPLICANT",
+       "start": 2.6399999999999997,
+       "end": 3.08,
+       "confidence": 0.3625256722344233,
+       "tier": "low",
+       "p": 0.2149,
+       "alternatives": [
+        {
+         "text": "COMPLICATEDLICANT",
+         "p": 0.1209
+        },
+        {
+         "text": "APPLIC",
+         "p": 0.1163
+        },
+        {
+         "text": "COMPLICATEDLIC",
+         "p": 0.1155
+        }
+       ]
+      }
+     ],
+     "alternatives": [
+      {
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "p": 0.6964,
+       "alternatives": [
+        {
+         "text": "WE",
+         "p": 0.2523
+        },
+        {
+         "text": "WOMENCOMLICANT",
+         "p": 0.0513
+        }
+       ]
+      },
+      {
+       "p": 0.2149,
+       "alternatives": [
+        {
+         "text": "COMPLICATEDLICANT",
+         "p": 0.1209
+        },
+        {
+         "text": "APPLIC",
+         "p": 0.1163
+        },
+        {
+         "text": "COMPLICATEDLIC",
+         "p": 0.1155
+        }
+       ]
+      }
+     ]
+    },
+    "names_t2": {
+     "words": [
+      {
+       "text": "ONE",
+       "start": 1.24,
+       "end": 1.28,
+       "confidence": 0.3029050352845373,
+       "tier": "low",
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "text": "MORE",
+       "start": 1.48,
+       "end": 1.52,
+       "confidence": 0.6074197834133571,
+       "tier": "low",
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "text": "WOMEN",
+       "start": 2.0,
+       "end": 2.04,
+       "confidence": 0.26214245869880437,
+       "tier": "low",
+       "p": 0.2789,
+       "alternatives": [
+        {
+         "text": "WE",
+         "p": 0.2613
+        },
+        {
+         "text": "WOMENCOMLICANT",
+         "p": 0.061
+        },
+        {
+         "text": "WOMENLICANT",
+         "p": 0.0604
+        }
+       ]
+      },
+      {
+       "text": "APPLICANT",
+       "start": 2.6399999999999997,
+       "end": 3.08,
+       "confidence": 0.3625256722344233,
+       "tier": "low",
+       "p": 0.2059,
+       "alternatives": [
+        {
+         "text": "COMPLICATEDLICANT",
+         "p": 0.1161
+        },
+        {
+         "text": "APPLIC",
+         "p": 0.1093
+        },
+        {
+         "text": "COMPLICATEDLIC",
+         "p": 0.1088
+        }
+       ]
+      }
+     ],
+     "alternatives": [
+      {
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "p": 0.2789,
+       "alternatives": [
+        {
+         "text": "WE",
+         "p": 0.2613
+        },
+        {
+         "text": "WOMENCOMLICANT",
+         "p": 0.061
+        },
+        {
+         "text": "WOMENLICANT",
+         "p": 0.0604
+        }
+       ]
+      },
+      {
+       "p": 0.2059,
+       "alternatives": [
+        {
+         "text": "COMPLICATEDLICANT",
+         "p": 0.1161
+        },
+        {
+         "text": "APPLIC",
+         "p": 0.1093
+        },
+        {
+         "text": "COMPLICATEDLIC",
+         "p": 0.1088
+        }
+       ]
+      }
+     ]
+    }
+   }
+  },
+  {
+   "id": "lrs3_07",
+   "source": "lrs3",
+   "index": 420,
+   "file": "beam_lrs3_07.bin",
+   "T": 95,
+   "t0": 1.5,
+   "label": "pain runs through my body with the fires of my love for you",
+   "results": {
+    "plain": {
+     "words": [
+      {
+       "text": "MANY",
+       "start": 1.78,
+       "end": 1.82,
+       "confidence": 0.2494063275418754,
+       "tier": "low",
+       "p": 0.3846,
+       "alternatives": [
+        {
+         "text": "BEING",
+         "p": 0.6154
+        }
+       ]
+      },
+      {
+       "text": "RUNS",
+       "start": 2.18,
+       "end": 2.38,
+       "confidence": 0.33524134332871613,
+       "tier": "low",
+       "p": 0.6168,
+       "alternatives": [
+        {
+         "text": "RUN",
+         "p": 0.3832
+        }
+       ]
+      },
+      {
+       "text": "THROUGH",
+       "start": 2.54,
+       "end": 2.58,
+       "confidence": 0.9671944548560825,
+       "tier": "high",
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "text": "MY",
+       "start": 2.74,
+       "end": 2.7800000000000002,
+       "confidence": 0.9980011915676544,
+       "tier": "high",
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "text": "BODY",
+       "start": 2.98,
+       "end": 3.02,
+       "confidence": 0.9916427833430317,
+       "tier": "high",
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "text": "WITH",
+       "start": 3.34,
+       "end": 3.38,
+       "confidence": 0.45294155136860514,
+       "tier": "low",
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "text": "THE",
+       "start": 3.5,
+       "end": 3.54,
+       "confidence": 0.6611210267967931,
+       "tier": "low",
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "text": "FILES",
+       "start": 3.74,
+       "end": 4.02,
+       "confidence": 0.37908022406327957,
+       "tier": "low",
+       "p": 0.5058,
+       "alternatives": [
+        {
+         "text": "FILE",
+         "p": 0.4942
+        }
+       ]
+      },
+      {
+       "text": "OF",
+       "start": 4.140000000000001,
+       "end": 4.18,
+       "confidence": 0.0007589355109414391,
+       "tier": "low",
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "text": "MY",
+       "start": 4.3,
+       "end": 4.34,
+       "confidence": 0.7139701940799238,
+       "tier": "medium",
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "text": "FEAR",
+       "start": 4.82,
+       "end": 4.859999999999999,
+       "confidence": 0.5895944728838,
+       "tier": "low",
+       "p": 1.0,
+       "alternatives": []
+      }
+     ],
+     "alternatives": [
+      {
+       "p": 0.3846,
+       "alternatives": [
+        {
+         "text": "BEING",
+         "p": 0.6154
+        }
+       ]
+      },
+      {
+       "p": 0.6168,
+       "alternatives": [
+        {
+         "text": "RUN",
+         "p": 0.3832
+        }
+       ]
+      },
+      {
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "p": 0.5058,
+       "alternatives": [
+        {
+         "text": "FILE",
+         "p": 0.4942
+        }
+       ]
+      },
+      {
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "p": 1.0,
+       "alternatives": []
+      }
+     ]
+    },
+    "names_t2": {
+     "words": [
+      {
+       "text": "MANY",
+       "start": 1.78,
+       "end": 1.82,
+       "confidence": 0.2494063275418754,
+       "tier": "low",
+       "p": 0.4686,
+       "alternatives": [
+        {
+         "text": "BEING",
+         "p": 0.3177
+        },
+        {
+         "text": "BE",
+         "p": 0.2137
+        }
+       ]
+      },
+      {
+       "text": "RUNS",
+       "start": 2.18,
+       "end": 2.38,
+       "confidence": 0.33524134332871613,
+       "tier": "low",
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "text": "THROUGH",
+       "start": 2.54,
+       "end": 2.58,
+       "confidence": 0.9671944548560825,
+       "tier": "high",
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "text": "MY",
+       "start": 2.74,
+       "end": 2.7800000000000002,
+       "confidence": 0.9980011915676544,
+       "tier": "high",
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "text": "BODY",
+       "start": 2.98,
+       "end": 3.02,
+       "confidence": 0.9916427833430317,
+       "tier": "high",
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "text": "WITH",
+       "start": 3.34,
+       "end": 3.38,
+       "confidence": 0.45294155136860514,
+       "tier": "low",
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "text": "THE",
+       "start": 3.5,
+       "end": 3.54,
+       "confidence": 0.6611210267967931,
+       "tier": "low",
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "text": "FILES",
+       "start": 3.74,
+       "end": 4.02,
+       "confidence": 0.37908022406327957,
+       "tier": "low",
+       "p": 0.5285,
+       "alternatives": [
+        {
+         "text": "FILE",
+         "p": 0.3009
+        },
+        {
+         "text": "FIRES",
+         "p": 0.0857
+        },
+        {
+         "text": "FOSFI",
+         "p": 0.0567
+        }
+       ]
+      },
+      {
+       "text": "MY",
+       "start": 4.3,
+       "end": 4.34,
+       "confidence": 0.7139701940799238,
+       "tier": "medium",
+       "p": 0.7832,
+       "alternatives": [
+        {
+         "text": "MYFI",
+         "p": 0.1319
+        },
+        {
+         "text": "FOSFI",
+         "p": 0.0567
+        },
+        {
+         "text": "FILESFI",
+         "p": 0.0282
+        }
+       ]
+      },
+      {
+       "text": "FEAR",
+       "start": 4.82,
+       "end": 4.859999999999999,
+       "confidence": 0.5895944728838,
+       "tier": "low",
+       "p": 0.7832,
+       "alternatives": [
+        {
+         "text": "MYFI",
+         "p": 0.1319
+        },
+        {
+         "text": "FOSFI",
+         "p": 0.0567
+        },
+        {
+         "text": "FILESFI",
+         "p": 0.0282
+        }
+       ]
+      }
+     ],
+     "alternatives": [
+      {
+       "p": 0.4686,
+       "alternatives": [
+        {
+         "text": "BEING",
+         "p": 0.3177
+        },
+        {
+         "text": "BE",
+         "p": 0.2137
+        }
+       ]
+      },
+      {
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "p": 0.5285,
+       "alternatives": [
+        {
+         "text": "FILE",
+         "p": 0.3009
+        },
+        {
+         "text": "FIRES",
+         "p": 0.0857
+        },
+        {
+         "text": "FOSFI",
+         "p": 0.0567
+        }
+       ]
+      },
+      {
+       "p": 0.7832,
+       "alternatives": [
+        {
+         "text": "MYFI",
+         "p": 0.1319
+        },
+        {
+         "text": "FOSFI",
+         "p": 0.0567
+        },
+        {
+         "text": "FILESFI",
+         "p": 0.0282
+        }
+       ]
+      },
+      {
+       "p": 0.7832,
+       "alternatives": [
+        {
+         "text": "MYFI",
+         "p": 0.1319
+        },
+        {
+         "text": "FOSFI",
+         "p": 0.0567
+        },
+        {
+         "text": "FILESFI",
+         "p": 0.0282
+        }
+       ]
+      }
+     ]
+    }
+   }
+  },
+  {
+   "id": "lrs3_08",
+   "source": "lrs3",
+   "index": 480,
+   "file": "beam_lrs3_08.bin",
+   "T": 34,
+   "t0": 0.0,
+   "label": "and that's what we did",
+   "results": {
+    "plain": {
+     "words": [
+      {
+       "text": "AND",
+       "start": 0.12,
+       "end": 0.16,
+       "confidence": 0.8843841344198528,
+       "tier": "medium",
+       "p": 0.7894,
+       "alternatives": []
+      },
+      {
+       "text": "THAT'S",
+       "start": 0.32,
+       "end": 0.52,
+       "confidence": 0.9072266340135818,
+       "tier": "high",
+       "p": 0.8381,
+       "alternatives": [
+        {
+         "text": "THAT",
+         "p": 0.1037
+        },
+        {
+         "text": "THATS",
+         "p": 0.0582
+        }
+       ]
+      },
+      {
+       "text": "WHAT",
+       "start": 0.6,
+       "end": 0.64,
+       "confidence": 0.9993855457574498,
+       "tier": "high",
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "text": "WE",
+       "start": 0.76,
+       "end": 0.8,
+       "confidence": 0.999475140076003,
+       "tier": "high",
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "text": "NEED",
+       "start": 1.0,
+       "end": 1.04,
+       "confidence": 0.9095105941100241,
+       "tier": "high",
+       "p": 0.524,
+       "alternatives": [
+        {
+         "text": "DID",
+         "p": 0.1734
+        },
+        {
+         "text": "THINK",
+         "p": 0.1077
+        },
+        {
+         "text": "DO",
+         "p": 0.0453
+        }
+       ]
+      }
+     ],
+     "alternatives": [
+      {
+       "p": 0.7894,
+       "alternatives": []
+      },
+      {
+       "p": 0.8381,
+       "alternatives": [
+        {
+         "text": "THAT",
+         "p": 0.1037
+        },
+        {
+         "text": "THATS",
+         "p": 0.0582
+        }
+       ]
+      },
+      {
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "p": 0.524,
+       "alternatives": [
+        {
+         "text": "DID",
+         "p": 0.1734
+        },
+        {
+         "text": "THINK",
+         "p": 0.1077
+        },
+        {
+         "text": "DO",
+         "p": 0.0453
+        }
+       ]
+      }
+     ]
+    },
+    "names_t2": {
+     "words": [
+      {
+       "text": "AND",
+       "start": 0.12,
+       "end": 0.16,
+       "confidence": 0.8843841344198528,
+       "tier": "medium",
+       "p": 0.8428,
+       "alternatives": []
+      },
+      {
+       "text": "THAT'S",
+       "start": 0.32,
+       "end": 0.52,
+       "confidence": 0.9072266340135818,
+       "tier": "high",
+       "p": 0.9309,
+       "alternatives": [
+        {
+         "text": "THAT",
+         "p": 0.0691
+        }
+       ]
+      },
+      {
+       "text": "WHAT",
+       "start": 0.6,
+       "end": 0.64,
+       "confidence": 0.9993855457574498,
+       "tier": "high",
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "text": "WE",
+       "start": 0.76,
+       "end": 0.8,
+       "confidence": 0.999475140076003,
+       "tier": "high",
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "text": "NEED",
+       "start": 1.0,
+       "end": 1.04,
+       "confidence": 0.9095105941100241,
+       "tier": "high",
+       "p": 0.4266,
+       "alternatives": [
+        {
+         "text": "DID",
+         "p": 0.1651
+        },
+        {
+         "text": "THINK",
+         "p": 0.0756
+        },
+        {
+         "text": "NEEDS",
+         "p": 0.0707
+        }
+       ]
+      }
+     ],
+     "alternatives": [
+      {
+       "p": 0.8428,
+       "alternatives": []
+      },
+      {
+       "p": 0.9309,
+       "alternatives": [
+        {
+         "text": "THAT",
+         "p": 0.0691
+        }
+       ]
+      },
+      {
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "p": 0.4266,
+       "alternatives": [
+        {
+         "text": "DID",
+         "p": 0.1651
+        },
+        {
+         "text": "THINK",
+         "p": 0.0756
+        },
+        {
+         "text": "NEEDS",
+         "p": 0.0707
+        }
+       ]
+      }
+     ]
+    }
+   }
+  },
+  {
+   "id": "lrs3_09",
+   "source": "lrs3",
+   "index": 540,
+   "file": "beam_lrs3_09.bin",
+   "T": 38,
+   "t0": 0.5,
+   "label": "it is the default option",
+   "results": {
+    "plain": {
+     "words": [
+      {
+       "text": "THIS",
+       "start": 0.7,
+       "end": 0.74,
+       "confidence": 0.5326542177657382,
+       "tier": "low",
+       "p": 0.5476,
+       "alternatives": [
+        {
+         "text": "IT",
+         "p": 0.3494
+        },
+        {
+         "text": "IT'S",
+         "p": 0.103
+        }
+       ]
+      },
+      {
+       "text": "IS",
+       "start": 0.78,
+       "end": 0.86,
+       "confidence": 0.5344779281537155,
+       "tier": "low",
+       "p": 0.897,
+       "alternatives": [
+        {
+         "text": "IT'S",
+         "p": 0.103
+        }
+       ]
+      },
+      {
+       "text": "A",
+       "start": 0.9,
+       "end": 0.94,
+       "confidence": 0.7885583862135747,
+       "tier": "medium",
+       "p": 0.6563,
+       "alternatives": [
+        {
+         "text": "THE",
+         "p": 0.3437
+        }
+       ]
+      },
+      {
+       "text": "DEFAULT",
+       "start": 1.3,
+       "end": 1.3399999999999999,
+       "confidence": 0.9999175105740706,
+       "tier": "high",
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "text": "OPTION",
+       "start": 1.58,
+       "end": 1.62,
+       "confidence": 0.3784468315265319,
+       "tier": "low",
+       "p": 0.4363,
+       "alternatives": [
+        {
+         "text": "OBJECT",
+         "p": 0.3575
+        },
+        {
+         "text": "OP",
+         "p": 0.073
+        },
+        {
+         "text": "OPPOSITE",
+         "p": 0.039
+        }
+       ]
+      }
+     ],
+     "alternatives": [
+      {
+       "p": 0.5476,
+       "alternatives": [
+        {
+         "text": "IT",
+         "p": 0.3494
+        },
+        {
+         "text": "IT'S",
+         "p": 0.103
+        }
+       ]
+      },
+      {
+       "p": 0.897,
+       "alternatives": [
+        {
+         "text": "IT'S",
+         "p": 0.103
+        }
+       ]
+      },
+      {
+       "p": 0.6563,
+       "alternatives": [
+        {
+         "text": "THE",
+         "p": 0.3437
+        }
+       ]
+      },
+      {
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "p": 0.4363,
+       "alternatives": [
+        {
+         "text": "OBJECT",
+         "p": 0.3575
+        },
+        {
+         "text": "OP",
+         "p": 0.073
+        },
+        {
+         "text": "OPPOSITE",
+         "p": 0.039
+        }
+       ]
+      }
+     ]
+    },
+    "names_t2": {
+     "words": [
+      {
+       "text": "THIS",
+       "start": 0.7,
+       "end": 0.74,
+       "confidence": 0.5326542177657382,
+       "tier": "low",
+       "p": 0.5991,
+       "alternatives": [
+        {
+         "text": "IT",
+         "p": 0.4009
+        }
+       ]
+      },
+      {
+       "text": "IS",
+       "start": 0.78,
+       "end": 0.86,
+       "confidence": 0.5344779281537155,
+       "tier": "low",
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "text": "THE",
+       "start": 0.9,
+       "end": 0.94,
+       "confidence": 0.1719172216487542,
+       "tier": "low",
+       "p": 0.4409,
+       "alternatives": [
+        {
+         "text": "A",
+         "p": 0.5591
+        }
+       ]
+      },
+      {
+       "text": "DEFAULT",
+       "start": 1.3,
+       "end": 1.3399999999999999,
+       "confidence": 0.9999175105740706,
+       "tier": "high",
+       "p": 0.8736,
+       "alternatives": [
+        {
+         "text": "DEFAULTED",
+         "p": 0.0787
+        },
+        {
+         "text": "DEFAULTO",
+         "p": 0.0244
+        },
+        {
+         "text": "DEFAULTTOP",
+         "p": 0.0232
+        }
+       ]
+      },
+      {
+       "text": "OPTION",
+       "start": 1.58,
+       "end": 1.62,
+       "confidence": 0.3784468315265319,
+       "tier": "low",
+       "p": 0.3652,
+       "alternatives": [
+        {
+         "text": "OBJECT",
+         "p": 0.3123
+        },
+        {
+         "text": "DEFAULTED",
+         "p": 0.0787
+        },
+        {
+         "text": "DEFAULTO",
+         "p": 0.0244
+        }
+       ]
+      }
+     ],
+     "alternatives": [
+      {
+       "p": 0.5991,
+       "alternatives": [
+        {
+         "text": "IT",
+         "p": 0.4009
+        }
+       ]
+      },
+      {
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "p": 0.4409,
+       "alternatives": [
+        {
+         "text": "A",
+         "p": 0.5591
+        }
+       ]
+      },
+      {
+       "p": 0.8736,
+       "alternatives": [
+        {
+         "text": "DEFAULTED",
+         "p": 0.0787
+        },
+        {
+         "text": "DEFAULTO",
+         "p": 0.0244
+        },
+        {
+         "text": "DEFAULTTOP",
+         "p": 0.0232
+        }
+       ]
+      },
+      {
+       "p": 0.3652,
+       "alternatives": [
+        {
+         "text": "OBJECT",
+         "p": 0.3123
+        },
+        {
+         "text": "DEFAULTED",
+         "p": 0.0787
+        },
+        {
+         "text": "DEFAULTO",
+         "p": 0.0244
+        }
+       ]
+      }
+     ]
+    }
+   }
+  },
+  {
+   "id": "lrs3_10",
+   "source": "lrs3",
+   "index": 600,
+   "file": "beam_lrs3_10.bin",
+   "T": 75,
+   "t0": 1.0,
+   "label": "and if it's completely okay what's the joke",
+   "results": {
+    "plain": {
+     "words": [
+      {
+       "text": "AND",
+       "start": 1.28,
+       "end": 1.32,
+       "confidence": 0.827916666953722,
+       "tier": "medium",
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "text": "BUT",
+       "start": 2.08,
+       "end": 2.12,
+       "confidence": 0.8614227278970417,
+       "tier": "medium",
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "text": "YOU",
+       "start": 2.24,
+       "end": 2.2800000000000002,
+       "confidence": 0.9223684204722651,
+       "tier": "high",
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "text": "KNOW",
+       "start": 2.3200000000000003,
+       "end": 2.3600000000000003,
+       "confidence": 0.881850779194859,
+       "tier": "medium",
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "text": "WHAT",
+       "start": 2.52,
+       "end": 2.56,
+       "confidence": 0.38836844817636496,
+       "tier": "low",
+       "p": 0.698,
+       "alternatives": []
+      },
+      {
+       "text": "THIS",
+       "start": 3.2,
+       "end": 3.24,
+       "confidence": 0.8617382480917556,
+       "tier": "medium",
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "text": "IS",
+       "start": 3.4,
+       "end": 3.44,
+       "confidence": 0.6718601446996623,
+       "tier": "low",
+       "p": 1.0,
+       "alternatives": []
+      }
+     ],
+     "alternatives": [
+      {
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "p": 0.698,
+       "alternatives": []
+      },
+      {
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "p": 1.0,
+       "alternatives": []
+      }
+     ]
+    },
+    "names_t2": {
+     "words": [
+      {
+       "text": "AND",
+       "start": 1.28,
+       "end": 1.32,
+       "confidence": 0.827916666953722,
+       "tier": "medium",
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "text": "THEN",
+       "start": 1.56,
+       "end": 1.6,
+       "confidence": 0.15083005153891788,
+       "tier": "low",
+       "p": 0.4418,
+       "alternatives": []
+      },
+      {
+       "text": "BUT",
+       "start": 2.08,
+       "end": 2.12,
+       "confidence": 0.8614227278970417,
+       "tier": "medium",
+       "p": 0.8756,
+       "alternatives": [
+        {
+         "text": "YOU",
+         "p": 0.1244
+        }
+       ]
+      },
+      {
+       "text": "YOU",
+       "start": 2.24,
+       "end": 2.2800000000000002,
+       "confidence": 0.9223684204722651,
+       "tier": "high",
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "text": "KNOW",
+       "start": 2.3200000000000003,
+       "end": 2.3600000000000003,
+       "confidence": 0.881850779194859,
+       "tier": "medium",
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "text": "WHAT",
+       "start": 2.52,
+       "end": 2.56,
+       "confidence": 0.38836844817636496,
+       "tier": "low",
+       "p": 0.7563,
+       "alternatives": []
+      },
+      {
+       "text": "THIS",
+       "start": 3.2,
+       "end": 3.24,
+       "confidence": 0.8617382480917556,
+       "tier": "medium",
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "text": "IS",
+       "start": 3.4,
+       "end": 3.44,
+       "confidence": 0.6718601446996623,
+       "tier": "low",
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "text": "WHAT",
+       "start": 3.6,
+       "end": 3.64,
+       "confidence": 0.05608654274486039,
+       "tier": "low",
+       "p": 0.3344,
+       "alternatives": [
+        {
+         "text": "VERY",
+         "p": 0.2944
+        },
+        {
+         "text": "JUST",
+         "p": 0.1214
+        },
+        {
+         "text": "ONE",
+         "p": 0.1151
+        }
+       ]
+      }
+     ],
+     "alternatives": [
+      {
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "p": 0.4418,
+       "alternatives": []
+      },
+      {
+       "p": 0.8756,
+       "alternatives": [
+        {
+         "text": "YOU",
+         "p": 0.1244
+        }
+       ]
+      },
+      {
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "p": 0.7563,
+       "alternatives": []
+      },
+      {
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "p": 0.3344,
+       "alternatives": [
+        {
+         "text": "VERY",
+         "p": 0.2944
+        },
+        {
+         "text": "JUST",
+         "p": 0.1214
+        },
+        {
+         "text": "ONE",
+         "p": 0.1151
+        }
+       ]
+      }
+     ]
+    }
+   }
+  },
+  {
+   "id": "lrs3_11",
+   "source": "lrs3",
+   "index": 660,
+   "file": "beam_lrs3_11.bin",
+   "T": 67,
+   "t0": 1.5,
+   "label": "i will not forget the day we got that text message",
+   "results": {
+    "plain": {
+     "words": [
+      {
+       "text": "I",
+       "start": 1.62,
+       "end": 1.66,
+       "confidence": 0.9960595722701894,
+       "tier": "high",
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "text": "WILL",
+       "start": 1.82,
+       "end": 1.8599999999999999,
+       "confidence": 0.9973256649420232,
+       "tier": "high",
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "text": "NOT",
+       "start": 2.02,
+       "end": 2.06,
+       "confidence": 0.9985943192792684,
+       "tier": "high",
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "text": "FORGET",
+       "start": 2.3,
+       "end": 2.34,
+       "confidence": 0.9996903422196173,
+       "tier": "high",
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "text": "THE",
+       "start": 2.46,
+       "end": 2.5,
+       "confidence": 0.9925435026111042,
+       "tier": "high",
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "text": "DAY",
+       "start": 2.58,
+       "end": 2.62,
+       "confidence": 0.7929987816335862,
+       "tier": "medium",
+       "p": 0.3583,
+       "alternatives": [
+        {
+         "text": "THE",
+         "p": 0.2385
+        },
+        {
+         "text": "DATE",
+         "p": 0.1402
+        },
+        {
+         "text": "DATA",
+         "p": 0.1197
+        }
+       ]
+      },
+      {
+       "text": "I",
+       "start": 2.7800000000000002,
+       "end": 2.8200000000000003,
+       "confidence": 0.4489780629526202,
+       "tier": "low",
+       "p": 0.5104,
+       "alternatives": [
+        {
+         "text": "WE",
+         "p": 0.4896
+        }
+       ]
+      },
+      {
+       "text": "GOT",
+       "start": 2.94,
+       "end": 2.98,
+       "confidence": 0.988100841626083,
+       "tier": "high",
+       "p": 0.9601,
+       "alternatives": [
+        {
+         "text": "CUT",
+         "p": 0.0399
+        }
+       ]
+      },
+      {
+       "text": "THAT",
+       "start": 3.1,
+       "end": 3.1399999999999997,
+       "confidence": 0.9991920875539934,
+       "tier": "high",
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "text": "TEXT",
+       "start": 3.34,
+       "end": 3.38,
+       "confidence": 0.9999681716262234,
+       "tier": "high",
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "text": "MESSAGE",
+       "start": 3.62,
+       "end": 3.66,
+       "confidence": 0.9991306271471857,
+       "tier": "high",
+       "p": 0.9494,
+       "alternatives": []
+      }
+     ],
+     "alternatives": [
+      {
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "p": 0.3583,
+       "alternatives": [
+        {
+         "text": "THE",
+         "p": 0.2385
+        },
+        {
+         "text": "DATE",
+         "p": 0.1402
+        },
+        {
+         "text": "DATA",
+         "p": 0.1197
+        }
+       ]
+      },
+      {
+       "p": 0.5104,
+       "alternatives": [
+        {
+         "text": "WE",
+         "p": 0.4896
+        }
+       ]
+      },
+      {
+       "p": 0.9601,
+       "alternatives": [
+        {
+         "text": "CUT",
+         "p": 0.0399
+        }
+       ]
+      },
+      {
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "p": 0.9494,
+       "alternatives": []
+      }
+     ]
+    },
+    "names_t2": {
+     "words": [
+      {
+       "text": "I",
+       "start": 1.62,
+       "end": 1.66,
+       "confidence": 0.9960595722701894,
+       "tier": "high",
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "text": "WILL",
+       "start": 1.82,
+       "end": 1.8599999999999999,
+       "confidence": 0.9973256649420232,
+       "tier": "high",
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "text": "NOT",
+       "start": 2.02,
+       "end": 2.06,
+       "confidence": 0.9985943192792684,
+       "tier": "high",
+       "p": 0.8795,
+       "alternatives": [
+        {
+         "text": "NEVER",
+         "p": 0.1205
+        }
+       ]
+      },
+      {
+       "text": "FORGET",
+       "start": 2.3,
+       "end": 2.34,
+       "confidence": 0.9996903422196173,
+       "tier": "high",
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "text": "THE",
+       "start": 2.46,
+       "end": 2.5,
+       "confidence": 0.9925435026111042,
+       "tier": "high",
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "text": "DAY",
+       "start": 2.58,
+       "end": 2.62,
+       "confidence": 0.7929987816335862,
+       "tier": "medium",
+       "p": 0.4809,
+       "alternatives": [
+        {
+         "text": "THE",
+         "p": 0.2597
+        },
+        {
+         "text": "DATE",
+         "p": 0.1314
+        },
+        {
+         "text": "DATA",
+         "p": 0.128
+        }
+       ]
+      },
+      {
+       "text": "I",
+       "start": 2.7800000000000002,
+       "end": 2.8200000000000003,
+       "confidence": 0.4489780629526202,
+       "tier": "low",
+       "p": 0.5524,
+       "alternatives": [
+        {
+         "text": "WE",
+         "p": 0.4476
+        }
+       ]
+      },
+      {
+       "text": "GOT",
+       "start": 2.94,
+       "end": 2.98,
+       "confidence": 0.988100841626083,
+       "tier": "high",
+       "p": 0.9451,
+       "alternatives": [
+        {
+         "text": "GET",
+         "p": 0.0549
+        }
+       ]
+      },
+      {
+       "text": "THAT",
+       "start": 3.1,
+       "end": 3.1399999999999997,
+       "confidence": 0.9991920875539934,
+       "tier": "high",
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "text": "TEXT",
+       "start": 3.34,
+       "end": 3.38,
+       "confidence": 0.9999681716262234,
+       "tier": "high",
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "text": "MESSAGE",
+       "start": 3.62,
+       "end": 3.66,
+       "confidence": 0.9991306271471857,
+       "tier": "high",
+       "p": 0.8952,
+       "alternatives": [
+        {
+         "text": "MESSAGEAGE",
+         "p": 0.0176
+        }
+       ]
+      }
+     ],
+     "alternatives": [
+      {
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "p": 0.8795,
+       "alternatives": [
+        {
+         "text": "NEVER",
+         "p": 0.1205
+        }
+       ]
+      },
+      {
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "p": 0.4809,
+       "alternatives": [
+        {
+         "text": "THE",
+         "p": 0.2597
+        },
+        {
+         "text": "DATE",
+         "p": 0.1314
+        },
+        {
+         "text": "DATA",
+         "p": 0.128
+        }
+       ]
+      },
+      {
+       "p": 0.5524,
+       "alternatives": [
+        {
+         "text": "WE",
+         "p": 0.4476
+        }
+       ]
+      },
+      {
+       "p": 0.9451,
+       "alternatives": [
+        {
+         "text": "GET",
+         "p": 0.0549
+        }
+       ]
+      },
+      {
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "p": 0.8952,
+       "alternatives": [
+        {
+         "text": "MESSAGEAGE",
+         "p": 0.0176
+        }
+       ]
+      }
+     ]
+    }
+   }
+  },
+  {
+   "id": "lrs2_12",
+   "source": "lrs2",
+   "index": 0,
+   "file": "beam_lrs2_12.bin",
+   "T": 62,
+   "t0": 0.0,
+   "label": "AND FOR ME THE SURPRISE WAS",
+   "results": {
+    "plain": {
+     "words": [
+      {
+       "text": "AND",
+       "start": 0.12,
+       "end": 0.16,
+       "confidence": 0.9666928056450972,
+       "tier": "high",
+       "p": 0.8934,
+       "alternatives": []
+      },
+      {
+       "text": "FOR",
+       "start": 0.64,
+       "end": 0.68,
+       "confidence": 0.9916049558943966,
+       "tier": "high",
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "text": "ME",
+       "start": 0.8,
+       "end": 0.84,
+       "confidence": 0.9972096345797666,
+       "tier": "high",
+       "p": 0.9471,
+       "alternatives": []
+      },
+      {
+       "text": "THE",
+       "start": 1.28,
+       "end": 1.32,
+       "confidence": 0.9462321541261604,
+       "tier": "high",
+       "p": 0.8188,
+       "alternatives": [
+        {
+         "text": "A",
+         "p": 0.0987
+        }
+       ]
+      },
+      {
+       "text": "SURPRISE",
+       "start": 1.76,
+       "end": 1.8,
+       "confidence": 0.9827703961441991,
+       "tier": "high",
+       "p": 0.8244,
+       "alternatives": [
+        {
+         "text": "PRIZE",
+         "p": 0.0774
+        },
+        {
+         "text": "SURPRISED",
+         "p": 0.0504
+        }
+       ]
+      },
+      {
+       "text": "WAS",
+       "start": 2.12,
+       "end": 2.16,
+       "confidence": 0.9877089115959471,
+       "tier": "high",
+       "p": 0.8084,
+       "alternatives": [
+        {
+         "text": "WASS",
+         "p": 0.092
+        },
+        {
+         "text": "ONE",
+         "p": 0.063
+        }
+       ]
+      }
+     ],
+     "alternatives": [
+      {
+       "p": 0.8934,
+       "alternatives": []
+      },
+      {
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "p": 0.9471,
+       "alternatives": []
+      },
+      {
+       "p": 0.8188,
+       "alternatives": [
+        {
+         "text": "A",
+         "p": 0.0987
+        }
+       ]
+      },
+      {
+       "p": 0.8244,
+       "alternatives": [
+        {
+         "text": "PRIZE",
+         "p": 0.0774
+        },
+        {
+         "text": "SURPRISED",
+         "p": 0.0504
+        }
+       ]
+      },
+      {
+       "p": 0.8084,
+       "alternatives": [
+        {
+         "text": "WASS",
+         "p": 0.092
+        },
+        {
+         "text": "ONE",
+         "p": 0.063
+        }
+       ]
+      }
+     ]
+    },
+    "names_t2": {
+     "words": [
+      {
+       "text": "AND",
+       "start": 0.12,
+       "end": 0.16,
+       "confidence": 0.9666928056450972,
+       "tier": "high",
+       "p": 0.9266,
+       "alternatives": []
+      },
+      {
+       "text": "FOR",
+       "start": 0.64,
+       "end": 0.68,
+       "confidence": 0.9916049558943966,
+       "tier": "high",
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "text": "ME",
+       "start": 0.8,
+       "end": 0.84,
+       "confidence": 0.9972096345797666,
+       "tier": "high",
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "text": "THE",
+       "start": 1.28,
+       "end": 1.32,
+       "confidence": 0.9462321541261604,
+       "tier": "high",
+       "p": 0.8552,
+       "alternatives": [
+        {
+         "text": "A",
+         "p": 0.0736
+        }
+       ]
+      },
+      {
+       "text": "SURPRISE",
+       "start": 1.76,
+       "end": 1.8,
+       "confidence": 0.9827703961441991,
+       "tier": "high",
+       "p": 0.8723,
+       "alternatives": [
+        {
+         "text": "PRIZE",
+         "p": 0.0749
+        },
+        {
+         "text": "SURPRISED",
+         "p": 0.0528
+        }
+       ]
+      },
+      {
+       "text": "WAS",
+       "start": 2.12,
+       "end": 2.16,
+       "confidence": 0.9877089115959471,
+       "tier": "high",
+       "p": 0.7614,
+       "alternatives": [
+        {
+         "text": "WASS",
+         "p": 0.0816
+        }
+       ]
+      }
+     ],
+     "alternatives": [
+      {
+       "p": 0.9266,
+       "alternatives": []
+      },
+      {
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "p": 0.8552,
+       "alternatives": [
+        {
+         "text": "A",
+         "p": 0.0736
+        }
+       ]
+      },
+      {
+       "p": 0.8723,
+       "alternatives": [
+        {
+         "text": "PRIZE",
+         "p": 0.0749
+        },
+        {
+         "text": "SURPRISED",
+         "p": 0.0528
+        }
+       ]
+      },
+      {
+       "p": 0.7614,
+       "alternatives": [
+        {
+         "text": "WASS",
+         "p": 0.0816
+        }
+       ]
+      }
+     ]
+    }
+   }
+  },
+  {
+   "id": "lrs2_13",
+   "source": "lrs2",
+   "index": 57,
+   "file": "beam_lrs2_13.bin",
+   "T": 75,
+   "t0": 0.5,
+   "label": "BUT WE'RE GOING TO IMPROVE ON THINGS LIKE THE GREEN ROOF",
+   "results": {
+    "plain": {
+     "words": [
+      {
+       "text": "BUT",
+       "start": 0.62,
+       "end": 0.66,
+       "confidence": 0.5568556556161779,
+       "tier": "low",
+       "p": 0.5375,
+       "alternatives": [
+        {
+         "text": "BECAUSE",
+         "p": 0.3197
+        }
+       ]
+      },
+      {
+       "text": "WE'RE",
+       "start": 0.86,
+       "end": 0.98,
+       "confidence": 0.7594053047985696,
+       "tier": "medium",
+       "p": 0.6081,
+       "alternatives": [
+        {
+         "text": "ARE",
+         "p": 0.3919
+        }
+       ]
+      },
+      {
+       "text": "GOING",
+       "start": 1.06,
+       "end": 1.1,
+       "confidence": 0.9830853602137966,
+       "tier": "high",
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "text": "TO",
+       "start": 1.3,
+       "end": 1.3399999999999999,
+       "confidence": 0.9987590866105992,
+       "tier": "high",
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "text": "IMPROVE",
+       "start": 1.7,
+       "end": 1.74,
+       "confidence": 0.9974778563724923,
+       "tier": "high",
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "text": "ON",
+       "start": 1.94,
+       "end": 1.98,
+       "confidence": 0.9873322024036617,
+       "tier": "high",
+       "p": 0.9496,
+       "alternatives": []
+      },
+      {
+       "text": "THINGS",
+       "start": 2.26,
+       "end": 2.3,
+       "confidence": 0.9963711935956228,
+       "tier": "high",
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "text": "LIKE",
+       "start": 2.54,
+       "end": 2.58,
+       "confidence": 0.9978336944386373,
+       "tier": "high",
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "text": "THE",
+       "start": 2.7,
+       "end": 2.74,
+       "confidence": 0.8343082473666673,
+       "tier": "medium",
+       "p": 0.6334,
+       "alternatives": [
+        {
+         "text": "A",
+         "p": 0.1546
+        }
+       ]
+      },
+      {
+       "text": "GREEN",
+       "start": 2.86,
+       "end": 2.9,
+       "confidence": 0.9674896642225472,
+       "tier": "high",
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "text": "ROOF",
+       "start": 3.14,
+       "end": 3.18,
+       "confidence": 0.9709799469210525,
+       "tier": "high",
+       "p": 0.9476,
+       "alternatives": [
+        {
+         "text": "ROOFOO",
+         "p": 0.0271
+        },
+        {
+         "text": "ROOFF",
+         "p": 0.0253
+        }
+       ]
+      }
+     ],
+     "alternatives": [
+      {
+       "p": 0.5375,
+       "alternatives": [
+        {
+         "text": "BECAUSE",
+         "p": 0.3197
+        }
+       ]
+      },
+      {
+       "p": 0.6081,
+       "alternatives": [
+        {
+         "text": "ARE",
+         "p": 0.3919
+        }
+       ]
+      },
+      {
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "p": 0.9496,
+       "alternatives": []
+      },
+      {
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "p": 0.6334,
+       "alternatives": [
+        {
+         "text": "A",
+         "p": 0.1546
+        }
+       ]
+      },
+      {
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "p": 0.9476,
+       "alternatives": [
+        {
+         "text": "ROOFOO",
+         "p": 0.0271
+        },
+        {
+         "text": "ROOFF",
+         "p": 0.0253
+        }
+       ]
+      }
+     ]
+    },
+    "names_t2": {
+     "words": [
+      {
+       "text": "BUT",
+       "start": 0.62,
+       "end": 0.66,
+       "confidence": 0.5568556556161779,
+       "tier": "low",
+       "p": 0.6879,
+       "alternatives": [
+        {
+         "text": "BECAUSE",
+         "p": 0.1651
+        }
+       ]
+      },
+      {
+       "text": "WE",
+       "start": 0.86,
+       "end": 0.9,
+       "confidence": 0.993149488002025,
+       "tier": "high",
+       "p": 0.5978,
+       "alternatives": [
+        {
+         "text": "WE'RE",
+         "p": 0.4022
+        }
+       ]
+      },
+      {
+       "text": "ARE",
+       "start": 0.9,
+       "end": 0.98,
+       "confidence": 0.45649401598482847,
+       "tier": "low",
+       "p": 0.5978,
+       "alternatives": [
+        {
+         "text": "WE'RE",
+         "p": 0.4022
+        }
+       ]
+      },
+      {
+       "text": "GOING",
+       "start": 1.06,
+       "end": 1.1,
+       "confidence": 0.9830853602137966,
+       "tier": "high",
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "text": "TO",
+       "start": 1.3,
+       "end": 1.3399999999999999,
+       "confidence": 0.9987590866105992,
+       "tier": "high",
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "text": "IMPROVE",
+       "start": 1.7,
+       "end": 1.74,
+       "confidence": 0.9974778563724923,
+       "tier": "high",
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "text": "ON",
+       "start": 1.94,
+       "end": 1.98,
+       "confidence": 0.9873322024036617,
+       "tier": "high",
+       "p": 0.9339,
+       "alternatives": []
+      },
+      {
+       "text": "THINGS",
+       "start": 2.26,
+       "end": 2.3,
+       "confidence": 0.9963711935956228,
+       "tier": "high",
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "text": "LIKE",
+       "start": 2.54,
+       "end": 2.58,
+       "confidence": 0.9978336944386373,
+       "tier": "high",
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "text": "THE",
+       "start": 2.7,
+       "end": 2.74,
+       "confidence": 0.8343082473666673,
+       "tier": "medium",
+       "p": 0.7461,
+       "alternatives": [
+        {
+         "text": "A",
+         "p": 0.1257
+        }
+       ]
+      },
+      {
+       "text": "GREEN",
+       "start": 2.86,
+       "end": 2.9,
+       "confidence": 0.9674896642225472,
+       "tier": "high",
+       "p": 0.9709,
+       "alternatives": [
+        {
+         "text": "GREENOO",
+         "p": 0.0291
+        }
+       ]
+      },
+      {
+       "text": "ROOF",
+       "start": 3.14,
+       "end": 3.18,
+       "confidence": 0.9709799469210525,
+       "tier": "high",
+       "p": 0.8252,
+       "alternatives": [
+        {
+         "text": "ROOFOO",
+         "p": 0.0737
+        },
+        {
+         "text": "ROOFF",
+         "p": 0.0362
+        },
+        {
+         "text": "ROOFVE",
+         "p": 0.0359
+        }
+       ]
+      }
+     ],
+     "alternatives": [
+      {
+       "p": 0.6879,
+       "alternatives": [
+        {
+         "text": "BECAUSE",
+         "p": 0.1651
+        }
+       ]
+      },
+      {
+       "p": 0.5978,
+       "alternatives": [
+        {
+         "text": "WE'RE",
+         "p": 0.4022
+        }
+       ]
+      },
+      {
+       "p": 0.5978,
+       "alternatives": [
+        {
+         "text": "WE'RE",
+         "p": 0.4022
+        }
+       ]
+      },
+      {
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "p": 0.9339,
+       "alternatives": []
+      },
+      {
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "p": 0.7461,
+       "alternatives": [
+        {
+         "text": "A",
+         "p": 0.1257
+        }
+       ]
+      },
+      {
+       "p": 0.9709,
+       "alternatives": [
+        {
+         "text": "GREENOO",
+         "p": 0.0291
+        }
+       ]
+      },
+      {
+       "p": 0.8252,
+       "alternatives": [
+        {
+         "text": "ROOFOO",
+         "p": 0.0737
+        },
+        {
+         "text": "ROOFF",
+         "p": 0.0362
+        },
+        {
+         "text": "ROOFVE",
+         "p": 0.0359
+        }
+       ]
+      }
+     ]
+    }
+   }
+  },
+  {
+   "id": "lrs2_14",
+   "source": "lrs2",
+   "index": 114,
+   "file": "beam_lrs2_14.bin",
+   "T": 35,
+   "t0": 1.0,
+   "label": "ADD ANOTHER TEN ON",
+   "results": {
+    "plain": {
+     "words": [
+      {
+       "text": "HAS",
+       "start": 1.16,
+       "end": 1.2,
+       "confidence": 0.6492841922324925,
+       "tier": "low",
+       "p": 0.6861,
+       "alternatives": [
+        {
+         "text": "AS",
+         "p": 0.1902
+        },
+        {
+         "text": "AND",
+         "p": 0.1236
+        }
+       ]
+      },
+      {
+       "text": "THE",
+       "start": 1.6400000000000001,
+       "end": 1.6800000000000002,
+       "confidence": 0.6160821277906783,
+       "tier": "low",
+       "p": 0.724,
+       "alternatives": [
+        {
+         "text": "THIS",
+         "p": 0.276
+        }
+       ]
+      },
+      {
+       "text": "SCALE",
+       "start": 1.88,
+       "end": 1.92,
+       "confidence": 0.5582168274047017,
+       "tier": "low",
+       "p": 0.9622,
+       "alternatives": [
+        {
+         "text": "SCALELE",
+         "p": 0.0378
+        }
+       ]
+      },
+      {
+       "text": "ON",
+       "start": 2.12,
+       "end": 2.16,
+       "confidence": 0.9044177909808457,
+       "tier": "high",
+       "p": 0.8022,
+       "alternatives": [
+        {
+         "text": "SCALELE",
+         "p": 0.0378
+        }
+       ]
+      }
+     ],
+     "alternatives": [
+      {
+       "p": 0.6861,
+       "alternatives": [
+        {
+         "text": "AS",
+         "p": 0.1902
+        },
+        {
+         "text": "AND",
+         "p": 0.1236
+        }
+       ]
+      },
+      {
+       "p": 0.724,
+       "alternatives": [
+        {
+         "text": "THIS",
+         "p": 0.276
+        }
+       ]
+      },
+      {
+       "p": 0.9622,
+       "alternatives": [
+        {
+         "text": "SCALELE",
+         "p": 0.0378
+        }
+       ]
+      },
+      {
+       "p": 0.8022,
+       "alternatives": [
+        {
+         "text": "SCALELE",
+         "p": 0.0378
+        }
+       ]
+      }
+     ]
+    },
+    "names_t2": {
+     "words": [
+      {
+       "text": "AND",
+       "start": 1.16,
+       "end": 1.2,
+       "confidence": 0.06582845251961858,
+       "tier": "low",
+       "p": 0.306,
+       "alternatives": [
+        {
+         "text": "HAS",
+         "p": 0.4941
+        },
+        {
+         "text": "AS",
+         "p": 0.1999
+        }
+       ]
+      },
+      {
+       "text": "THE",
+       "start": 1.6400000000000001,
+       "end": 1.6800000000000002,
+       "confidence": 0.6160821277906783,
+       "tier": "low",
+       "p": 0.8674,
+       "alternatives": [
+        {
+         "text": "THIS",
+         "p": 0.1326
+        }
+       ]
+      },
+      {
+       "text": "SCALE",
+       "start": 1.88,
+       "end": 1.92,
+       "confidence": 0.5582168274047017,
+       "tier": "low",
+       "p": 0.8316,
+       "alternatives": [
+        {
+         "text": "SCALELE",
+         "p": 0.1154
+        },
+        {
+         "text": "SCALEAL",
+         "p": 0.053
+        }
+       ]
+      },
+      {
+       "text": "ON",
+       "start": 2.12,
+       "end": 2.16,
+       "confidence": 0.9044177909808457,
+       "tier": "high",
+       "p": 0.3805,
+       "alternatives": [
+        {
+         "text": "SCALELE",
+         "p": 0.1154
+        },
+        {
+         "text": "SCALEAL",
+         "p": 0.053
+        }
+       ]
+      }
+     ],
+     "alternatives": [
+      {
+       "p": 0.306,
+       "alternatives": [
+        {
+         "text": "HAS",
+         "p": 0.4941
+        },
+        {
+         "text": "AS",
+         "p": 0.1999
+        }
+       ]
+      },
+      {
+       "p": 0.8674,
+       "alternatives": [
+        {
+         "text": "THIS",
+         "p": 0.1326
+        }
+       ]
+      },
+      {
+       "p": 0.8316,
+       "alternatives": [
+        {
+         "text": "SCALELE",
+         "p": 0.1154
+        },
+        {
+         "text": "SCALEAL",
+         "p": 0.053
+        }
+       ]
+      },
+      {
+       "p": 0.3805,
+       "alternatives": [
+        {
+         "text": "SCALELE",
+         "p": 0.1154
+        },
+        {
+         "text": "SCALEAL",
+         "p": 0.053
+        }
+       ]
+      }
+     ]
+    }
+   }
+  },
+  {
+   "id": "lrs2_15",
+   "source": "lrs2",
+   "index": 171,
+   "file": "beam_lrs2_15.bin",
+   "T": 36,
+   "t0": 1.5,
+   "label": "IT'S A MULTICULTURAL",
+   "results": {
+    "plain": {
+     "words": [
+      {
+       "text": "IT'S",
+       "start": 1.62,
+       "end": 1.74,
+       "confidence": 0.9483084490064623,
+       "tier": "high",
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "text": "A",
+       "start": 1.74,
+       "end": 1.78,
+       "confidence": 0.983370414683564,
+       "tier": "high",
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "text": "MULTICULTURAL",
+       "start": 1.98,
+       "end": 2.8200000000000003,
+       "confidence": 0.5328805611691174,
+       "tier": "low",
+       "p": 0.1426,
+       "alternatives": [
+        {
+         "text": "MULTICULTAL",
+         "p": 0.0773
+        },
+        {
+         "text": "MULTICULTUR",
+         "p": 0.0716
+        },
+        {
+         "text": "MULTICULTURE",
+         "p": 0.0695
+        }
+       ]
+      }
+     ],
+     "alternatives": [
+      {
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "p": 0.1426,
+       "alternatives": [
+        {
+         "text": "MULTICULTAL",
+         "p": 0.0773
+        },
+        {
+         "text": "MULTICULTUR",
+         "p": 0.0716
+        },
+        {
+         "text": "MULTICULTURE",
+         "p": 0.0695
+        }
+       ]
+      }
+     ]
+    },
+    "names_t2": {
+     "words": [
+      {
+       "text": "IT'S",
+       "start": 1.62,
+       "end": 1.74,
+       "confidence": 0.9483084490064623,
+       "tier": "high",
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "text": "A",
+       "start": 1.74,
+       "end": 1.78,
+       "confidence": 0.983370414683564,
+       "tier": "high",
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "text": "MULTICULTURAL",
+       "start": 1.98,
+       "end": 2.7800000000000002,
+       "confidence": 0.5217681455040091,
+       "tier": "low",
+       "p": 0.1485,
+       "alternatives": [
+        {
+         "text": "MULTICULTAL",
+         "p": 0.0676
+        },
+        {
+         "text": "MULTICULTUR",
+         "p": 0.0628
+        },
+        {
+         "text": "MULTICULTUREAL",
+         "p": 0.0612
+        }
+       ]
+      }
+     ],
+     "alternatives": [
+      {
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "p": 0.1485,
+       "alternatives": [
+        {
+         "text": "MULTICULTAL",
+         "p": 0.0676
+        },
+        {
+         "text": "MULTICULTUR",
+         "p": 0.0628
+        },
+        {
+         "text": "MULTICULTUREAL",
+         "p": 0.0612
+        }
+       ]
+      }
+     ]
+    }
+   }
+  },
+  {
+   "id": "lrs2_16",
+   "source": "lrs2",
+   "index": 228,
+   "file": "beam_lrs2_16.bin",
+   "T": 30,
+   "t0": 0.0,
+   "label": "IN THE FIRST YEAR ALONE",
+   "results": {
+    "plain": {
+     "words": [
+      {
+       "text": "IN",
+       "start": 0.08,
+       "end": 0.12,
+       "confidence": 0.937808991624164,
+       "tier": "high",
+       "p": 0.6817,
+       "alternatives": [
+        {
+         "text": "AND",
+         "p": 0.1234
+        },
+        {
+         "text": "THE",
+         "p": 0.0902
+        },
+        {
+         "text": "AT",
+         "p": 0.0539
+        }
+       ]
+      },
+      {
+       "text": "THE",
+       "start": 0.2,
+       "end": 0.24,
+       "confidence": 0.997243871643278,
+       "tier": "high",
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "text": "FIRST",
+       "start": 0.36,
+       "end": 0.4,
+       "confidence": 0.9990958489020377,
+       "tier": "high",
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "text": "YEAR",
+       "start": 0.6,
+       "end": 0.64,
+       "confidence": 0.9649538054122039,
+       "tier": "high",
+       "p": 0.8151,
+       "alternatives": [
+        {
+         "text": "HERE",
+         "p": 0.0673
+        },
+        {
+         "text": "ARE",
+         "p": 0.0442
+        },
+        {
+         "text": "YEARLOG",
+         "p": 0.0195
+        }
+       ]
+      },
+      {
+       "text": "ALONE",
+       "start": 0.84,
+       "end": 0.88,
+       "confidence": 0.997335176226094,
+       "tier": "high",
+       "p": 0.879,
+       "alternatives": [
+        {
+         "text": "ALONG",
+         "p": 0.0431
+        },
+        {
+         "text": "ALONES",
+         "p": 0.0211
+        },
+        {
+         "text": "ALONEN",
+         "p": 0.0199
+        }
+       ]
+      }
+     ],
+     "alternatives": [
+      {
+       "p": 0.6817,
+       "alternatives": [
+        {
+         "text": "AND",
+         "p": 0.1234
+        },
+        {
+         "text": "THE",
+         "p": 0.0902
+        },
+        {
+         "text": "AT",
+         "p": 0.0539
+        }
+       ]
+      },
+      {
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "p": 0.8151,
+       "alternatives": [
+        {
+         "text": "HERE",
+         "p": 0.0673
+        },
+        {
+         "text": "ARE",
+         "p": 0.0442
+        },
+        {
+         "text": "YEARLOG",
+         "p": 0.0195
+        }
+       ]
+      },
+      {
+       "p": 0.879,
+       "alternatives": [
+        {
+         "text": "ALONG",
+         "p": 0.0431
+        },
+        {
+         "text": "ALONES",
+         "p": 0.0211
+        },
+        {
+         "text": "ALONEN",
+         "p": 0.0199
+        }
+       ]
+      }
+     ]
+    },
+    "names_t2": {
+     "words": [
+      {
+       "text": "IN",
+       "start": 0.08,
+       "end": 0.12,
+       "confidence": 0.937808991624164,
+       "tier": "high",
+       "p": 0.8055,
+       "alternatives": [
+        {
+         "text": "AND",
+         "p": 0.106
+        },
+        {
+         "text": "THE",
+         "p": 0.0885
+        }
+       ]
+      },
+      {
+       "text": "THE",
+       "start": 0.2,
+       "end": 0.24,
+       "confidence": 0.997243871643278,
+       "tier": "high",
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "text": "FIRST",
+       "start": 0.36,
+       "end": 0.4,
+       "confidence": 0.9990958489020377,
+       "tier": "high",
+       "p": 0.9374,
+       "alternatives": []
+      },
+      {
+       "text": "YEAR",
+       "start": 0.6,
+       "end": 0.64,
+       "confidence": 0.9649538054122039,
+       "tier": "high",
+       "p": 0.8468,
+       "alternatives": [
+        {
+         "text": "HERE",
+         "p": 0.0618
+        },
+        {
+         "text": "YEARLOG",
+         "p": 0.0261
+        }
+       ]
+      },
+      {
+       "text": "ALONE",
+       "start": 0.84,
+       "end": 0.88,
+       "confidence": 0.997335176226094,
+       "tier": "high",
+       "p": 0.8013,
+       "alternatives": [
+        {
+         "text": "ALONG",
+         "p": 0.057
+        },
+        {
+         "text": "ALONES",
+         "p": 0.0296
+        },
+        {
+         "text": "ALONEN",
+         "p": 0.0289
+        }
+       ]
+      }
+     ],
+     "alternatives": [
+      {
+       "p": 0.8055,
+       "alternatives": [
+        {
+         "text": "AND",
+         "p": 0.106
+        },
+        {
+         "text": "THE",
+         "p": 0.0885
+        }
+       ]
+      },
+      {
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "p": 0.9374,
+       "alternatives": []
+      },
+      {
+       "p": 0.8468,
+       "alternatives": [
+        {
+         "text": "HERE",
+         "p": 0.0618
+        },
+        {
+         "text": "YEARLOG",
+         "p": 0.0261
+        }
+       ]
+      },
+      {
+       "p": 0.8013,
+       "alternatives": [
+        {
+         "text": "ALONG",
+         "p": 0.057
+        },
+        {
+         "text": "ALONES",
+         "p": 0.0296
+        },
+        {
+         "text": "ALONEN",
+         "p": 0.0289
+        }
+       ]
+      }
+     ]
+    }
+   }
+  },
+  {
+   "id": "lrs2_17",
+   "source": "lrs2",
+   "index": 285,
+   "file": "beam_lrs2_17.bin",
+   "T": 23,
+   "t0": 0.5,
+   "label": "I CAN'T BELIEVE IT",
+   "results": {
+    "plain": {
+     "words": [
+      {
+       "text": "I",
+       "start": 0.62,
+       "end": 0.66,
+       "confidence": 0.9928502364894071,
+       "tier": "high",
+       "p": 0.9093,
+       "alternatives": []
+      },
+      {
+       "text": "CAN'T",
+       "start": 0.78,
+       "end": 0.98,
+       "confidence": 0.9406279320227133,
+       "tier": "high",
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "text": "BELIEVE",
+       "start": 1.1,
+       "end": 1.1400000000000001,
+       "confidence": 0.9978260816007466,
+       "tier": "high",
+       "p": 0.8942,
+       "alternatives": [
+        {
+         "text": "IT",
+         "p": 0.0387
+        },
+        {
+         "text": "BELIEVER",
+         "p": 0.0264
+        }
+       ]
+      },
+      {
+       "text": "IT",
+       "start": 1.22,
+       "end": 1.26,
+       "confidence": 0.6530997592990764,
+       "tier": "low",
+       "p": 0.3389,
+       "alternatives": [
+        {
+         "text": "BELIEVE",
+         "p": 0.1918
+        },
+        {
+         "text": "YOU",
+         "p": 0.07
+        },
+        {
+         "text": "THEM",
+         "p": 0.0694
+        }
+       ]
+      }
+     ],
+     "alternatives": [
+      {
+       "p": 0.9093,
+       "alternatives": []
+      },
+      {
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "p": 0.8942,
+       "alternatives": [
+        {
+         "text": "IT",
+         "p": 0.0387
+        },
+        {
+         "text": "BELIEVER",
+         "p": 0.0264
+        }
+       ]
+      },
+      {
+       "p": 0.3389,
+       "alternatives": [
+        {
+         "text": "BELIEVE",
+         "p": 0.1918
+        },
+        {
+         "text": "YOU",
+         "p": 0.07
+        },
+        {
+         "text": "THEM",
+         "p": 0.0694
+        }
+       ]
+      }
+     ]
+    },
+    "names_t2": {
+     "words": [
+      {
+       "text": "I",
+       "start": 0.62,
+       "end": 0.66,
+       "confidence": 0.9928502364894071,
+       "tier": "high",
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "text": "CAN'T",
+       "start": 0.78,
+       "end": 0.98,
+       "confidence": 0.9406279320227133,
+       "tier": "high",
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "text": "BELIEVE",
+       "start": 1.1,
+       "end": 1.1400000000000001,
+       "confidence": 0.9978260816007466,
+       "tier": "high",
+       "p": 0.8652,
+       "alternatives": [
+        {
+         "text": "BELIEVER",
+         "p": 0.0323
+        }
+       ]
+      },
+      {
+       "text": "IT",
+       "start": 1.22,
+       "end": 1.26,
+       "confidence": 0.6530997592990764,
+       "tier": "low",
+       "p": 0.2537,
+       "alternatives": [
+        {
+         "text": "BELIEVE",
+         "p": 0.3405
+        },
+        {
+         "text": "THEM",
+         "p": 0.0663
+        },
+        {
+         "text": "IN",
+         "p": 0.0633
+        }
+       ]
+      }
+     ],
+     "alternatives": [
+      {
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "p": 0.8652,
+       "alternatives": [
+        {
+         "text": "BELIEVER",
+         "p": 0.0323
+        }
+       ]
+      },
+      {
+       "p": 0.2537,
+       "alternatives": [
+        {
+         "text": "BELIEVE",
+         "p": 0.3405
+        },
+        {
+         "text": "THEM",
+         "p": 0.0663
+        },
+        {
+         "text": "IN",
+         "p": 0.0633
+        }
+       ]
+      }
+     ]
+    }
+   }
+  },
+  {
+   "id": "lrs2_18",
+   "source": "lrs2",
+   "index": 342,
+   "file": "beam_lrs2_18.bin",
+   "T": 56,
+   "t0": 1.0,
+   "label": "SOME PEOPLE HERE TONIGHT PREFER SUBTITLES",
+   "results": {
+    "plain": {
+     "words": [
+      {
+       "text": "SOME",
+       "start": 1.12,
+       "end": 1.16,
+       "confidence": 0.9941691349568784,
+       "tier": "high",
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "text": "PEOPLE",
+       "start": 1.32,
+       "end": 1.3599999999999999,
+       "confidence": 0.9976129457191224,
+       "tier": "high",
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "text": "HERE",
+       "start": 1.56,
+       "end": 1.6,
+       "confidence": 0.9026530739003487,
+       "tier": "high",
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "text": "TONIGHT",
+       "start": 1.92,
+       "end": 1.96,
+       "confidence": 0.995288538704045,
+       "tier": "high",
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "text": "PREFER",
+       "start": 2.2800000000000002,
+       "end": 2.3200000000000003,
+       "confidence": 0.7889435185068799,
+       "tier": "medium",
+       "p": 0.4439,
+       "alternatives": [
+        {
+         "text": "FIRST",
+         "p": 0.3706
+        }
+       ]
+      },
+      {
+       "text": "SUBTITLES",
+       "start": 2.52,
+       "end": 2.96,
+       "confidence": 0.7906625744431729,
+       "tier": "medium",
+       "p": 0.3601,
+       "alternatives": [
+        {
+         "text": "SUBTITLESS",
+         "p": 0.2983
+        },
+        {
+         "text": "SUBTITLESLES",
+         "p": 0.1951
+        },
+        {
+         "text": "SUBTITS",
+         "p": 0.0525
+        }
+       ]
+      }
+     ],
+     "alternatives": [
+      {
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "p": 0.4439,
+       "alternatives": [
+        {
+         "text": "FIRST",
+         "p": 0.3706
+        }
+       ]
+      },
+      {
+       "p": 0.3601,
+       "alternatives": [
+        {
+         "text": "SUBTITLESS",
+         "p": 0.2983
+        },
+        {
+         "text": "SUBTITLESLES",
+         "p": 0.1951
+        },
+        {
+         "text": "SUBTITS",
+         "p": 0.0525
+        }
+       ]
+      }
+     ]
+    },
+    "names_t2": {
+     "words": [
+      {
+       "text": "SOME",
+       "start": 1.12,
+       "end": 1.16,
+       "confidence": 0.9941691349568784,
+       "tier": "high",
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "text": "PEOPLE",
+       "start": 1.32,
+       "end": 1.3599999999999999,
+       "confidence": 0.9976129457191224,
+       "tier": "high",
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "text": "HERE",
+       "start": 1.56,
+       "end": 1.6,
+       "confidence": 0.9026530739003487,
+       "tier": "high",
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "text": "TONIGHT",
+       "start": 1.92,
+       "end": 1.96,
+       "confidence": 0.995288538704045,
+       "tier": "high",
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "text": "SUBTITLES",
+       "start": 2.52,
+       "end": 2.96,
+       "confidence": 0.7906625744431729,
+       "tier": "medium",
+       "p": 0.371,
+       "alternatives": [
+        {
+         "text": "SUBTITLESS",
+         "p": 0.2841
+        },
+        {
+         "text": "SUBTITLESLES",
+         "p": 0.0965
+        },
+        {
+         "text": "SUBTITALLESS",
+         "p": 0.0508
+        }
+       ]
+      }
+     ],
+     "alternatives": [
+      {
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "p": 0.371,
+       "alternatives": [
+        {
+         "text": "SUBTITLESS",
+         "p": 0.2841
+        },
+        {
+         "text": "SUBTITLESLES",
+         "p": 0.0965
+        },
+        {
+         "text": "SUBTITALLESS",
+         "p": 0.0508
+        }
+       ]
+      }
+     ]
+    }
+   }
+  },
+  {
+   "id": "lrs2_19",
+   "source": "lrs2",
+   "index": 399,
+   "file": "beam_lrs2_19.bin",
+   "T": 51,
+   "t0": 1.5,
+   "label": "I'VE BEEN INVOLVED WITH THE MILITARY",
+   "results": {
+    "plain": {
+     "words": [
+      {
+       "text": "I'VE",
+       "start": 1.62,
+       "end": 1.78,
+       "confidence": 0.9571296918133442,
+       "tier": "high",
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "text": "BEEN",
+       "start": 1.9,
+       "end": 1.94,
+       "confidence": 0.9569478830775566,
+       "tier": "high",
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "text": "INVOLVED",
+       "start": 2.2199999999999998,
+       "end": 2.26,
+       "confidence": 0.9957214594197757,
+       "tier": "high",
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "text": "WITH",
+       "start": 2.5,
+       "end": 2.54,
+       "confidence": 0.9392983953662195,
+       "tier": "high",
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "text": "THE",
+       "start": 2.66,
+       "end": 2.7,
+       "confidence": 0.723798538180612,
+       "tier": "medium",
+       "p": 0.9678,
+       "alternatives": [
+        {
+         "text": "THEMI",
+         "p": 0.0322
+        }
+       ]
+      },
+      {
+       "text": "IMAGE",
+       "start": 2.98,
+       "end": 3.02,
+       "confidence": 0.10789869514276741,
+       "tier": "low",
+       "p": 0.1129,
+       "alternatives": [
+        {
+         "text": "MISSION",
+         "p": 0.0812
+        },
+        {
+         "text": "MILITARY",
+         "p": 0.0794
+        },
+        {
+         "text": "MINI",
+         "p": 0.0791
+        }
+       ]
+      }
+     ],
+     "alternatives": [
+      {
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "p": 0.9678,
+       "alternatives": [
+        {
+         "text": "THEMI",
+         "p": 0.0322
+        }
+       ]
+      },
+      {
+       "p": 0.1129,
+       "alternatives": [
+        {
+         "text": "MISSION",
+         "p": 0.0812
+        },
+        {
+         "text": "MILITARY",
+         "p": 0.0794
+        },
+        {
+         "text": "MINI",
+         "p": 0.0791
+        }
+       ]
+      }
+     ]
+    },
+    "names_t2": {
+     "words": [
+      {
+       "text": "I'VE",
+       "start": 1.62,
+       "end": 1.78,
+       "confidence": 0.9571296918133442,
+       "tier": "high",
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "text": "BEEN",
+       "start": 1.9,
+       "end": 1.94,
+       "confidence": 0.9569478830775566,
+       "tier": "high",
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "text": "INVOLVED",
+       "start": 2.2199999999999998,
+       "end": 2.26,
+       "confidence": 0.9957214594197757,
+       "tier": "high",
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "text": "WITH",
+       "start": 2.5,
+       "end": 2.54,
+       "confidence": 0.9392983953662195,
+       "tier": "high",
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "text": "THE",
+       "start": 2.66,
+       "end": 2.7,
+       "confidence": 0.723798538180612,
+       "tier": "medium",
+       "p": 0.9683,
+       "alternatives": [
+        {
+         "text": "THEMI",
+         "p": 0.0317
+        }
+       ]
+      },
+      {
+       "text": "IMAGE",
+       "start": 2.98,
+       "end": 3.02,
+       "confidence": 0.10789869514276741,
+       "tier": "low",
+       "p": 0.1028,
+       "alternatives": [
+        {
+         "text": "MILITARY",
+         "p": 0.0866
+        },
+        {
+         "text": "MISSION",
+         "p": 0.0861
+        },
+        {
+         "text": "MAN",
+         "p": 0.0824
+        }
+       ]
+      }
+     ],
+     "alternatives": [
+      {
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "p": 1.0,
+       "alternatives": []
+      },
+      {
+       "p": 0.9683,
+       "alternatives": [
+        {
+         "text": "THEMI",
+         "p": 0.0317
+        }
+       ]
+      },
+      {
+       "p": 0.1028,
+       "alternatives": [
+        {
+         "text": "MILITARY",
+         "p": 0.0866
+        },
+        {
+         "text": "MISSION",
+         "p": 0.0861
+        },
+        {
+         "text": "MAN",
+         "p": 0.0824
+        }
+       ]
+      }
+     ]
+    }
+   }
+  }
+ ]
+}

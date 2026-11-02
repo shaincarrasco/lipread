@@ -10,6 +10,8 @@ import { setGeometry, correctedKeypoints, interEye, interpolate, mouthCrops } fr
 import { assess } from "./quality.js";
 import { greedyWords, segment } from "./decode.js";
 import * as store from "./model-store.js";
+import { NgramLM } from "./lm.js";
+import { BeamDecoder } from "./beam.js";
 
 const json = async (name) => (await fetch(assetUrl(name))).json();
 
@@ -82,6 +84,15 @@ export class LipRead {
       setGeometry(geometry);
     }
     if (withPieces && !this._assets.pieces) this._assets.pieces = await json("spm_pieces.json");
+    if (CONFIG.context && this._assets.lm === undefined) {
+      try {
+        const buf = await store.ensureLm();
+        this._assets.lm = buf ? new NgramLM(buf) : null;
+      } catch (err) {
+        console.warn("LipRead: language model unavailable, using greedy decoding", err);
+        this._assets.lm = null;
+      }
+    }
     return this._assets;
   }
 
@@ -252,7 +263,11 @@ export class LipRead {
         report("lips", done / wanted.length, `Reading face ${done + 1} of ${wanted.length}`);
         const crops = t.crops;
         const { logprobs, T, V } = await this._call("lips", { crops, T: t.T }, [crops.buffer]);
-        let words = greedyWords(logprobs, T, V, assets.tokens, t0);
+        // Context-aware decoding: keep several candidate transcripts and let the word language model
+        // pick the most plausible one; every word carries alternatives. Greedy if the LM is missing.
+        let words = assets.lm
+          ? new BeamDecoder(assets.tokens, assets.lm, { names }).decode(logprobs, T, V, t0).words
+          : greedyWords(logprobs, T, V, assets.tokens, t0);
         if (Booster) words = new Booster(names, assets.tokens, assets.pieces).apply(words, logprobs, T, V, t0);
         item.utterances = segment(words, t0, tEnd);
         done++;

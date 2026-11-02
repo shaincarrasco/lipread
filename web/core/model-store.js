@@ -77,7 +77,23 @@ export async function downloadModel(onBytes = () => {}, signal) {
     throw new Error(`STORAGE_FULL: ${err.message || err}`);
   }
   try { await navigator.storage?.persist?.(); } catch { /* best effort */ }
+  await ensureLm().catch(() => null);   // best effort: the word LM (11.5 MB) for context-aware decoding
   return true;
+}
+
+/** The word language model bytes (ArrayBuffer) from the model cache, fetching it once if needed.
+ *  Resolves null when it can't be had (offline before first use): decoding then falls back to greedy. */
+export async function ensureLm() {
+  if (!("caches" in self) || !CONFIG.lmUrl) return null;
+  const cache = await caches.open(CONFIG.modelCache);
+  let r = await cache.match(CONFIG.lmUrl);
+  if (!r) {
+    const net = await fetch(CONFIG.lmUrl, { cache: "no-store" });
+    if (!net.ok) return null;
+    await cache.put(CONFIG.lmUrl, net.clone());
+    r = net;
+  }
+  return r.arrayBuffer();
 }
 
 export async function deleteModel() {

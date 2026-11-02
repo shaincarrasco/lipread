@@ -129,7 +129,9 @@ class BeamDecoder:
                 # repeated last piece without a blank between: same prefix
                 if key:
                     last = key[-1]
-                    s = get(key, h); s.pnb = _lse(s.pnb, h.pnb + row[last])
+                    s = get(key, h); rep = h.pnb + row[last]; s.pnb = _lse(s.pnb, rep)
+                    if rep > tot + row[self.blank]:   # the piece is still being "spoken": extend the word
+                        s.last_frame = t
                 for c in cand:
                     p = (h.pb if key and key[-1] == c else tot) + row[c]
                     nkey = key + (c,)

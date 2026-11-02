@@ -22,6 +22,12 @@ export const CONFIG = {
   ortModule: new URL("../vendor/ort/ort.wasm.min.mjs", import.meta.url).href,
   ortWasmPaths: new URL("../vendor/ort/", import.meta.url).href,
 
+  // Word language model for context-aware decoding (trigram, built from TED transcripts with
+  // scripts/build_lm.py; same non-commercial terms as the lip model). Served with the app, cached
+  // in the model cache on first use. If it's missing the app falls back to greedy decoding.
+  lmUrl: new URL("./assets/lm.bin", import.meta.url).href,
+  context: true,
+
   fps: 25,               // model frame rate
   maxSeconds: 30,        // longest window processed on a phone
   maxSide: 1920,         // frames are drawn at most this large (long side)
