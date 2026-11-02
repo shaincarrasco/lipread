@@ -32,6 +32,8 @@
   --pill-bg: rgba(0, 0, 0, 0.6);
   --toast-bg: rgba(40, 40, 44, 0.92);
   --shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+  --menu-bg: #FFFFFF;         /* popovers: elevated, solid so the caret blends */
+  --menu-shadow: drop-shadow(0 0 0.5px rgba(0, 0, 0, 0.3)) drop-shadow(0 8px 22px rgba(0, 0, 0, 0.18));
 
   --radius-card: 14px;
   --radius-group: 10px;
@@ -67,6 +69,8 @@
     --pill-bg: rgba(0, 0, 0, 0.62);
     --toast-bg: rgba(60, 60, 64, 0.94);
     --shadow: none;
+    --menu-bg: #2C2C2E;
+    --menu-shadow: drop-shadow(0 0 0.5px rgba(255, 255, 255, 0.2)) drop-shadow(0 10px 26px rgba(0, 0, 0, 0.55));
   }
 }
 
@@ -96,6 +100,8 @@
   --pill-bg: rgba(0, 0, 0, 0.62);
   --toast-bg: rgba(60, 60, 64, 0.94);
   --shadow: none;
+  --menu-bg: #2C2C2E;
+  --menu-shadow: drop-shadow(0 0 0.5px rgba(255, 255, 255, 0.2)) drop-shadow(0 10px 26px rgba(0, 0, 0, 0.55));
 }
 
 /* ---------- Base ---------- */
@@ -785,6 +791,126 @@ input[type="range"]::-moz-range-thumb {
   white-space: nowrap;
 }
 .word.is-now .tag { background: var(--card); }
+/* Words with other candidates: a faint dotted underline. Low words keep their own underline. */
+.word.has-alts:not(.is-low) {
+  text-decoration: underline dotted;
+  text-decoration-color: var(--tertiary-label);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.25rem;
+}
+.word[aria-expanded="true"] { background: var(--fill); }
+.word .tag--edit { color: var(--secondary-label); background: var(--fill-tertiary); }
+.word.is-now .tag--edit { background: var(--card); }
+
+/* ---------- Word menu (popover on a transcript word) ---------- */
+.wmenu {
+  position: fixed;
+  left: 0; top: 0;
+  z-index: 30;
+  width: 260px;
+  max-width: calc(100vw - 16px);
+  transform: translate(-9999px, 0);
+  filter: var(--menu-shadow);   /* one shadow for the panel and the caret */
+}
+.wmenu[hidden] { display: none; }
+.wmenu__caret {
+  position: absolute;
+  left: 0;
+  width: 14px; height: 14px;
+  margin-left: -7px;
+  background: var(--menu-bg);
+  border-radius: 2px;
+  transform: rotate(45deg);
+}
+.wmenu[data-side="below"] .wmenu__caret { top: -7px; }
+.wmenu[data-side="above"] .wmenu__caret { bottom: -7px; }
+.wmenu__panel {
+  position: relative;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  border-radius: 14px;
+  background: var(--menu-bg);
+  color: var(--label);
+  outline: none;
+}
+.wmenu[data-side="below"] .wmenu__panel { transform-origin: 50% 0; }
+.wmenu[data-side="above"] .wmenu__panel { transform-origin: 50% 100%; }
+.wmenu:not([hidden]) .wmenu__panel { animation: wmenu-in 0.18s var(--ease-sheet) both; }
+@keyframes wmenu-in { from { opacity: 0; scale: 0.94; } to { opacity: 1; scale: 1; } }
+
+.wmenu__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.6875rem 1rem 0.625rem;
+}
+.wmenu__word {
+  min-width: 0;
+  font-size: 1.0625rem;
+  font-weight: 600;
+  line-height: 1.3;
+  overflow-wrap: anywhere;
+}
+.wmenu__cert {
+  flex: none;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  white-space: nowrap;
+  color: var(--secondary-label);
+}
+.wmenu__cert[data-tone="likely"] { color: var(--green-text); }
+.wmenu__cert[data-tone="unsure"] { color: var(--orange-text); }
+
+.wmenu__alts { border-top: 0.5px solid var(--separator); padding: 0.375rem 0 0.25rem; }
+.wmenu__alts[hidden] { display: none; }
+.wmenu__label {
+  padding: 0.25rem 1rem 0.3125rem;
+  font-size: 0.8125rem;
+  color: var(--secondary-label);
+}
+.wmenu__row {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  width: 100%;
+  min-height: 2.75rem;
+  padding: 0.5rem 1rem;
+  border: 0;
+  background: none;
+  text-align: left;
+  font-size: 1.0625rem;
+  color: var(--label);
+  cursor: pointer;
+}
+.wmenu__row + .wmenu__row::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 1rem; right: 0;
+  height: 0.5px;
+  background: var(--separator);
+}
+.wmenu__row:active, .wmenu__row:focus-visible { background: var(--fill); outline: none; }
+.wmenu__alt { min-width: 0; overflow-wrap: anywhere; }
+.wmenu__note {
+  flex: none;
+  padding: 0.125rem 0.375rem;
+  border-radius: 999px;
+  background: var(--fill-tertiary);
+  color: var(--secondary-label);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  line-height: 1.2;
+}
+.wmenu__pct {
+  margin-left: auto;
+  flex: none;
+  font-size: 0.9375rem;
+  color: var(--secondary-label);
+  font-variant-numeric: tabular-nums;
+}
 
 /* ---------- Footer, toast, hint ---------- */
 .toast {

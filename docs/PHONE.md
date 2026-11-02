@@ -18,7 +18,7 @@ video file
   -> readability gate (face size, yaw)
   -> mouth crops (144 x 144 grayscale, stored per track per frame)
   -> lip-reading model (onnxruntime-web, WASM)        Web Worker
-  -> CTC decode (words, times, confidence)
+  -> beam search + word language model (16 candidates, context picks the words; alternatives per word)
   -> name booster (roster rescoring, flags boosted words)
   -> UI (captions, Likely / All, share sheet)         main thread
 ```

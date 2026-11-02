@@ -205,6 +205,7 @@ function showScreen(name, { animate = true, focus = true } = {}) {
       node.classList.add("enter");
     }
   }
+  if (name !== "results") closeWordMenu({ restoreFocus: "never" });
   state.screen = name;
 
   const nav = $("#navbar");
@@ -404,6 +405,7 @@ function closeSheet(name, { instant = false } = {}) {
 
 document.addEventListener("keydown", (e) => {
   if (e.key !== "Escape") return;
+  if (wm.chip) { closeWordMenu({ restoreFocus: "always" }); return; }
   if (!$("#alert").hidden) { closeAlert(false); return; }
   if (state.openSheet === "firstRun") closeFirstRun();
   else if (state.openSheet === "settings") closeSettings();
@@ -1028,6 +1030,7 @@ function finishRun(run, result) {
     faces: run.faces,
     result,
     faceCount: tracks.length,
+    edits: new Map(),  // word object -> the candidate the user chose (kept in memory, per result)
   };
   state.recent.unshift(item);
   if (state.recent.length > 8) {
@@ -1126,6 +1129,7 @@ const stage = $("#stage");
 const overlay = $("#overlay");
 
 function openResults(item) {
+  if (!item.edits) item.edits = new Map();
   openLayer("results");
   state.current = {
     item,
@@ -1174,6 +1178,7 @@ function wordTier(w) {
 }
 
 function renderFaces() {
+  closeWordMenu({ restoreFocus: "never" });
   const cur = state.current;
   const list = $("#facesList");
   list.replaceChildren();
@@ -1239,6 +1244,7 @@ function toggleFace(i) {
   const row = li.querySelector(".face__row");
   const body = li.querySelector(".face__body");
   const open = !cur.expanded.has(i);
+  if (!open && wm.chip && body.contains(wm.chip)) closeWordMenu({ restoreFocus: "ifInside" });
   if (open) {
     cur.expanded.add(i);
     if (!body.childElementCount) buildTranscript(i, body);
@@ -1259,21 +1265,16 @@ function buildTranscript(i, body) {
   for (const u of track.utterances) {
     const words = el("div", { class: "words" });
     for (const w of u.words) {
-      const tier = wordTier(w);
-      const textNode = document.createTextNode(displayWord(w));
-      const classes = ["word"];
-      if (tier === "low") classes.push("is-low");
-      const chipChildren = [el("span", { class: "w-text" }, textNode)];
-      if (w.boosted) chipChildren.push(el("span", { class: "tag", text: "name match" }));
-      const label = tier === "low" ? `${w.text}, uncertain` : w.boosted ? `${w.text}, name match` : w.text;
       const chip = el("button", {
         type: "button",
-        class: classes.join(" "),
-        "aria-label": label,
-        onclick: () => seekTo(w.start),
-      }, ...chipChildren);
+        class: "word",
+        "aria-haspopup": "dialog",
+        "aria-expanded": "false",
+        "aria-controls": "wordMenu",
+        onclick: () => onWordTap(chip),
+      });
       chip._word = w;
-      chip._text = textNode;
+      refreshChip(chip);
       words.append(chip);
       cur.chips.push(chip);
     }
@@ -1284,8 +1285,27 @@ function buildTranscript(i, body) {
   }
 }
 
+/* Chip text, state and label, from the word, its confidence and the user's choice. */
+function refreshChip(chip) {
+  const w = chip._word;
+  const edited = isEdited(w);
+  const uncertain = wordTier(w) === "low" && !edited;
+  chip.classList.toggle("is-low", uncertain);
+  chip.classList.toggle("has-alts", candidatesOf(w).length > 1);
+  chip.classList.toggle("is-edited", edited);
+  const kids = [el("span", { class: "w-text", text: displayWord(w) })];
+  if (w.boosted) kids.push(el("span", { class: "tag", text: "name match" }));
+  if (edited) kids.push(el("span", { class: "tag tag--edit", text: "edited" }));
+  chip.replaceChildren(...kids);
+  const parts = [chosenText(w)];
+  if (uncertain) parts.push("uncertain");
+  if (w.boosted) parts.push("name match");
+  if (edited) parts.push("edited");
+  chip.setAttribute("aria-label", parts.join(", "));
+}
+
 function displayWord(w) {
-  return state.current?.mode === "likely" && wordTier(w) === "low" ? "…" : w.text;
+  return hiddenInLikely(w) ? "…" : chosenText(w);
 }
 
 function setMode(mode) {
@@ -1298,9 +1318,7 @@ function setMode(mode) {
   $("#modeNote").textContent = mode === "likely"
     ? "Uncertain words show as “…”. Choose All to see every guess."
     : "Every word the model read, including its guesses.";
-  for (const chip of cur.chips) {
-    chip._text.textContent = displayWord(chip._word);
-  }
+  for (const chip of cur.chips) refreshChip(chip);
   cur.views.forEach((v) => { v.key = ""; });
   renderOverlay();
 }
@@ -1311,12 +1329,14 @@ $$(".segmented button").forEach((btn) => {
 
 /* Player */
 
-function seekTo(t) {
+/* Seeks the clip. `reveal` scrolls the video back into view when it has scrolled away; a word tap turns it off,
+   so the word the user tapped (and its menu) stays where it is. */
+function seekTo(t, { reveal = true } = {}) {
   if (!state.current) return;
   video.currentTime = Math.max(0, t - 0.1);
   renderOverlay();
   const rect = stage.getBoundingClientRect();
-  if (rect.bottom < 80) {
+  if (reveal && rect.bottom < 80) {
     stage.scrollIntoView({ behavior: REDUCE_MOTION ? "auto" : "smooth", block: "start" });
   }
 }
@@ -1411,7 +1431,7 @@ function interpolateBox(boxes, t) {
   };
 }
 
-function recentWords(track, t, mode) {
+function recentWords(track, t) {
   const words = [];
   for (const u of track.utterances) {
     if (u.end < t - 4 || u.start > t + 0.05) continue;
@@ -1424,7 +1444,7 @@ function recentWords(track, t, mode) {
   let total = 0;
   const kept = [];
   for (let i = tail.length - 1; i >= 0; i--) {
-    const text = mode === "likely" && wordTier(tail[i]) === "low" ? "…" : tail[i].text;
+    const text = hiddenInLikely(tail[i]) ? "…" : chosenText(tail[i]);
     total += text.length + 1;
     if (total > 34 && kept.length) break;
     kept.unshift(tail[i]);
@@ -1461,7 +1481,7 @@ function renderOverlay() {
     view.box.style.width = `${w.toFixed(1)}px`;
     view.box.style.height = `${h.toFixed(1)}px`;
 
-    const words = recentWords(view.track, t, cur.mode);
+    const words = recentWords(view.track, t);
     if (!words.length) {
       view.pill.hidden = true;
       view.key = "";
@@ -1469,17 +1489,17 @@ function renderOverlay() {
     }
     const currentIdx = words.length - 1;
     const isCurrent = t <= words[currentIdx].end + 0.25;
-    const key = words.map((w) => `${w.start}`).join(",") + `|${cur.mode}|${isCurrent ? currentIdx : -1}`;
+    const key = words.map((w) => `${w.start}:${chosenText(w)}`).join(",") + `|${cur.mode}|${isCurrent ? currentIdx : -1}`;
     if (view.key !== key) {
       view.key = key;
       view.pill.replaceChildren();
       words.forEach((w, idx) => {
-        const hidden = cur.mode === "likely" && wordTier(w) === "low";
+        const hidden = hiddenInLikely(w);
         // a run of hidden low-confidence words collapses into a single "…"
-        if (hidden && idx > 0 && cur.mode === "likely" && wordTier(words[idx - 1]) === "low") return;
+        if (hidden && idx > 0 && hiddenInLikely(words[idx - 1])) return;
         const span = el("span", {
-          class: `w${wordTier(w) === "low" ? " is-low" : ""}${isCurrent && idx === currentIdx ? " is-current" : ""}`,
-          text: hidden ? "…" : w.text,
+          class: `w${wordTier(w) === "low" && !isEdited(w) ? " is-low" : ""}${isCurrent && idx === currentIdx ? " is-current" : ""}`,
+          text: hidden ? "…" : chosenText(w),
         });
         if (view.pill.childNodes.length) view.pill.append(document.createTextNode(" "));
         view.pill.append(span);
@@ -1514,7 +1534,8 @@ async function shareCurrent() {
   const cur = state.current;
   const engine = state.engine;
   if (!cur || !engine) return;
-  const body = engine.toText(cur.result).trim();
+  const exported = exportResult(cur.item);
+  const body = engine.toText(exported).trim();
   if (!body) {
     toast("Nothing to share yet");
     return;
@@ -1522,7 +1543,7 @@ async function shareCurrent() {
   const text = `AI estimate — don’t treat as a quote.\n\n${body}`;
   const data = { title: `LipRead: ${cur.item.name}`, text };
   try {
-    const srt = engine.toSRT(cur.result);
+    const srt = engine.toSRT(exported);
     const file = new File([srt], `${baseName(cur.item.name)}-captions.srt`, { type: "application/x-subrip" });
     if (navigator.canShare?.({ files: [file] })) data.files = [file];
   } catch { /* the SRT file is optional */ }
@@ -1543,6 +1564,186 @@ async function shareCurrent() {
 }
 
 $("#shareBtn").addEventListener("click", shareCurrent);
+
+/* ---------- Word menu: alternatives for a transcript word ---------- */
+
+/* A popover anchored to a word, as the iOS text-selection callout. It is not modal: the page stays usable, and
+   no history entry is pushed for it. Escape, a tap outside, scrolling the word away, leaving Results or Back close it. */
+const wm = { chip: null };
+
+const CERT = [
+  { min: 0.7, label: "Likely", tone: "likely" },
+  { min: 0.4, label: "Possible", tone: "possible" },
+  { min: -1, label: "Unsure", tone: "unsure" },
+];
+
+const unitOrNull = (v) => (typeof v === "number" && isFinite(v) ? clamp(v, 0, 1) : null);
+
+/* The candidates for a word: the engine's reading first, then up to three alternatives, without repeats. */
+function candidatesOf(w) {
+  const out = [{ text: w.text, p: unitOrNull(w.p), engine: true }];
+  for (const alt of Array.isArray(w.alternatives) ? w.alternatives : []) {
+    const text = typeof alt?.text === "string" ? alt.text.trim() : "";
+    if (!text || out.some((c) => c.text === text)) continue;
+    out.push({ text, p: unitOrNull(alt.p), engine: false });
+    if (out.length >= 4) break;
+  }
+  return out;
+}
+
+function isEdited(w) {
+  return !!state.current?.item.edits?.has(w);
+}
+
+function chosenText(w) {
+  return state.current?.item.edits?.get(w) ?? w.text;
+}
+
+/* In Likely mode an uncertain word shows as "…" unless the user has chosen a word for it. */
+function hiddenInLikely(w) {
+  return state.current?.mode === "likely" && wordTier(w) === "low" && !isEdited(w);
+}
+
+function certaintyOf(w, cand) {
+  let p = cand?.p ?? unitOrNull(w.confidence);
+  if (p == null) p = { high: 0.9, medium: 0.7, low: 0.3 }[wordTier(w)] ?? 0.3;
+  return CERT.find((c) => p >= c.min);
+}
+
+/* The result as the user sees it, with their word choices applied. Share text and SRT are built from this copy. */
+function exportResult(item) {
+  const edits = item.edits;
+  if (!edits || edits.size === 0) return item.result;
+  return {
+    ...item.result,
+    tracks: item.result.tracks.map((tr) => {
+      if (!Array.isArray(tr.utterances)) return tr;
+      return {
+        ...tr,
+        utterances: tr.utterances.map((u) => {
+          if (!Array.isArray(u.words) || !u.words.some((w) => edits.has(w))) return u;
+          // "edited" is not "low", so the engine's text and SRT leave the word without a "?".
+          const words = u.words.map((w) => (edits.has(w) ? { ...w, text: edits.get(w), tier: "edited" } : w));
+          const out = { ...u, words };
+          if (typeof u.text === "string") {
+            out.text = words.map((w) => w.text).join(" ") + (/[.?!]$/.test(u.text) ? u.text.slice(-1) : "");
+          }
+          return out;
+        }),
+      };
+    }),
+  };
+}
+
+function onWordTap(chip) {
+  seekTo(chip._word.start, { reveal: false });
+  if (wm.chip !== chip) openWordMenu(chip);
+}
+
+function openWordMenu(chip) {
+  if (wm.chip) wm.chip.setAttribute("aria-expanded", "false");
+  wm.chip = chip;
+  chip.setAttribute("aria-expanded", "true");
+  renderWordMenu(chip);
+  const menu = $("#wordMenu");
+  menu.hidden = false;
+  placeWordMenu();
+  // Focus moves into the menu: the first alternative, or the menu itself when there are none.
+  const first = menu.querySelector(".wmenu__row");
+  (first || $("#wmPanel")).focus({ preventScroll: true });
+}
+
+function renderWordMenu(chip) {
+  const w = chip._word;
+  const cands = candidatesOf(w);
+  const chosen = chosenText(w);
+  const cert = certaintyOf(w, cands.find((c) => c.text === chosen));
+  $("#wmWord").textContent = chosen;
+  const certNode = $("#wmCert");
+  certNode.textContent = cert.label;
+  certNode.dataset.tone = cert.tone;
+
+  const alts = cands
+    .filter((c) => c.text !== chosen)
+    .sort((a, b) => (b.p ?? -1) - (a.p ?? -1));
+  $("#wmAlts").hidden = alts.length === 0;
+  $("#wmList").replaceChildren(...alts.map((c) => el("button", {
+    type: "button",
+    class: "wmenu__row",
+    onclick: () => chooseAlternative(chip, c.text),
+  },
+    el("span", { class: "wmenu__alt", text: c.text }),
+    c.engine ? el("span", { class: "wmenu__note", text: "Original" }) : null,
+    el("span", { class: "wmenu__pct", text: c.p == null ? "" : `${Math.round(c.p * 100)}%` }),
+  )));
+}
+
+/* Above or below the word, whichever has room for the menu, clamped to the screen width. */
+function placeWordMenu() {
+  const chip = wm.chip;
+  if (!chip) return;
+  if (!chip.isConnected) { closeWordMenu({ restoreFocus: "never" }); return; }
+  const r = chip.getBoundingClientRect();
+  const vw = document.documentElement.clientWidth;
+  const vh = window.innerHeight;
+  if (r.bottom < 0 || r.top > vh) { closeWordMenu({ restoreFocus: "ifInside" }); return; }
+
+  const menu = $("#wordMenu");
+  const margin = 8;
+  const gap = 10;
+  const width = Math.min(260, vw - margin * 2);
+  menu.style.width = `${width}px`;
+  const below = vh - r.bottom - gap - margin;
+  const above = r.top - gap - margin;
+  $("#wmPanel").style.maxHeight = `${Math.max(120, Math.max(below, above))}px`;
+  const h = menu.offsetHeight;
+  const side = below >= h ? "below" : above >= h ? "above" : above > below ? "above" : "below";
+  const top = side === "below" ? r.bottom + gap : r.top - gap - h;
+  const left = clamp(r.left + r.width / 2 - width / 2, margin, vw - width - margin);
+  const cx = r.left + r.width / 2;
+  menu.dataset.side = side;
+  menu.style.transform = `translate(${left.toFixed(1)}px, ${top.toFixed(1)}px)`;
+  menu.querySelector(".wmenu__caret").style.left = `${clamp(cx - left, 18, width - 18).toFixed(1)}px`;
+}
+
+/* restoreFocus: "always" | "ifInside" (only when focus was in the menu) | "never". */
+function closeWordMenu({ restoreFocus = "ifInside" } = {}) {
+  const chip = wm.chip;
+  if (!chip) return;
+  wm.chip = null;
+  const menu = $("#wordMenu");
+  const hadFocus = menu.contains(document.activeElement);
+  menu.hidden = true;
+  chip.setAttribute("aria-expanded", "false");
+  if (chip.isConnected && (restoreFocus === "always" || (restoreFocus === "ifInside" && hadFocus))) {
+    chip.focus({ preventScroll: true });
+  }
+}
+
+function chooseAlternative(chip, text) {
+  const cur = state.current;
+  if (!cur) return;
+  const w = chip._word;
+  if (text === w.text) cur.item.edits.delete(w);   // back to the engine's reading
+  else cur.item.edits.set(w, text);
+  refreshChip(chip);
+  renderOverlay();
+  closeWordMenu({ restoreFocus: "always" });
+}
+
+document.addEventListener("click", (e) => {
+  if (!wm.chip) return;
+  if ($("#wordMenu").contains(e.target) || e.target.closest?.(".word")) return;
+  closeWordMenu({ restoreFocus: "ifInside" });
+}, true);
+
+$("#wordMenu").addEventListener("focusout", (e) => {
+  if (!wm.chip || !e.relatedTarget || $("#wordMenu").contains(e.relatedTarget)) return;
+  closeWordMenu({ restoreFocus: "never" });
+});
+
+window.addEventListener("scroll", () => { if (wm.chip) placeWordMenu(); }, { passive: true });
+window.addEventListener("resize", () => { if (wm.chip) placeWordMenu(); }, { passive: true });
 
 /* ---------- Back, as on the system ---------- */
 
@@ -1571,6 +1772,12 @@ function dropLayer(lr) {
 window.addEventListener("popstate", (e) => {
   if (histSkip > 0) { histSkip--; return; }
   const lr = e.state?.lr || "home";
+  // Back first closes an open word menu. The Results entry is pushed again so the next Back leaves Results as usual.
+  if (wm.chip) {
+    closeWordMenu({ restoreFocus: "ifInside" });
+    if (state.screen === "results" && lr !== "results") history.pushState({ lr: "results" }, "");
+    return;
+  }
   // A run or a model download cannot be left with Back. The screen stays and says how to stop it.
   const busy = state.run ? { lr: "processing", msg: "Tap Cancel to stop reading." }
     : (state.openSheet === "firstRun" && dl.phase === "downloading") ? { lr: "sheet", msg: "Tap Cancel to stop the download." }

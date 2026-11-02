@@ -346,6 +346,21 @@
     </div>
   </section>
 
+  <!-- Word menu: a popover anchored to a word in the transcript. Not modal, so the page stays usable. -->
+  <div class="wmenu" id="wordMenu" hidden>
+    <span class="wmenu__caret" aria-hidden="true"></span>
+    <div class="wmenu__panel" id="wmPanel" role="dialog" aria-label="Word options" tabindex="-1">
+      <div class="wmenu__head">
+        <p class="wmenu__word" id="wmWord"></p>
+        <span class="wmenu__cert" id="wmCert"></span>
+      </div>
+      <div class="wmenu__alts" id="wmAlts" hidden>
+        <p class="wmenu__label" id="wmAltLabel">Could also be</p>
+        <div class="wmenu__list" id="wmList" role="group" aria-labelledby="wmAltLabel"></div>
+      </div>
+    </div>
+  </div>
+
   <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
 
   <input type="file" id="fileInput" accept="video/*" hidden>

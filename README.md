@@ -41,6 +41,11 @@ face-on speakers and unreliable elsewhere. The confidence on each word tells you
   scored 31.4%, and raw face detection without the correction scored 32.2%. The phone correction was
   fitted on 13 clips (1,234 face detections) that include these 8, so expect the phone figure to be
   slightly optimistic. Eight clips cannot tell these three apart.
+- **Context-aware decoding (new).** Instead of taking the single best guess for each word, LipRead keeps
+  16 candidate transcripts and lets a word language model (built from 4 million words of TED transcripts,
+  with every test sentence removed) pick the most plausible one. Measured on data not used for tuning:
+  LRS3 test **31.9% → 30.6%** word error, LRS2 **22.9% → 20.7%**. Tap any word to see what else it could
+  be; those percentages are calibrated (words shown at about 57% were right 57% of the time).
 - **Phone app in a desktop browser.** The phone app's engine running in desktop Chromium (iPhone-size
   emulation, 2-core machine) gave the same transcripts as the desktop app on the test clips. A 12 s
   single-face clip took 31–39 s; a 12 s three-face 720p clip took 46 s.
