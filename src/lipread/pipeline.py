@@ -274,6 +274,13 @@ def run(job: Job, engine: Engine | None = None, progress: ProgressFn | None = No
         log.info("video %dx%d @ %.2f fps, %.1f s, audio=%s", info.width, info.height,
                  info.src_fps, info.duration, info.has_audio)
 
+    max_s = float(os.environ.get("LIPREAD_MAX_SECONDS", "900"))
+    span = (min(job.end, info.duration) if job.end is not None else info.duration) - job.start
+    if span > max_s:
+        raise LipReadError(
+            f"clip window is {span:.0f} s; the limit is {max_s:.0f} s. Use --start/--end (or the time "
+            f"window in the web app) to pick the moment, or set LIPREAD_MAX_SECONDS.")
+
     # ---- pass 1: shots + detection + refinement (streaming)
     total = max(ingest.count_frames(info, job.start, job.end), 1)
     shot_det = shots_mod.ShotDetector()
