@@ -1,0 +1,968 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="dark">
+<title>LipRead</title>
+<meta name="description" content="Local AI lip reading for sports clips and fan video. Estimates, not quotes.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' fill='%2307070c'/%3E%3Crect x='2' y='2' width='12' height='3' fill='%2300F0FF'/%3E%3Crect x='2' y='11' width='12' height='3' fill='%23FF2D95'/%3E%3C/svg%3E">
+<style>
+:root{
+  --bg:#07070c; --panel:#0d0d18; --panel-2:#12121f; --line:rgba(0,240,255,.24);
+  --cyan:#00F0FF; --magenta:#FF2D95; --lime:#B6FF00; --amber:#FFB000;
+  --ink:#eef6ff; --ink-2:#a9b4c8; --ink-3:#6f7a92; --ink-on:#00131a;
+  --display:"Bebas Neue","Oswald",Impact,"Haettenschweiler","Arial Narrow Bold",sans-serif;
+  --body:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --mono:ui-monospace,"SFMono-Regular",Menlo,Consolas,"Liberation Mono",monospace;
+}
+*,*::before,*::after{box-sizing:border-box}
+[hidden]{display:none !important}
+html{-webkit-text-size-adjust:100%;background:var(--bg)}
+body{
+  margin:0;min-height:100vh;color:var(--ink);font:16px/1.5 var(--body);background-color:var(--bg);
+  background-image:
+    radial-gradient(900px 520px at 88% -8%,rgba(255,45,149,.16),transparent 62%),
+    radial-gradient(800px 520px at -12% 6%,rgba(0,240,255,.13),transparent 60%),
+    linear-gradient(rgba(0,240,255,.045) 1px,transparent 1px) 0 0/44px 44px,
+    linear-gradient(90deg,rgba(0,240,255,.045) 1px,transparent 1px) 0 0/44px 44px;
+  background-attachment:fixed;
+}
+.scanlines{position:fixed;inset:0;pointer-events:none;z-index:60;
+  background:repeating-linear-gradient(to bottom,rgba(255,255,255,.035) 0 1px,transparent 1px 4px)}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+:focus-visible{outline:2px solid var(--lime);outline-offset:3px}
+.wrap{max-width:1280px;margin:0 auto;padding:0 16px}
+@media (min-width:900px){.wrap{padding:0 28px}}
+
+/* masthead */
+.masthead{padding:26px 0 14px}
+.wordmark{
+  margin:0;font:400 clamp(72px,19vw,208px)/.8 var(--display);letter-spacing:.01em;color:#fff;text-transform:uppercase;
+  transform:skewX(-8deg);transform-origin:left bottom;
+  text-shadow:0 0 6px rgba(0,240,255,.85),0 0 22px rgba(0,240,255,.45),4px 0 0 rgba(255,45,149,.7),-3px 0 0 rgba(0,240,255,.55);
+  animation:flicker 1.8s steps(1,end) 1;
+}
+@keyframes flicker{0%,18%,22%,60%,100%{opacity:1}19%,21%,59%{opacity:.55}}
+.ticker{display:flex;flex-wrap:wrap;align-items:center;gap:12px;margin:16px 0 0;font:400 19px/1 var(--display);letter-spacing:.22em;text-transform:uppercase;color:var(--cyan);text-shadow:0 0 10px rgba(0,240,255,.5)}
+.ticker i{width:9px;height:9px;background:var(--magenta);transform:rotate(45deg);box-shadow:0 0 12px var(--magenta)}
+.banner{border-block:1px solid rgba(255,176,0,.55);background:repeating-linear-gradient(-45deg,rgba(255,176,0,.09) 0 10px,transparent 10px 20px),#0e0b05;padding:11px 0;font-size:15px;line-height:1.4}
+.banner strong{color:var(--amber);font-weight:700}
+
+/* layout */
+.layout{display:grid;gap:22px;padding-top:22px;padding-bottom:12px;min-width:0}
+.left{display:grid;gap:22px;min-width:0;align-content:start}
+@media (min-width:980px){
+  .layout{grid-template-columns:minmax(330px,410px) minmax(0,1fr);align-items:start}
+  .left{position:sticky;top:16px}
+}
+.panel{position:relative;min-width:0;padding:20px;background:linear-gradient(180deg,rgba(20,20,36,.94),rgba(9,9,16,.95));border:1px solid var(--line);box-shadow:0 0 30px rgba(0,240,255,.06)}
+.panel::before{content:"";position:absolute;left:-1px;top:-1px;bottom:-1px;width:4px;background:var(--cyan);box-shadow:0 0 14px var(--cyan)}
+.panel.is-magenta{border-color:rgba(255,45,149,.55)}
+.panel.is-magenta::before{background:var(--magenta);box-shadow:0 0 14px var(--magenta)}
+.kicker{display:flex;align-items:center;gap:10px;margin:0 0 14px;font:400 21px/1 var(--display);letter-spacing:.14em;text-transform:uppercase;color:var(--cyan);text-shadow:0 0 10px rgba(0,240,255,.5)}
+.kicker .num{color:var(--magenta);text-shadow:0 0 10px rgba(255,45,149,.7)}
+.kicker-sm{margin:4px 0 0;font:400 16px/1 var(--display);letter-spacing:.16em;text-transform:uppercase;color:var(--ink-2)}
+
+/* form */
+.drop{display:grid;place-items:center;align-content:center;gap:6px;min-height:176px;padding:22px 16px;text-align:center;cursor:pointer;
+  border:1px dashed rgba(0,240,255,.65);
+  background:radial-gradient(circle at 50% 0%,rgba(0,240,255,.14),transparent 70%),repeating-linear-gradient(135deg,rgba(0,240,255,.04) 0 12px,transparent 12px 24px);
+  transition:border-color .2s,box-shadow .2s}
+.drop:hover,.drop.is-over{border-color:var(--magenta);box-shadow:0 0 0 1px var(--magenta),0 0 30px rgba(255,45,149,.35),inset 0 0 30px rgba(255,45,149,.12)}
+.drop-title{font:400 44px/.95 var(--display);letter-spacing:.04em;color:#fff;text-shadow:0 0 14px rgba(0,240,255,.6)}
+.drop-sub{font-size:14px;color:var(--ink-2);overflow-wrap:anywhere;max-width:30ch}
+.drop-clear{margin-top:10px;width:100%}
+.or{display:flex;align-items:center;gap:12px;margin:18px 0 0;font:400 15px/1 var(--display);letter-spacing:.22em;color:var(--ink-3)}
+.or::before,.or::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,transparent,rgba(0,240,255,.45),transparent)}
+.field{display:grid;gap:7px;margin-top:16px;min-width:0}
+.label{font:400 16px/1.1 var(--display);letter-spacing:.12em;text-transform:uppercase;color:var(--ink-2)}
+input,textarea,select{width:100%;min-width:0;min-height:48px;padding:12px 14px;font:16px/1.4 var(--body);color:var(--ink);background:#08080f;border:1px solid rgba(0,240,255,.3);border-radius:0;outline:none;-webkit-appearance:none;appearance:none}
+input::placeholder,textarea::placeholder{color:#4e5970}
+textarea{min-height:118px;resize:vertical}
+select{padding-right:42px;background-image:linear-gradient(45deg,transparent 50%,var(--cyan) 50%),linear-gradient(135deg,var(--cyan) 50%,transparent 50%);background-position:calc(100% - 20px) 55%,calc(100% - 14px) 55%;background-size:6px 6px;background-repeat:no-repeat}
+input:focus,textarea:focus,select:focus{border-color:var(--cyan);box-shadow:0 0 0 1px var(--cyan),0 0 18px rgba(0,240,255,.25)}
+input:disabled{opacity:.5}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.hint{margin:0;font-size:13px;line-height:1.45;color:var(--ink-3)}
+.check{display:flex;align-items:flex-start;gap:10px;margin-top:18px;font-size:15px;line-height:1.4;cursor:pointer}
+.check input{flex:none;width:22px;height:22px;min-height:22px;margin:1px 0 0;padding:0;accent-color:var(--cyan)}
+.form-error{margin:14px 0 0;padding:9px 12px;font-size:15px;color:#ff8cc4;background:rgba(255,45,149,.09);border-left:3px solid var(--magenta)}
+.form-actions{margin-top:22px}
+
+/* buttons */
+.btn-run{display:inline-block;width:100%;min-height:60px;padding:12px 24px;font:400 31px/1 var(--display);letter-spacing:.08em;text-transform:uppercase;color:var(--ink-on);background:var(--cyan);border:0;cursor:pointer;
+  transform:skewX(-8deg);box-shadow:inset 0 0 0 1px rgba(255,255,255,.3),0 0 18px rgba(0,240,255,.6),0 0 48px rgba(0,240,255,.25);transition:filter .2s,transform .08s}
+.btn-run:hover{filter:brightness(1.12)}
+.btn-run:active{transform:skewX(-8deg) translateY(2px)}
+.btn-run:disabled{opacity:.55;cursor:wait;filter:saturate(.4)}
+.btn-run.small{width:auto;min-height:44px;padding:8px 18px;font-size:23px}
+.btn-ghost{min-height:40px;padding:8px 14px;font:400 17px/1 var(--display);letter-spacing:.12em;text-transform:uppercase;color:var(--cyan);background:transparent;border:1px solid rgba(0,240,255,.55);cursor:pointer;transition:background .2s,box-shadow .2s}
+.btn-ghost:hover{background:rgba(0,240,255,.1);box-shadow:0 0 14px rgba(0,240,255,.3)}
+.btn-ghost:disabled{opacity:.5;cursor:wait}
+.btn-ghost.magenta{color:var(--magenta);border-color:rgba(255,45,149,.6)}
+.btn-ghost.magenta:hover{background:rgba(255,45,149,.1);box-shadow:0 0 14px rgba(255,45,149,.35)}
+.row-btns{display:flex;flex-wrap:wrap;gap:8px}
+
+/* recent jobs */
+.rec-list{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.rec-btn{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 10px;align-items:center;width:100%;min-height:52px;padding:10px 12px;text-align:left;font:inherit;color:var(--ink);background:#09090f;border:1px solid rgba(255,255,255,.09);cursor:pointer}
+.rec-btn:hover{border-color:var(--cyan)}
+.rec-btn.is-current{border-color:var(--cyan);box-shadow:0 0 16px rgba(0,240,255,.2)}
+.rec-title{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rec-time{grid-column:1 / -1;font:13px var(--mono);color:var(--ink-3)}
+.pill{font:400 14px/1 var(--display);letter-spacing:.12em;text-transform:uppercase;padding:5px 7px;border:1px solid currentColor;color:var(--ink-2)}
+.pill--queued{color:var(--ink-2)}
+.pill--running{color:var(--cyan);text-shadow:0 0 8px rgba(0,240,255,.6)}
+.pill--done{color:var(--lime);text-shadow:0 0 8px rgba(182,255,0,.4)}
+.pill--error{color:var(--magenta)}
+.empty{margin:0;font-size:14px;color:var(--ink-3)}
+
+/* idle */
+.idle-big{margin:0 0 10px;font:400 clamp(56px,9vw,96px)/.9 var(--display);text-transform:uppercase;color:#fff;text-shadow:0 0 16px rgba(0,240,255,.45)}
+.idle p{margin:0;color:var(--ink-2);max-width:56ch}
+.legend{display:flex;flex-wrap:wrap;gap:10px 18px;margin:20px 0 0;padding:0;list-style:none}
+.legend li{display:inline-flex;align-items:center;gap:8px;font:400 16px/1 var(--display);letter-spacing:.12em;text-transform:uppercase;color:var(--ink-2)}
+.swatch{display:inline-block;width:12px;height:12px;flex:none;background:currentColor;box-shadow:0 0 10px currentColor}
+.c-cyan{color:var(--cyan)}.c-amber{color:var(--amber)}.c-magenta{color:var(--magenta)}.c-lime{color:var(--lime)}
+
+/* progress */
+.stage-row{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:6px 16px}
+.job-title{margin:0 0 12px;font-size:14px;color:var(--ink-2);overflow-wrap:anywhere}
+.stage-big{margin:0;font:400 clamp(44px,7vw,76px)/.9 var(--display);text-transform:uppercase;color:#fff;text-shadow:0 0 14px rgba(0,240,255,.6),0 0 40px rgba(0,240,255,.25);overflow-wrap:anywhere;min-width:0}
+.pct{margin:0;font:400 clamp(44px,7vw,76px)/.9 var(--display);color:var(--lime);text-shadow:0 0 14px rgba(182,255,0,.55)}
+.bar{position:relative;height:18px;margin:20px 0 10px;overflow:hidden;background:#11112a;border:1px solid rgba(0,240,255,.35)}
+.bar i{position:absolute;top:0;bottom:0;left:0;width:0;background:linear-gradient(90deg,var(--cyan),var(--magenta));box-shadow:0 0 18px rgba(0,240,255,.6);transition:width .35s ease}
+.bar.is-busy i::after{content:"";position:absolute;top:0;bottom:0;width:40%;left:-40%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.4),transparent);animation:sheen 1.4s linear infinite}
+@keyframes sheen{to{left:100%}}
+.msg{margin:0;font:14px/1.45 var(--mono);color:var(--ink-2);overflow-wrap:anywhere}
+.stages{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0 0;padding:0;list-style:none}
+.stages li{padding:7px 10px;font:400 14px/1 var(--display);letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);border:1px solid rgba(255,255,255,.12)}
+.stages li.is-done{color:var(--ink-2);border-color:rgba(0,240,255,.4)}
+.stages li.is-current{color:var(--ink-on);background:var(--cyan);border-color:var(--cyan);box-shadow:0 0 14px rgba(0,240,255,.6)}
+.failed-msg{margin:0 0 16px;font-size:16px;color:#ffb3d6;overflow-wrap:anywhere}
+.res-title-lg{margin:0;font:400 clamp(40px,6.5vw,68px)/.95 var(--display);text-transform:uppercase;color:#fff;overflow-wrap:anywhere}
+.res-stats{margin:12px 0 0;font:14px/1.5 var(--mono);color:var(--ink-2);overflow-wrap:anywhere}
+
+/* results */
+.results{display:grid;gap:22px;min-width:0}
+.player{display:block;width:100%;aspect-ratio:16/9;max-height:70vh;background:#000;border:1px solid rgba(0,240,255,.45);box-shadow:0 0 30px rgba(0,240,255,.16)}
+.player-panel{display:grid;gap:12px}
+.dl-row{display:flex;flex-wrap:wrap;gap:8px}
+.dl{display:inline-flex;align-items:center;min-height:44px;padding:0 16px;font:400 19px/1 var(--display);letter-spacing:.1em;text-transform:uppercase;color:var(--cyan);text-decoration:none;border:1px solid rgba(0,240,255,.55)}
+.dl:hover{background:rgba(0,240,255,.12);box-shadow:0 0 14px rgba(0,240,255,.3)}
+.dl.is-off{opacity:.35;border-style:dashed;pointer-events:none}
+.faces{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr));gap:16px;min-width:0}
+.face{position:relative;display:flex;flex-direction:column;min-width:0;background:#0a0a14;border:1px solid rgba(255,255,255,.1)}
+.face--readable{border-color:rgba(0,240,255,.55);box-shadow:0 0 22px rgba(0,240,255,.12)}
+.face--marginal{border-color:rgba(255,176,0,.6);box-shadow:0 0 22px rgba(255,176,0,.1)}
+.face--unreadable{border-color:rgba(255,45,149,.5)}
+.face-media{position:relative;aspect-ratio:4/3;background:#000;overflow:hidden}
+.face-media img{display:block;width:100%;height:100%;object-fit:cover}
+.face.is-skipped .face-media img{filter:grayscale(1) brightness(.55)}
+.face-none{display:grid;place-items:center;height:100%;color:var(--ink-3);font-size:14px}
+.badge{position:absolute;left:10px;top:10px;padding:6px 9px;font:400 19px/1 var(--display);letter-spacing:.1em;text-transform:uppercase;transform:skewX(-8deg)}
+.badge--readable{background:var(--cyan);color:var(--ink-on);box-shadow:0 0 14px rgba(0,240,255,.6)}
+.badge--marginal{background:var(--amber);color:#1a0f00;box-shadow:0 0 14px rgba(255,176,0,.5)}
+.badge--unreadable{background:var(--magenta);color:#1b0010;box-shadow:0 0 14px rgba(255,45,149,.6)}
+.track-tag{position:absolute;right:10px;bottom:10px;padding:5px 7px;font:400 15px/1 var(--display);letter-spacing:.12em;color:#fff;background:rgba(0,0,0,.72)}
+.face-body{display:grid;gap:12px;padding:14px;min-width:0}
+.face-time{margin:0;font:14px var(--mono);color:var(--ink-2)}
+.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:0}
+.stat{min-width:0;margin:0;padding:8px;background:#10101c}
+.stat dt{font:400 12px/1 var(--display);letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3)}
+.stat dd{margin:5px 0 0;font:600 14px/1.2 var(--mono);color:var(--ink);overflow-wrap:anywhere}
+.reasons{display:grid;gap:5px;margin:0;padding:0;list-style:none;font-size:14px;color:var(--ink-2)}
+.reasons li::before{content:"";display:inline-block;width:9px;height:2px;margin:0 9px 4px 0;background:var(--cyan);box-shadow:0 0 6px var(--cyan)}
+.crops{display:block;width:100%;height:auto;background:#000;border:1px solid rgba(255,255,255,.08)}
+.transcript{display:grid;gap:10px;padding-top:12px;border-top:1px solid rgba(255,255,255,.08);min-width:0}
+.utt{display:grid;gap:8px;padding:10px;min-width:0;background:#0c0c18;border-left:2px solid rgba(0,240,255,.45)}
+.utt-head{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px}
+.utt-meta{display:flex;flex-wrap:wrap;align-items:center;gap:10px;font:13px var(--mono);color:var(--ink-3)}
+.words{display:flex;flex-wrap:wrap;gap:6px}
+.word{min-height:40px;padding:8px 10px;font:600 15px/1 var(--body);letter-spacing:.02em;color:#e8fbff;background:rgba(0,240,255,.08);border:1px solid rgba(0,240,255,.55);cursor:pointer;overflow-wrap:anywhere;transition:filter .15s}
+.word:hover{filter:brightness(1.25)}
+.word.tier-medium{color:#c4eef6;background:transparent;border-color:rgba(0,240,255,.3)}
+.word.tier-low{color:#8a95aa;background:transparent;border:1px dashed rgba(169,180,200,.5)}
+.word.tier-low::after{content:"?";margin-left:3px;color:var(--magenta)}
+.word.boosted{color:var(--lime);background:rgba(182,255,0,.08);border-color:var(--lime);text-shadow:0 0 10px rgba(182,255,0,.55);box-shadow:0 0 14px rgba(182,255,0,.22)}
+.word.live{outline:2px solid #fff;outline-offset:2px}
+.editor{display:grid;gap:8px}
+.editor textarea{min-height:76px;font-size:16px}
+.corrected{margin:0;font-size:15px;overflow-wrap:anywhere}
+.tag{display:inline-block;margin-right:8px;padding:3px 6px;font:400 14px/1 var(--display);letter-spacing:.14em;color:var(--lime);border:1px solid var(--lime)}
+.saved-note{margin:0;font-size:13px;color:var(--ink-3)}
+.muted{margin:0;font-size:14px;color:var(--ink-3)}
+.guide{margin:0;font-size:13px;color:var(--ink-3)}
+.foot{padding:26px 0 40px;font:13px/1.5 var(--mono);color:var(--ink-3);border-top:1px solid rgba(255,255,255,.06)}
+
+/* license dialog */
+dialog{width:min(92vw,520px);max-width:none;margin:auto;padding:0;color:var(--ink);background:var(--panel-2);border:1px solid var(--magenta);box-shadow:0 0 44px rgba(255,45,149,.38)}
+dialog::backdrop{background:rgba(3,3,8,.82);backdrop-filter:blur(3px)}
+.lic{padding:22px;display:grid;gap:12px}
+.lic h2{margin:0;font:400 clamp(36px,8vw,48px)/.95 var(--display);text-transform:uppercase;color:#fff;text-shadow:0 0 14px rgba(255,45,149,.5)}
+.lic p{margin:0;font-size:15px;line-height:1.5;color:var(--ink-2);overflow-wrap:anywhere}
+.lic .lic-msg{color:#ffc2de}
+.lic-actions{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:10px;margin-top:6px}
+.lic-actions .btn-run.small{font-size:24px}
+
+@media (max-width:420px){
+  .drop-title{font-size:38px}
+  .row2{grid-template-columns:1fr}
+  .stats{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .btn-run{font-size:28px}
+}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none !important;transition:none !important}}
+</style>
+</head>
+<body>
+<div class="scanlines" aria-hidden="true"></div>
+
+<header class="masthead">
+  <div class="wrap">
+    <h1 class="wordmark">LipRead</h1>
+    <p class="ticker" aria-label="Works on fan cam, sideline and broadcast video"><span>Fan cam</span><i aria-hidden="true"></i><span>Sideline</span><i aria-hidden="true"></i><span>Broadcast</span></p>
+  </div>
+</header>
+
+<div class="banner" role="note">
+  <div class="wrap"><strong>AI lip-read estimates.</strong> Lip reading is uncertain — don't treat output as a quote.</div>
+</div>
+
+<main class="wrap layout">
+  <div class="left">
+    <section class="panel" aria-labelledby="intake-title">
+      <h2 class="kicker" id="intake-title"><span class="num">01</span>Clip</h2>
+      <form id="form" novalidate>
+        <div>
+          <label class="drop" id="drop" for="file">
+            <input id="file" class="sr-only" type="file" accept="video/*">
+            <span class="drop-title" id="drop-title">Drop a video</span>
+            <span class="drop-sub" id="drop-sub">or tap to choose one from your phone or computer</span>
+          </label>
+          <button class="btn-ghost drop-clear" id="clear-file" type="button" hidden>Remove file</button>
+        </div>
+
+        <div class="or">OR PASTE A LINK</div>
+
+        <label class="field">
+          <span class="label">Video URL</span>
+          <input id="url" type="url" inputmode="url" autocomplete="off" placeholder="https://">
+        </label>
+
+        <label class="field">
+          <span class="label">Player names, one per line</span>
+          <textarea id="roster" rows="4" placeholder="Haaland&#10;Saka&#10;Rice"></textarea>
+          <span class="hint">Names are boosted only when the lips support them, and every boost is flagged. Commas work too.</span>
+        </label>
+
+        <div class="field">
+          <span class="label" id="time-label">Time window</span>
+          <div class="row2" role="group" aria-labelledby="time-label">
+            <label class="field" style="margin-top:0"><span class="hint">From</span><input id="start" inputmode="decimal" placeholder="0:00" autocomplete="off"></label>
+            <label class="field" style="margin-top:0"><span class="hint">To</span><input id="end" inputmode="decimal" placeholder="end of clip" autocomplete="off"></label>
+          </div>
+          <span class="hint">Seconds or m:ss, such as 90 or 1:30. Leave "To" empty for the whole clip.</span>
+        </div>
+
+        <label class="field">
+          <span class="label">Faces to read</span>
+          <select id="faces">
+            <option value="readable">Readable only (recommended)</option>
+            <option value="all">Every face found</option>
+            <option value="largest">Largest face only</option>
+          </select>
+        </label>
+
+        <label class="check">
+          <input id="force" type="checkbox">
+          <span>Also decode unreadable faces, marked as unreadable</span>
+        </label>
+
+        <p class="form-error" id="form-error" role="alert" hidden></p>
+
+        <div class="form-actions">
+          <button class="btn-run" id="run" type="submit">Run LipRead</button>
+        </div>
+      </form>
+    </section>
+
+    <section class="panel" aria-labelledby="recent-title">
+      <h2 class="kicker" id="recent-title"><span class="num">02</span>Recent</h2>
+      <ul class="rec-list" id="recent"></ul>
+      <p class="empty" id="recent-empty">Nothing run yet on this computer.</p>
+    </section>
+  </div>
+
+  <section class="output" aria-label="Job status and results">
+    <!-- idle -->
+    <div class="panel idle" id="idle">
+      <p class="idle-big">No job running</p>
+      <p>Drop a clip on the left. Every word comes back with a confidence tier. The uncertain ones are dashed and marked with a question mark.</p>
+      <ul class="legend" aria-label="Colour key">
+        <li><span class="swatch c-cyan"></span>Readable</li>
+        <li><span class="swatch c-amber"></span>Marginal</li>
+        <li><span class="swatch c-magenta"></span>Unreadable</li>
+        <li><span class="swatch c-lime"></span>Boosted name</li>
+      </ul>
+    </div>
+
+    <!-- progress and upload -->
+    <div class="panel" id="progress" hidden>
+      <h2 class="kicker"><span class="num">//</span><span id="p-kicker">Working</span></h2>
+      <p class="job-title" id="p-title"></p>
+      <div class="stage-row">
+        <p class="stage-big" id="p-stage">Starting</p>
+        <p class="pct" id="p-pct"></p>
+      </div>
+      <div class="bar" id="bar" role="progressbar" aria-label="Progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><i id="p-bar"></i></div>
+      <p class="msg" id="p-msg" aria-live="polite"></p>
+      <ol class="stages" id="p-stages"></ol>
+    </div>
+
+    <!-- failed -->
+    <div class="panel is-magenta" id="failed" hidden>
+      <h2 class="kicker c-magenta" style="color:var(--magenta);text-shadow:0 0 10px rgba(255,45,149,.6)"><span class="num" style="color:var(--cyan)">//</span><span id="f-title">Run failed</span></h2>
+      <p class="failed-msg" id="f-msg" role="alert"></p>
+      <div class="row-btns">
+        <button class="btn-ghost magenta" id="f-retry" type="button">Run again</button>
+        <button class="btn-ghost" id="f-license" type="button" hidden>Review model license</button>
+      </div>
+    </div>
+
+    <!-- results -->
+    <div class="results" id="results" hidden>
+      <div class="panel">
+        <h2 class="kicker"><span class="num">03</span>Results</h2>
+        <h3 class="res-title-lg" id="r-title"></h3>
+        <p class="res-stats" id="r-stats"></p>
+        <ul class="legend" aria-label="Colour key">
+          <li><span class="swatch c-cyan"></span>Readable</li>
+          <li><span class="swatch c-amber"></span>Marginal</li>
+          <li><span class="swatch c-magenta"></span>Unreadable</li>
+          <li><span class="swatch c-lime"></span>Boosted name</li>
+        </ul>
+      </div>
+
+      <div class="panel player-panel" id="player-panel" hidden>
+        <video class="player" id="player" controls preload="metadata" playsinline aria-label="Annotated clip"></video>
+        <p class="guide">Click any word to jump the video to it. Times are on the original clip.</p>
+      </div>
+
+      <div class="panel">
+        <h2 class="kicker-sm">Downloads</h2>
+        <div class="dl-row" id="dl-row" style="margin-top:12px"></div>
+      </div>
+
+      <div>
+        <h2 class="kicker" style="margin-bottom:14px"><span class="num">04</span>Faces</h2>
+        <div class="faces" id="faces-grid"></div>
+        <p class="empty" id="no-faces" hidden>No faces were found in this window. Try a wider time range, or choose "Every face found".</p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="wrap foot">Runs on this computer. Clips and results stay in your LipRead jobs folder.</footer>
+
+<dialog id="license" aria-labelledby="lic-title">
+  <div class="lic">
+    <h2 class="kicker" style="margin:0;color:var(--magenta);text-shadow:0 0 10px rgba(255,45,149,.6)"><span class="num" style="color:var(--cyan)">//</span>Model license</h2>
+    <h3 class="sr-only" id="lic-title">Accept the model license</h3>
+    <p class="lic-msg" id="lic-msg"></p>
+    <p>The lip-reading model downloads on first use and carries its own license. Read it before you accept.</p>
+    <p class="form-error" id="lic-error" hidden></p>
+    <div class="lic-actions">
+      <button class="btn-ghost" id="lic-cancel" type="button">Not now</button>
+      <button class="btn-run small" id="lic-accept" type="button">Accept and run again</button>
+    </div>
+  </div>
+</dialog>
+
+<script>
+(() => {
+  "use strict";
+
+  const $ = (sel) => document.querySelector(sel);
+  const TIER_RANK = { readable: 0, marginal: 1, unreadable: 2 };
+  const TIER_LABEL = { readable: "Readable", marginal: "Marginal", unreadable: "Unreadable" };
+  const STAGE_LABEL = {
+    probe: "Probing video", shots: "Finding shots", faces: "Finding faces",
+    quality: "Judging readability", decode: "Reading lips", render: "Rendering video", done: "Done",
+  };
+  const DOWNLOADS = [["srt", "SRT"], ["vtt", "VTT"], ["json", "JSON"], ["txt", "TXT"], ["mp4", "MP4"]];
+  const VIEWS = ["idle", "progress", "failed", "results"];
+
+  const st = {
+    jobId: null, timer: null, busy: false, view: "idle",
+    offset: 0, words: [], chosenFile: null, licenseJob: null,
+  };
+
+  class ApiError extends Error {
+    constructor(status, message) { super(message); this.status = status; }
+  }
+
+  // ---- helpers -------------------------------------------------------------
+  // Builds DOM nodes. Text always goes through textContent, so model output is never parsed as HTML.
+  function h(tag, props, ...children) {
+    const el = document.createElement(tag);
+    for (const [k, v] of Object.entries(props || {})) {
+      if (v === undefined || v === null || v === false) continue;
+      if (k === "class") el.className = v;
+      else if (k === "text") el.textContent = v;
+      else if (k === "dataset") Object.assign(el.dataset, v);
+      else if (k.startsWith("on") && typeof v === "function") el.addEventListener(k.slice(2), v);
+      else el.setAttribute(k, v === true ? "" : String(v));
+    }
+    for (const c of children.flat()) {
+      if (c === null || c === undefined || c === false) continue;
+      el.append(c instanceof Node ? c : document.createTextNode(String(c)));
+    }
+    return el;
+  }
+
+  function errMessage(body, status) {
+    const d = body && body.detail;
+    if (typeof d === "string") return d;
+    if (Array.isArray(d)) return d.map((x) => x.msg).join("; ");
+    return `Request failed (${status})`;
+  }
+
+  async function api(path, opts = {}) {
+    let res;
+    try {
+      res = await fetch(path, opts);
+    } catch (_) {
+      throw new ApiError(0, "Could not reach LipRead on this computer.");
+    }
+    let body = null;
+    try { body = await res.json(); } catch (_) { /* not JSON */ }
+    if (!res.ok) throw new ApiError(res.status, errMessage(body, res.status));
+    return body;
+  }
+
+  // Multipart upload with progress. fetch cannot report upload progress, so use XHR.
+  function sendForm(fd, onProgress) {
+    return new Promise((resolve, reject) => {
+      const xhr = new XMLHttpRequest();
+      xhr.open("POST", "/api/jobs");
+      xhr.upload.onprogress = (e) => { if (e.lengthComputable && onProgress) onProgress(e.loaded / e.total); };
+      xhr.onload = () => {
+        let body = null;
+        try { body = JSON.parse(xhr.responseText); } catch (_) { /* not JSON */ }
+        if (xhr.status >= 200 && xhr.status < 300) resolve(body);
+        else reject(new ApiError(xhr.status, errMessage(body, xhr.status)));
+      };
+      xhr.onerror = () => reject(new ApiError(0, "Could not reach LipRead on this computer."));
+      xhr.send(fd);
+    });
+  }
+
+  function fmtTime(sec) {
+    if (typeof sec !== "number" || !isFinite(sec)) return "--";
+    const m = Math.floor(sec / 60);
+    const s = (sec - m * 60).toFixed(1).padStart(4, "0");
+    return `${m}:${s}`;
+  }
+  function fmtPct(v) { return typeof v === "number" && isFinite(v) ? `${Math.round(v * 100)}%` : "--"; }
+  function fmtBytes(n) {
+    if (n >= 1073741824) return `${(n / 1073741824).toFixed(2)} GB`;
+    return `${(n / 1048576).toFixed(1)} MB`;
+  }
+  function fmtDate(iso) {
+    if (!iso) return "";
+    return new Date(iso).toLocaleString([], { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" });
+  }
+  // Same grammar as the server: seconds, m:ss or h:mm:ss. Empty gives null.
+  function parseTime(text) {
+    const s = (text || "").trim();
+    if (!s) return null;
+    const parts = s.split(":");
+    if (parts.length > 3) throw new Error("bad time");
+    let total = 0;
+    for (const p of parts) {
+      if (!p.trim()) throw new Error("bad time");
+      const v = Number(p);
+      if (!Number.isFinite(v) || v < 0) throw new Error("bad time");
+      total = total * 60 + v;
+    }
+    return total;
+  }
+  const stageLabel = (code) => STAGE_LABEL[code] || (code ? code.replace(/[_-]+/g, " ") : "Starting");
+
+  function show(view) {
+    st.view = view;
+    for (const v of VIEWS) {
+      const el = $("#" + v);
+      if (el) el.hidden = v !== view;
+    }
+  }
+
+  function setFormError(msg) {
+    const el = $("#form-error");
+    el.textContent = msg || "";
+    el.hidden = !msg;
+  }
+
+  function setBar(pct, busy) {
+    $("#p-bar").style.width = `${pct}%`;
+    const bar = $("#bar");
+    bar.setAttribute("aria-valuenow", String(pct));
+    bar.classList.toggle("is-busy", !!busy);
+  }
+
+  function setHash(id) {
+    const want = `#job=${id}`;
+    if (location.hash !== want) history.replaceState(null, "", want);
+  }
+
+  // ---- file and URL intake -------------------------------------------------
+  function setFile(f) {
+    st.chosenFile = f;
+    $("#url").value = "";
+    $("#drop-title").textContent = "Ready";
+    $("#drop-sub").textContent = `${f.name} · ${fmtBytes(f.size)}`;
+    $("#clear-file").hidden = false;
+    setFormError("");
+  }
+  function clearFile() {
+    st.chosenFile = null;
+    $("#file").value = "";
+    $("#drop-title").textContent = "Drop a video";
+    $("#drop-sub").textContent = "or tap to choose one from your phone or computer";
+    $("#clear-file").hidden = true;
+  }
+
+  async function submitJob(e) {
+    e.preventDefault();
+    setFormError("");
+    const file = st.chosenFile;
+    const url = $("#url").value.trim();
+    if (file && url) return setFormError("Choose a video file or paste a URL, not both.");
+    if (!file && !url) return setFormError("Drop a video, choose one, or paste a URL.");
+    if (url && !/^https?:\/\//i.test(url)) return setFormError("The URL must start with http:// or https://.");
+    let start, end;
+    try {
+      start = parseTime($("#start").value) ?? 0;
+      end = parseTime($("#end").value);
+    } catch (_) {
+      return setFormError("Times are seconds or m:ss, such as 90 or 1:30.");
+    }
+    if (end !== null && end <= start) return setFormError("End must be after start.");
+
+    const fd = new FormData();
+    if (file) fd.append("file", file, file.name);
+    else fd.append("url", url);
+    fd.append("start", String(start));
+    if (end !== null) fd.append("end", String(end));
+    fd.append("faces", $("#faces").value);
+    fd.append("names", $("#roster").value);
+    fd.append("force_unreadable", $("#force").checked ? "1" : "");
+
+    const run = $("#run");
+    const prevJob = st.jobId;
+    run.disabled = true;
+    run.textContent = "Sending";
+    stopPolling();
+    st.jobId = null;
+    if (file) showUpload(0, file.name);
+    try {
+      const body = await sendForm(fd, (frac) => showUpload(frac, file.name));
+      openJob(body.id);
+      refreshList();
+    } catch (err) {
+      setFormError(err.message);
+      if (prevJob) openJob(prevJob);
+      else show("idle");
+    } finally {
+      run.disabled = false;
+      run.textContent = "Run LipRead";
+    }
+  }
+
+  // ---- job lifecycle -------------------------------------------------------
+  function stopPolling() {
+    if (st.timer) clearInterval(st.timer);
+    st.timer = null;
+  }
+
+  function openJob(id) {
+    stopPolling();
+    const p = $("#player");
+    p.pause();
+    p.removeAttribute("src");
+    p.load();
+    st.jobId = id;
+    st.offset = 0;
+    st.words = [];
+    setHash(id);
+    refreshList();
+    st.timer = setInterval(tick, 900);
+    tick();
+  }
+
+  async function tick() {
+    if (st.busy || !st.jobId) return;
+    st.busy = true;
+    const id = st.jobId;
+    try {
+      const s = await api(`/api/jobs/${id}`);
+      if (id !== st.jobId) return;
+      if (s.status === "done") {
+        stopPolling();
+        const r = await api(`/api/jobs/${id}/result`);
+        if (id !== st.jobId) return;
+        renderResult(r, s);
+        refreshList();
+      } else if (s.status === "error") {
+        stopPolling();
+        renderFailed(s);
+        refreshList();
+        if (s.needs_license) openLicense(id, s.error);
+      } else {
+        renderProgress(s);
+      }
+    } catch (err) {
+      if (id !== st.jobId) return;
+      if (err.status === 404) {
+        stopPolling();
+        renderFailed({ error: "This job is no longer on the server.", needs_license: false });
+      } else {
+        $("#p-msg").textContent = "Lost contact with the server. Retrying…";
+      }
+    } finally {
+      st.busy = false;
+    }
+  }
+
+  function showUpload(frac, name) {
+    show("progress");
+    $("#p-kicker").textContent = "Uploading";
+    $("#p-title").textContent = name;
+    const done = frac >= 1;
+    $("#p-stage").textContent = done ? "Starting" : "Uploading";
+    const pct = Math.round(frac * 100);
+    $("#p-pct").textContent = `${pct}%`;
+    setBar(pct, done);
+    $("#p-msg").textContent = done ? "Clip received. Queuing the job." : "Sending the clip to this computer.";
+    $("#p-stages").replaceChildren();
+  }
+
+  function renderProgress(s) {
+    show("progress");
+    const queued = s.status === "queued";
+    $("#p-kicker").textContent = queued ? "Queued" : "Working";
+    $("#p-title").textContent = s.title;
+    $("#p-stage").textContent = queued
+      ? (s.queue_position ? `In queue, #${s.queue_position}` : "In queue")
+      : stageLabel(s.stage);
+    const pct = queued ? 0 : Math.round((s.progress || 0) * 100);
+    $("#p-pct").textContent = queued ? "" : `${pct}%`;
+    setBar(pct, !queued);
+    $("#p-msg").textContent = s.message || "";
+    const cur = s.stage;
+    $("#p-stages").replaceChildren(...(s.stages || []).map((code) =>
+      h("li", { class: code === cur ? "is-current" : "is-done", text: stageLabel(code) })));
+  }
+
+  function renderFailed(s) {
+    show("failed");
+    $("#f-title").textContent = s.needs_license ? "License needed" : "Run failed";
+    $("#f-msg").textContent = s.error || "Something went wrong.";
+    $("#f-retry").hidden = !!s.needs_license;
+    $("#f-license").hidden = !s.needs_license;
+  }
+
+  // ---- results -------------------------------------------------------------
+  function renderResult(r, s) {
+    show("results");
+    const tracks = (r.tracks || []).slice().sort((a, b) =>
+      (TIER_RANK[a.quality.tier] - TIER_RANK[b.quality.tier]) || (a.track_id - b.track_id));
+    const counts = { readable: 0, marginal: 0, unreadable: 0 };
+    let words = 0;
+    for (const t of tracks) {
+      counts[t.quality.tier] = (counts[t.quality.tier] || 0) + 1;
+      for (const u of t.utterances || []) words += (u.words || []).length;
+    }
+    $("#r-title").textContent = s.title;
+    const model = r.model && r.model.engine ? ` · model ${r.model.engine}` : "";
+    $("#r-stats").textContent =
+      `${tracks.length} faces · ${counts.readable} readable · ${counts.marginal} marginal · ` +
+      `${counts.unreadable} unreadable · ${words} words${model}`;
+
+    st.offset = Number(r.job && r.job.start) || 0;
+    const mp4 = r.outputs && r.outputs.mp4;
+    const player = $("#player");
+    $("#player-panel").hidden = !mp4;
+    if (mp4) player.setAttribute("src", mp4);
+    else { player.removeAttribute("src"); player.load(); }
+
+    const outputs = r.outputs || {};
+    $("#dl-row").replaceChildren(...DOWNLOADS.map(([key, label]) => outputs[key]
+      ? h("a", { class: "dl", href: outputs[key], download: "", text: label })
+      : h("span", { class: "dl is-off", "aria-disabled": "true", text: label })));
+
+    st.words = [];
+    $("#faces-grid").replaceChildren(...tracks.map((t) => faceCard(t)));
+    $("#no-faces").hidden = tracks.length > 0;
+  }
+
+  function stat(label, value) {
+    return h("div", { class: "stat" }, h("dt", { text: label }), h("dd", { text: value }));
+  }
+
+  function faceCard(t) {
+    const q = t.quality || {};
+    const tier = q.tier || "unreadable";
+    const media = t.thumbnail
+      ? h("img", { src: t.thumbnail, alt: `Face of track ${t.track_id}`, loading: "lazy" })
+      : h("div", { class: "face-none", text: "No thumbnail" });
+    const reasons = (q.reasons || []).map((r) => h("li", { text: r }));
+    return h("article", {
+      class: `face face--${tier}${t.skipped ? " is-skipped" : ""}`,
+      "aria-label": `Track ${t.track_id}, ${TIER_LABEL[tier] || tier}`,
+    },
+      h("div", { class: "face-media" },
+        media,
+        h("span", { class: `badge badge--${tier}`, text: TIER_LABEL[tier] || tier }),
+        h("span", { class: "track-tag", text: `Track ${t.track_id}` })),
+      h("div", { class: "face-body" },
+        h("p", { class: "face-time", text: `${fmtTime(t.start)} – ${fmtTime(t.end)}` }),
+        h("dl", { class: "stats" },
+          stat("Face", typeof q.face_px === "number" ? `${Math.round(q.face_px)} px` : "--"),
+          stat("Mouth", typeof q.mouth_px === "number" ? `${Math.round(q.mouth_px)} px` : "--"),
+          stat("Yaw", typeof q.yaw_deg === "number" ? `${Math.round(q.yaw_deg)}°` : "--"),
+          stat("Coverage", fmtPct(q.coverage)),
+          stat("Motion", fmtPct(q.motion))),
+        reasons.length ? h("ul", { class: "reasons" }, reasons) : null,
+        t.crops_preview ? h("img", { class: "crops", src: t.crops_preview, alt: `Mouth crops for track ${t.track_id}`, loading: "lazy" }) : null,
+        st.jobId && $("#player").getAttribute("src") && !t.skipped && (t.utterances || []).length
+          ? h("button", { class: "btn-ghost", type: "button", onclick: () => seekTo(t.start) }, "Play from here")
+          : null,
+        transcriptBlock(t)));
+  }
+
+  function transcriptBlock(t) {
+    if (t.skipped) {
+      return h("div", { class: "transcript" },
+        h("p", { class: "muted", text: "Not decoded: this face was not readable enough. Tick \"Also decode unreadable faces\" to try anyway." }));
+    }
+    const utts = t.utterances || [];
+    if (!utts.length) {
+      return h("div", { class: "transcript" }, h("p", { class: "muted", text: "No speech found for this face." }));
+    }
+    const note = t.quality && t.quality.tier === "marginal"
+      ? "Marginal face: expect more errors." : null;
+    return h("div", { class: "transcript" },
+      h("p", { class: "kicker-sm", text: "Transcript" }),
+      note ? h("p", { class: "guide", text: note }) : null,
+      utts.map((u) => utteranceBlock(t, u)));
+  }
+
+  function wordChip(w) {
+    const tier = w.tier || "medium";
+    const cls = ["word", `tier-${tier}`];
+    if (w.boosted) cls.push("boosted");
+    const detail = w.boosted
+      ? `boosted from ${w.original}`
+      : `${Math.round((w.confidence || 0) * 100)}% confidence${tier === "low" ? ", uncertain" : ""}`;
+    const chip = h("button", {
+      type: "button",
+      class: cls.join(" "),
+      title: w.boosted ? `boosted from: ${w.original}` : `${w.text}: ${detail}`,
+      "aria-label": `${w.text}, ${detail}, at ${fmtTime(w.start)}`,
+      text: w.text,
+    });
+    chip.addEventListener("click", () => seekTo(w.start));
+    return chip;
+  }
+
+  function utteranceBlock(t, u) {
+    const words = u.words || [];
+    const text = words.map((w) => w.text).join(" ");
+    const chips = words.map((w) => {
+      const chip = wordChip(w);
+      st.words.push({ el: chip, start: w.start, end: w.end });
+      return chip;
+    });
+    const view = h("div", { class: "words" }, chips);
+    const corrected = h("p", { class: "corrected", hidden: true });
+    const savedNote = h("p", { class: "saved-note", hidden: true, text: "Saved for your sports test set." });
+
+    const ta = h("textarea", { rows: 2, maxlength: 500, "aria-label": "Corrected words for this line" });
+    ta.value = text;
+    const err = h("p", { class: "form-error", role: "alert", hidden: true });
+    const save = h("button", { class: "btn-run small", type: "button" }, "Save");
+    const cancel = h("button", { class: "btn-ghost", type: "button" }, "Cancel");
+    const editor = h("div", { class: "editor", hidden: true }, ta, err, h("div", { class: "row-btns" }, save, cancel));
+    const editBtn = h("button", { class: "btn-ghost", type: "button", "aria-expanded": "false" }, "Edit / correct");
+
+    const toggle = (open) => {
+      editor.hidden = !open;
+      editBtn.setAttribute("aria-expanded", String(open));
+      if (open) ta.focus();
+    };
+    editBtn.addEventListener("click", () => toggle(editor.hidden));
+    cancel.addEventListener("click", () => { ta.value = text; err.hidden = true; toggle(false); });
+    save.addEventListener("click", async () => {
+      const fixed = ta.value.split(/\s+/).filter(Boolean).join(" ");
+      if (!fixed) {
+        err.textContent = "Type the corrected words, or cancel.";
+        err.hidden = false;
+        return;
+      }
+      save.disabled = true;
+      err.hidden = true;
+      try {
+        await api(`/api/jobs/${st.jobId}/labels`, {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({ track_id: t.track_id, start: u.start, end: u.end, text: fixed, original: text }),
+        });
+        corrected.replaceChildren(h("span", { class: "tag", text: "Corrected" }), document.createTextNode(fixed));
+        corrected.hidden = false;
+        savedNote.hidden = false;
+        view.hidden = true;
+        toggle(false);
+        editBtn.textContent = "Correct again";
+      } catch (e) {
+        err.textContent = e.message;
+        err.hidden = false;
+      } finally {
+        save.disabled = false;
+      }
+    });
+
+    return h("div", { class: "utt" },
+      h("div", { class: "utt-head" },
+        h("span", { class: "utt-meta" },
+          `${fmtTime(u.start)} – ${fmtTime(u.end)}`,
+          h("span", { text: `· ${fmtPct(u.confidence)} confidence` })),
+        editBtn),
+      view, corrected, savedNote, editor);
+  }
+
+  function seekTo(t) {
+    const p = $("#player");
+    if (!p.getAttribute("src")) return;
+    p.currentTime = Math.max(0, t - st.offset);
+    p.play().catch(() => {});
+    const box = p.getBoundingClientRect();
+    if (box.bottom < 0 || box.top > window.innerHeight) {
+      p.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+  }
+
+  function highlightWords() {
+    const now = $("#player").currentTime + st.offset;
+    st.words = st.words.filter((x) => x.el.isConnected);
+    for (const x of st.words) x.el.classList.toggle("live", now >= x.start && now < x.end);
+  }
+
+  // ---- license ---------------------------------------------------------------
+  function openLicense(id, message) {
+    st.licenseJob = id;
+    $("#lic-msg").textContent = message || "The model license must be accepted before the first run.";
+    $("#lic-error").hidden = true;
+    const d = $("#license");
+    if (!d.open) d.showModal();
+  }
+
+  async function acceptLicense() {
+    const btn = $("#lic-accept");
+    const id = st.licenseJob || st.jobId;
+    btn.disabled = true;
+    try {
+      await api("/api/accept-license", { method: "POST" });
+      if (id) await api(`/api/jobs/${id}/retry`, { method: "POST" });
+      $("#license").close();
+      if (id) openJob(id);
+    } catch (e) {
+      $("#lic-error").textContent = e.message;
+      $("#lic-error").hidden = false;
+    } finally {
+      btn.disabled = false;
+    }
+  }
+
+  // ---- recent jobs -----------------------------------------------------------
+  async function refreshList() {
+    try {
+      renderRecent(await api("/api/jobs?limit=8"));
+    } catch (_) { /* the list is a convenience; keep what is shown */ }
+  }
+
+  function renderRecent(items) {
+    const list = $("#recent");
+    list.replaceChildren(...items.map((j) => h("li", null,
+      h("button", {
+        class: "rec-btn" + (j.id === st.jobId ? " is-current" : ""),
+        type: "button",
+        "aria-label": `Open ${j.title}, ${j.status}`,
+        onclick: () => openJob(j.id),
+      },
+        h("span", { class: "rec-title", text: j.title }),
+        h("span", { class: `pill pill--${j.status}`, text: j.status }),
+        h("span", { class: "rec-time", text: `${fmtDate(j.created)}${j.faces ? " · faces " + j.faces : ""}` })))));
+    $("#recent-empty").hidden = items.length > 0;
+  }
+
+  // ---- wiring ----------------------------------------------------------------
+  function init() {
+    const file = $("#file");
+    const drop = $("#drop");
+
+    file.addEventListener("change", () => { if (file.files[0]) setFile(file.files[0]); });
+    $("#clear-file").addEventListener("click", clearFile);
+    $("#url").addEventListener("input", (e) => { if (e.target.value) clearFile(); });
+
+    ["dragenter", "dragover"].forEach((ev) => drop.addEventListener(ev, (e) => {
+      e.preventDefault();
+      drop.classList.add("is-over");
+    }));
+    ["dragleave", "dragend", "drop"].forEach((ev) => drop.addEventListener(ev, (e) => {
+      if (ev === "drop") e.preventDefault();
+      drop.classList.remove("is-over");
+    }));
+    drop.addEventListener("drop", (e) => {
+      const f = e.dataTransfer && e.dataTransfer.files[0];
+      if (f) setFile(f);
+    });
+    // A drop that misses the zone must not navigate away from the app.
+    window.addEventListener("dragover", (e) => e.preventDefault());
+    window.addEventListener("drop", (e) => e.preventDefault());
+
+    $("#form").addEventListener("submit", submitJob);
+    $("#f-retry").addEventListener("click", async () => {
+      const id = st.jobId;
+      if (!id) return;
+      try {
+        await api(`/api/jobs/${id}/retry`, { method: "POST" });
+        openJob(id);
+      } catch (e) {
+        $("#f-msg").textContent = e.message;
+      }
+    });
+    $("#f-license").addEventListener("click", () => openLicense(st.jobId, $("#f-msg").textContent));
+    $("#lic-accept").addEventListener("click", acceptLicense);
+    $("#lic-cancel").addEventListener("click", () => $("#license").close());
+
+    $("#player").addEventListener("timeupdate", highlightWords);
+    $("#player").addEventListener("seeked", highlightWords);
+
+    window.addEventListener("hashchange", () => {
+      const m = location.hash.match(/job=([a-f0-9]{12})/);
+      if (m && m[1] !== st.jobId) openJob(m[1]);
+    });
+
+    refreshList();
+    const m = location.hash.match(/job=([a-f0-9]{12})/);
+    if (m) openJob(m[1]);
+    else show("idle");
+  }
+
+  init();
+})();
+</script>
+</body>
+</html>
