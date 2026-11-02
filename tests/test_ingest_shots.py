@@ -126,11 +126,78 @@ def test_count_frames_clips_to_duration(two_shot_clip):
     assert ingest.count_frames(info, 5.0, 6.0) == 0
 
 
-def test_output_size_caps_height_and_keeps_even_width():
-    assert ingest._output_size(1920, 1080, 1080) == (1920, 1080)
-    assert ingest._output_size(3840, 2160, 1080) == (1920, 1080)
-    w, h = ingest._output_size(1001, 2000, 1080)
-    assert h == 1080 and w % 2 == 0
+def test_output_size_caps_long_side_and_keeps_even_sides():
+    assert ingest._output_size(1920, 1080) == (1920, 1080)
+    assert ingest._output_size(1080, 1920) == (1080, 1920)     # portrait stays full size
+    assert ingest._output_size(3840, 2160) == (1920, 1080)
+    assert ingest._output_size(2160, 3840) == (1080, 1920)
+    w, h = ingest._output_size(1001, 2000)
+    assert h == 1920 and w % 2 == 0
+
+
+def test_max_height_is_a_deprecated_alias_for_max_side(two_shot_clip):
+    info = ingest.probe(str(two_shot_clip))
+    with pytest.warns(DeprecationWarning):
+        frames = ingest.iter_frames(info, start=0.0, end=0.2, max_height=120)
+        assert next(frames).shape == (90, 120, 3)           # long side 320 -> 120
+        frames.close()
+
+
+def _portrait_clip(path) -> str:
+    """1 s solid 1080x1920 (portrait) clip, no audio."""
+    import subprocess
+
+    cmd = ["ffmpeg", "-v", "error", "-y", "-f", "lavfi",
+           "-i", "color=c=gray:s=1080x1920:r=25:d=1", "-c:v", "libx264",
+           "-preset", "ultrafast", "-pix_fmt", "yuv420p", str(path)]
+    subprocess.run(cmd, check=True, capture_output=True)
+    return str(path)
+
+
+def test_portrait_1080x1920_keeps_full_size(tmp_path, require_ffmpeg):
+    info = ingest.probe(_portrait_clip(tmp_path / "portrait.mp4"))
+    assert (info.width, info.height) == (1080, 1920)
+    frames = list(ingest.iter_frames(info))
+    assert frames
+    assert frames[0].shape == (1920, 1080, 3)
+
+
+def test_start_past_the_end_raises(two_shot_clip):
+    info = ingest.probe(str(two_shot_clip))
+    with pytest.raises(LipReadError, match="no frames in the requested time range"):
+        list(ingest.iter_frames(info, start=info.duration + 5.0))
+
+
+# --------------------------------------------------------------------------- URL guard
+
+@pytest.mark.parametrize("url", [
+    "http://127.0.0.1/x",
+    "http://localhost/x",
+    "http://192.168.1.5/x",
+    "http://169.254.169.254/x",
+    "file:///etc/passwd",
+    "ftp://93.184.216.34/x",
+    "http://[::1]/x",
+])
+def test_check_public_url_rejects_local_and_private(url):
+    with pytest.raises(LipReadError):
+        ingest._check_public_url(url)
+
+
+def test_check_public_url_accepts_public_literal_ip():
+    assert ingest._check_public_url("http://93.184.216.34/x") is None
+
+
+def test_check_public_url_rejects_host_resolving_to_private(monkeypatch):
+    import socket
+
+    def fake_getaddrinfo(host, port, **kwargs):
+        return [(socket.AF_INET, socket.SOCK_STREAM, 6, "", ("93.184.216.34", 0)),
+                (socket.AF_INET, socket.SOCK_STREAM, 6, "", ("10.0.0.7", 0))]
+
+    monkeypatch.setattr(socket, "getaddrinfo", fake_getaddrinfo)
+    with pytest.raises(LipReadError):
+        ingest._check_public_url("https://example.test/x")
 
 
 # --------------------------------------------------------------------------- audio
