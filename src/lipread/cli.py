@@ -208,6 +208,14 @@ def _cmd_scan(args: argparse.Namespace) -> int:
 
 def _cmd_models(args: argparse.Namespace) -> int:
     if args.models_cmd == "download":
+        if args.accept_license:
+            spec = models.MANIFEST["vsr"]
+            print("LICENCE NOTICE - lip-reading model (Auto-AVSR, LRS3 visual-only, int8 ONNX)\n"
+                  f"  Terms: {spec.license}.\n"
+                  "  The weights were trained on LRS3 (TED/TEDx). They may be used for research and\n"
+                  "  non-commercial purposes only. Do not use them in a commercial product.\n"
+                  "  Details: MODEL_LICENSES.md. By passing --accept-license you accept these terms.\n")
+            models.accept_license_persist()   # recorded even if a licence-free download fails first
         paths = models.ensure_all(accept_license=args.accept_license)
         for name, path in paths.items():
             print(f"{name:<10} {path}")

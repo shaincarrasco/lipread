@@ -11,6 +11,7 @@ import logging
 import os
 import shutil
 import subprocess
+import tempfile
 from dataclasses import dataclass
 from typing import Iterable, Iterator
 
@@ -333,6 +334,23 @@ def _normalize_frame(frame: np.ndarray, width: int, height: int) -> np.ndarray:
     return np.ascontiguousarray(frame)
 
 
+def _stop_ffmpeg(proc: subprocess.Popen | None) -> None:
+    """Close ffmpeg's stdin, kill it if it is still running and reap it. Never raises."""
+    if proc is None:
+        return
+    if proc.stdin is not None:
+        try:
+            proc.stdin.close()
+        except OSError:
+            pass
+    try:
+        if proc.poll() is None:
+            proc.kill()
+        proc.wait()
+    except OSError:
+        pass
+
+
 def _ffmpeg_command(out_path: str, width: int, height: int, job: Job,
                     audio_src: str | None) -> list[str]:
     """Build the ffmpeg command: raw BGR on stdin, H.264 out, optional trimmed audio."""
@@ -346,7 +364,7 @@ def _ffmpeg_command(out_path: str, width: int, height: int, job: Job,
         cmd += ["-ss", f"{job.start:.3f}"]
         if job.end is not None:
             cmd += ["-t", f"{max(0.0, job.end - job.start):.3f}"]
-        cmd += ["-i", audio_src]
+        cmd += ["-protocol_whitelist", "file,pipe", "-i", audio_src]
     cmd += ["-map", "0:v"]
     if audio_src:
         cmd += ["-map", "1:a?", "-c:a", "aac", "-b:a", "128k", "-shortest"]
@@ -385,10 +403,14 @@ def render_video(result: Result, frames: Iterable[np.ndarray], tracks_by_id: dic
     parent = os.path.dirname(os.path.abspath(out_path))
     os.makedirs(parent, exist_ok=True)
     cmd = _ffmpeg_command(out_path, out_w, out_h, job, audio_src)
-    proc = subprocess.Popen(cmd, stdin=subprocess.PIPE, stderr=subprocess.PIPE)
+    # ffmpeg's stderr goes to a temp file, not a pipe: nothing reads a pipe until the end, so
+    # a chatty ffmpeg would block once the pipe buffer (64 KB) fills.
+    err = tempfile.TemporaryFile()
+    proc: subprocess.Popen | None = None
     count = 0
     warned_size = False
     try:
+        proc = subprocess.Popen(cmd, stdin=subprocess.PIPE, stderr=err)
         assert proc.stdin is not None
         for i, frame in enumerate(itertools.chain([first], iterator)):
             if frame.shape[:2] != (height, width) and not warned_size:
@@ -426,13 +448,14 @@ def render_video(result: Result, frames: Iterable[np.ndarray], tracks_by_id: dic
             proc.stdin.close()
         except BrokenPipeError:
             pass  # ffmpeg exited early; the exit code check below reports it
-        stderr = proc.stderr.read() if proc.stderr else b""
         rc = proc.wait()
+        err.seek(0)
+        stderr = err.read()
     except BaseException:
-        if proc.poll() is None:
-            proc.kill()
-            proc.wait()
+        _stop_ffmpeg(proc)
         raise
+    finally:
+        err.close()
 
     if rc != 0:
         msg = stderr.decode("utf-8", "replace").strip()[-2000:]
