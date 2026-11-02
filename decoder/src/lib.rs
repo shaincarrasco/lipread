@@ -39,11 +39,16 @@ pub struct Decoder {
 impl Decoder {
     /// `lm_bytes`: the LM file (empty = decode without an LM); `vocab_json`: JSON array of piece strings.
     pub fn try_new(lm_bytes: &[u8], vocab_json: &str) -> Result<Decoder, String> {
+        Decoder::try_from_vec(lm_bytes.to_vec(), vocab_json)
+    }
+
+    /// Same as `try_new`, taking ownership of the bytes (no extra copy of the 11 MB LM).
+    pub fn try_from_vec(lm_bytes: Vec<u8>, vocab_json: &str) -> Result<Decoder, String> {
         let vocab: Vec<String> = serde_json::from_str(vocab_json).map_err(|e| format!("bad vocab JSON: {e}"))?;
         if vocab.is_empty() {
             return Err("empty vocabulary".into());
         }
-        let lm = if lm_bytes.is_empty() { None } else { Some(NgramLM::from_bytes(lm_bytes.to_vec())?) };
+        let lm = if lm_bytes.is_empty() { None } else { Some(NgramLM::from_bytes(lm_bytes)?) };
         let beam = BeamDecoder::new(&vocab, 0);
         Ok(Decoder { lm, vocab, beam })
     }
@@ -85,8 +90,8 @@ impl Decoder {
 #[wasm_bindgen]
 impl Decoder {
     #[wasm_bindgen(constructor)]
-    pub fn new(lm_bytes: &[u8], vocab_json: &str) -> Result<Decoder, JsError> {
-        Decoder::try_new(lm_bytes, vocab_json).map_err(|e| JsError::new(&e))
+    pub fn new(lm_bytes: Vec<u8>, vocab_json: &str) -> Result<Decoder, JsError> {
+        Decoder::try_from_vec(lm_bytes, vocab_json).map_err(|e| JsError::new(&e))
     }
 
     /// logprobs: Float32Array (T x V) row-major raw model log-probs; t0: source time of frame 0;

@@ -613,9 +613,7 @@ impl BeamDecoder {
             sc.extend(nxt.iter().map(|h| lse(h.pb, h.pnb) + h.lm));
             order.clear();
             order.extend(0..nxt.len() as u32);
-            order.sort_unstable_by(|&i, &j| {
-                sc[j as usize].partial_cmp(&sc[i as usize]).unwrap_or(std::cmp::Ordering::Equal).then(i.cmp(&j))
-            });
+            order.sort_unstable_by(|&i, &j| sort_key(sc[j as usize]).total_cmp(&sort_key(sc[i as usize])).then(i.cmp(&j)));
             order.truncate(o.beam);
             beams.clear();
             beams.extend(order.iter().map(|&i| nxt[i as usize]));
@@ -627,7 +625,7 @@ impl BeamDecoder {
             let f = self.complete(&beams[bi], &cx);
             finals.push((lse(f.pb, f.pnb) + f.lm, f));
         }
-        finals.sort_by(|a, b| b.0.partial_cmp(&a.0).unwrap_or(std::cmp::Ordering::Equal));
+        finals.sort_by(|a, b| sort_key(b.0).total_cmp(&sort_key(a.0)));
 
         self.s.row = row;
         self.s.ex = ex;
@@ -749,8 +747,8 @@ impl BeamDecoder {
             }
             let mut ranked = options.clone();
             ranked.sort_by(|x, y| {
-                y.1.partial_cmp(&x.1)
-                    .unwrap_or(std::cmp::Ordering::Equal)
+                sort_key(y.1)
+                    .total_cmp(&sort_key(x.1))
                     .then_with(|| texts[x.0 as usize].cmp(&texts[y.0 as usize]))
             });
             let alternatives: Vec<Alternative> = ranked
@@ -773,5 +771,18 @@ impl BeamDecoder {
             });
         }
         out
+    }
+}
+
+/// Total order for scores: NaN sorts as -inf (never panics in std sorts), and -0.0 equals 0.0 so ties
+/// behave exactly like Python's comparisons.
+#[inline]
+fn sort_key(x: f64) -> f64 {
+    if x.is_nan() {
+        f64::NEG_INFINITY
+    } else if x == 0.0 {
+        0.0
+    } else {
+        x
     }
 }

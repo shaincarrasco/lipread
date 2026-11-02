@@ -201,3 +201,42 @@ fn decodes_without_lm_and_rejects_bad_shapes() {
     lp[2 * v] = 0.0;
     assert_eq!(d.decode_json(&lp, 3, v, 0.0, "").unwrap(), r#"{"words":[]}"#);
 }
+
+#[test]
+fn corrupt_lm_files_are_rejected_without_panicking() {
+    let root = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("..");
+    let lm = std::fs::read(root.join("web/core/assets/lm.bin")).unwrap();
+    let vocab = std::fs::read_to_string(root.join("web/core/assets/tokens.json")).unwrap();
+    // truncated at many points
+    for cut in [7usize, 12, 100, 1000, lm.len() / 2, lm.len() - 1] {
+        assert!(Decoder::try_new(&lm[..cut], &vocab).is_err(), "cut at {cut}");
+    }
+    // huge header length (would wrap a 32-bit offset)
+    let mut bad = lm.clone();
+    bad[6..10].copy_from_slice(&u32::MAX.to_le_bytes());
+    assert!(Decoder::try_new(&bad, &vocab).is_err());
+    // right length, scrambled bytes after the word list: index tables must be caught
+    let mut bad = lm.clone();
+    let n = bad.len();
+    for (i, x) in bad[n / 3..].iter_mut().enumerate() {
+        *x = (i * 2654435761usize >> 7) as u8;
+    }
+    assert!(Decoder::try_new(&bad, &vocab).is_err());
+}
+
+#[test]
+fn nan_logprobs_do_not_panic() {
+    let root = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("..");
+    let lm = std::fs::read(root.join("web/core/assets/lm.bin")).unwrap();
+    let vocab_json = std::fs::read_to_string(root.join("web/core/assets/tokens.json")).unwrap();
+    let v: Vec<String> = serde_json::from_str(&vocab_json).unwrap();
+    let mut d = Decoder::try_new(&lm, &vocab_json).unwrap();
+    let t = 60;
+    let mut lp = vec![-5.0f32; t * v.len()];
+    for (i, x) in lp.iter_mut().enumerate() {
+        if i % 7 == 0 {
+            *x = f32::NAN;
+        }
+    }
+    let _ = d.decode_json(&lp, t, v.len(), 0.0, "{\"beam\":64}");
+}

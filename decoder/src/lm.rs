@@ -71,49 +71,66 @@ impl NgramLM {
         if buf.len() < MAGIC.len() + 4 || &buf[..MAGIC.len()] != MAGIC {
             return Err("not a LipRead LM file".into());
         }
+        // All offsets use checked arithmetic: usize is 32-bit on wasm32, and a corrupt header must
+        // produce an error, never a wrapped offset that panics later.
+        let bad = || "truncated or corrupt LM file".to_string();
+        let end = |at: usize, n: usize| at.checked_add(n).filter(|&e| e <= buf.len()).ok_or_else(bad);
         let mut off = MAGIC.len();
         let hlen = rd_u32(&buf, off) as usize;
         off += 4;
-        if off + hlen + 4 > buf.len() {
-            return Err("truncated LM file".into());
-        }
-        let header: Header = serde_json::from_slice(&buf[off..off + hlen]).map_err(|e| format!("bad LM header: {e}"))?;
-        off += hlen;
+        let hend = end(off, hlen)?;
+        end(hend, 4)?;
+        let header: Header = serde_json::from_slice(&buf[off..hend]).map_err(|e| format!("bad LM header: {e}"))?;
+        off = hend;
         let wlen = rd_u32(&buf, off) as usize;
         off += 4;
-        if off + wlen > buf.len() {
-            return Err("truncated LM file".into());
-        }
-        let words: Vec<String> = std::str::from_utf8(&buf[off..off + wlen])
+        let wend = end(off, wlen)?;
+        let words: Vec<String> = std::str::from_utf8(&buf[off..wend])
             .map_err(|_| "LM word list is not UTF-8".to_string())?
             .split('\n')
             .map(str::to_owned)
             .collect();
-        off = align4(off + wlen);
+        off = align4(wend);
 
         let (v, b, t) = (header.v, header.b, header.t);
-        let mut take = |elem: usize, n: usize| {
+        if v < 3 || v > 65536 || words.len() != v {
+            return Err(format!("LM header says V={v} but the file lists {} words", words.len()));
+        }
+        if !(header.qscale.is_finite() && header.qscale > 0.0) {
+            return Err("bad LM qscale".into());
+        }
+        let mut take = |elem: usize, n: usize| -> Result<usize, String> {
             let at = off;
-            off = align4(off + elem * n);
-            at
+            let e = n.checked_mul(elem).and_then(|bytes| at.checked_add(bytes)).filter(|&e| e <= buf.len()).ok_or_else(bad)?;
+            off = align4(e);
+            Ok(at)
         };
         let o = Offsets {
-            uni_lp: take(4, v),
-            uni_bow: take(4, v),
-            bi_start: take(4, v + 1),
-            bi_w: take(2, b),
-            bi_lp: take(2, b),
-            bi_bow: take(2, b),
-            tri_start: take(4, b + 1),
-            tri_w: take(2, t),
-            tri_lp: take(2, t),
+            uni_lp: take(4, v)?,
+            uni_bow: take(4, v)?,
+            bi_start: take(4, v + 1)?,
+            bi_w: take(2, b)?,
+            bi_lp: take(2, b)?,
+            bi_bow: take(2, b)?,
+            tri_start: take(4, b.checked_add(1).ok_or_else(bad)?)?,
+            tri_w: take(2, t)?,
+            tri_lp: take(2, t)?, // the last array need not be padded at the end of the file
         };
-        // The last array need not be padded at the end of the file.
-        if o.tri_lp + 2 * t > buf.len() {
-            return Err("truncated LM file".into());
-        }
-        if words.len() != v {
-            return Err(format!("LM header says V={v} but the file lists {} words", words.len()));
+        // The row-start tables must be non-decreasing and end at the array length, so every lookup
+        // stays in bounds.
+        let csr_ok = |start: usize, rows: usize, total: usize| {
+            let mut prev = 0u32;
+            for i in 0..=rows {
+                let x = rd_u32(&buf, start + 4 * i);
+                if x < prev {
+                    return false;
+                }
+                prev = x;
+            }
+            rd_u32(&buf, start) == 0 && prev as usize == total
+        };
+        if !csr_ok(o.bi_start, v, b) || !csr_ok(o.tri_start, b, t) {
+            return Err("corrupt LM index tables".into());
         }
         let mut wid = HashMap::with_capacity(words.len());
         for (i, w) in words.iter().enumerate() {
