@@ -30,7 +30,12 @@ export class LipRead {
     busy(+1);
     try { return await store.downloadModel(onBytes, signal); } catch (err) { throw coded(err); } finally { busy(-1); }
   }
-  async deleteModel() { await this._call("dispose").catch(() => {}); return store.deleteModel(); }
+  async deleteModel() {
+    await this._call("dispose").catch(() => {});
+    if (this._assets?.decoder) { try { this._assets.decoder.free?.(); } catch { /* ignore */ } }
+    if (this._assets) delete this._assets.decoder;   // reloaded (and re-downloaded) on next use
+    return store.deleteModel();
+  }
   get model() { return { name: CONFIG.modelName, license: CONFIG.modelLicense, bytes: CONFIG.modelBytes }; }
 
   /** Feature check for the UI's "device not supported" screen. */
@@ -85,33 +90,52 @@ export class LipRead {
     }
     if (withPieces && !this._assets.pieces) this._assets.pieces = await json("spm_pieces.json");
     if (CONFIG.context && this._assets.decoder === undefined) {
-      this._assets.decoder = null;
-      let buf = null;
-      try { buf = await store.ensureLm(); } catch (err) {
-        console.warn("LipRead: language model unavailable, using greedy decoding", err);
-      }
-      if (buf) {
-        // Rust (WebAssembly) decoder first; the identical JS decoder if it can't load.
-        if (CONFIG.rustDecoder) {
-          try {
-            const { createRustDecoder } = await import("./rust-decoder.js");
-            this._assets.decoder = await createRustDecoder(buf, this._assets.tokens);
-          } catch (err) {
-            console.warn("LipRead: Rust decoder unavailable, using the JS decoder", err);
-          }
-        }
-        if (!this._assets.decoder) {
-          try {
-            const lm = new NgramLM(buf), tokens = this._assets.tokens;
-            this._assets.decoder = { kind: "js", decode: (lp, T, V, t0, opts) => new BeamDecoder(tokens, lm, opts).decode(lp, T, V, t0) };
-          } catch (err) {
-            console.warn("LipRead: language model unreadable, using greedy decoding", err);
-          }
-        }
-      }
+      this._assets.decoder = await this._makeDecoder(CONFIG.rustDecoder);
       console.info(`LipRead decoder: ${this._assets.decoder?.kind || "greedy"}`);
     }
     return this._assets;
+  }
+
+  /** Context-aware decoder: Rust (WebAssembly) first, then the identical JS decoder; null = greedy. */
+  async _makeDecoder(tryRust) {
+    let buf = null;
+    try { buf = await store.ensureLm(); } catch (err) {
+      console.warn("LipRead: language model unavailable, using greedy decoding", err);
+    }
+    if (!buf) return null;
+    if (tryRust) {
+      try {
+        const { createRustDecoder } = await import("./rust-decoder.js");
+        return await createRustDecoder(buf, this._assets.tokens);
+      } catch (err) {
+        console.warn("LipRead: Rust decoder unavailable, using the JS decoder", err);
+      }
+    }
+    try {
+      const lm = new NgramLM(buf), tokens = this._assets.tokens;
+      return { kind: "js", decode: (lp, T, V, t0, opts) => new BeamDecoder(tokens, lm, opts).decode(lp, T, V, t0) };
+    } catch (err) {
+      // Neither decoder can read the cached file: drop it so the next session downloads a fresh copy.
+      console.warn("LipRead: language model unreadable, using greedy decoding", err);
+      await store.evictLm().catch(() => {});
+      return null;
+    }
+  }
+
+  /** Words for one face. A decoder that fails mid-run is replaced (Rust -> JS -> greedy) and the face retried,
+   *  so a decoder problem never costs the user their result. */
+  async _decodeWords(assets, logprobs, T, V, t0, names) {
+    while (assets.decoder) {
+      try {
+        return assets.decoder.decode(logprobs, T, V, t0, { names }).words;
+      } catch (err) {
+        const was = assets.decoder.kind;
+        console.warn(`LipRead: ${was} decoder failed, falling back`, err);
+        assets.decoder = was === "rust" ? await this._makeDecoder(false) : null;   // don't free() a trapped instance
+        console.info(`LipRead decoder: ${assets.decoder?.kind || "greedy"}`);
+      }
+    }
+    return greedyWords(logprobs, T, V, assets.tokens, t0);
   }
 
   _progress(stage, fraction, message = "") { this.onProgress({ stage, fraction: Math.max(0, Math.min(1, fraction)), message }); }
@@ -283,9 +307,7 @@ export class LipRead {
         const { logprobs, T, V } = await this._call("lips", { crops, T: t.T }, [crops.buffer]);
         // Context-aware decoding: keep several candidate transcripts and let the word language model
         // pick the most plausible one; every word carries alternatives. Greedy if the LM is missing.
-        let words = assets.decoder
-          ? assets.decoder.decode(logprobs, T, V, t0, { names }).words
-          : greedyWords(logprobs, T, V, assets.tokens, t0);
+        let words = await this._decodeWords(assets, logprobs, T, V, t0, names);
         if (Booster) words = new Booster(names, assets.tokens, assets.pieces).apply(words, logprobs, T, V, t0);
         item.utterances = segment(words, t0, tEnd);
         done++;

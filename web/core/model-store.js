@@ -96,6 +96,12 @@ export async function ensureLm() {
   return r.arrayBuffer();
 }
 
+/** Remove a cached language model that couldn't be read, so the next ensureLm() fetches it again. */
+export async function evictLm() {
+  if (!("caches" in self) || !CONFIG.lmUrl) return false;
+  return (await caches.open(CONFIG.modelCache)).delete(CONFIG.lmUrl);
+}
+
 export async function deleteModel() {
   partial = null;
   return caches.delete(CONFIG.modelCache);
