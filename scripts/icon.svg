@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="38%" r="75%">
+      <stop offset="0%" stop-color="#1b1430"/>
+      <stop offset="60%" stop-color="#0b0814"/>
+      <stop offset="100%" stop-color="#040306"/>
+    </radialGradient>
+    <linearGradient id="lip" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ff7ae0"/>
+      <stop offset="55%" stop-color="#ff2bd6"/>
+      <stop offset="100%" stop-color="#b3108f"/>
+    </linearGradient>
+    <linearGradient id="wave" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#00f0ff"/>
+      <stop offset="100%" stop-color="#7cf7ff"/>
+    </linearGradient>
+    <filter id="glowL" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="22" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="glowC" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="9" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <!-- rounded tile, macOS icon-grid margins -->
+  <rect x="100" y="100" width="824" height="824" rx="190" fill="url(#bg)"/>
+  <rect x="100" y="100" width="824" height="824" rx="190" fill="none" stroke="#00f0ff" stroke-opacity="0.55" stroke-width="6"/>
+
+  <!-- scan lines for texture -->
+  <g stroke="#ffffff" stroke-opacity="0.035" stroke-width="2">
+    <line x1="100" y1="260" x2="924" y2="260"/>
+    <line x1="100" y1="380" x2="924" y2="380"/>
+    <line x1="100" y1="620" x2="924" y2="620"/>
+    <line x1="100" y1="740" x2="924" y2="740"/>
+  </g>
+
+  <!-- lips: neon magenta, blurred halo first -->
+  <g filter="url(#glowL)">
+    <path d="M 214 500 C 300 384, 420 404, 512 436 C 604 404, 724 384, 810 500 C 752 470, 640 458, 512 472 C 384 458, 272 470, 214 500 Z" fill="url(#lip)"/>
+    <path d="M 214 500 C 272 530, 384 528, 512 528 C 640 528, 752 530, 810 500 C 760 616, 650 668, 512 662 C 374 668, 264 616, 214 500 Z" fill="url(#lip)"/>
+  </g>
+  <!-- dark mouth slit so the waveform reads inside it -->
+  <path d="M 268 500 C 380 478, 644 478, 756 500 C 644 520, 380 520, 268 500 Z" fill="#07050c"/>
+
+  <!-- waveform: cyan, glowing -->
+  <g filter="url(#glowC)" fill="none" stroke="url(#wave)" stroke-width="10" stroke-linejoin="round" stroke-linecap="round">
+    <polyline points="268.0,499.0 272.1,497.9 276.1,497.7 280.2,498.5 284.3,498.0 288.3,495.6 292.4,494.8 296.5,498.7 300.5,504.8 304.6,507.2 308.7,503.8 312.7,499.5 316.8,500.0 320.9,503.5 324.9,502.5 329.0,494.1 333.1,485.4 337.1,485.7 341.2,494.6 345.3,502.3 349.3,501.6 353.4,497.4 357.5,499.9 361.5,510.4 365.6,517.8 369.7,512.0 373.7,497.3 377.8,487.9 381.9,490.6 385.9,496.9 390.0,494.3 394.1,484.2 398.1,480.7 402.2,492.7 406.3,511.1 410.3,518.9 414.4,511.4 418.5,501.9 422.5,503.4 426.6,511.7 430.7,510.8 434.7,494.5 438.8,476.4 442.9,474.1 446.9,487.9 451.0,500.7 455.1,499.8 459.1,492.7 463.2,496.3 467.3,513.5 471.3,527.4 475.4,522.0 479.5,502.3 483.5,488.3 487.6,490.7 491.7,498.4 495.7,494.5 499.8,479.7 503.9,472.3 507.9,485.0 512.0,507.7 516.1,519.2 520.1,512.8 524.2,502.9 528.3,505.3 532.3,516.3 536.4,517.4 540.5,500.3 544.5,479.0 548.6,473.3 552.7,485.3 556.7,497.6 560.8,496.5 564.9,488.8 568.9,491.5 573.0,508.9 577.1,524.9 581.1,523.1 585.2,506.5 589.3,493.6 593.3,494.9 597.4,501.4 601.5,497.7 605.5,483.6 609.6,474.7 613.7,482.9 617.7,501.0 621.8,511.6 625.9,508.1 629.9,501.2 634.0,503.7 638.1,513.2 642.1,515.8 646.2,504.5 650.3,488.8 654.3,482.9 658.4,489.4 662.5,496.9 666.5,495.9 670.6,490.4 674.7,491.4 678.7,501.7 682.8,512.2 686.9,512.8 690.9,504.8 695.0,498.2 699.1,498.6 703.1,501.8 707.2,500.1 711.3,493.5 715.3,489.1 719.4,491.6 723.5,498.0 727.5,501.8 731.6,500.9 735.7,499.1 739.7,499.7 743.8,501.5 747.9,501.5 751.9,499.8 756.0,499.0"/>
+  </g>
+
+  <!-- lip highlight -->
+  <path d="M 300 448 C 360 420, 420 418, 470 430" fill="none" stroke="#ffd1f3" stroke-opacity="0.55" stroke-width="10" stroke-linecap="round"/>
+</svg>
