@@ -61,9 +61,73 @@ def seen_jobs(monkeypatch):
 
 
 @pytest.fixture
-def client(tmp_path, seen_jobs):
+def client(tmp_path, seen_jobs, monkeypatch):
+    # example.com may not resolve in CI: skip the DNS-based public-URL check for these tests
+    import lipread.ingest as ingest
+    monkeypatch.setattr(ingest, "_check_public_url", lambda url: None, raising=False)
+    monkeypatch.setenv("LIPREAD_HOME", str(tmp_path / "models"))
     app = server.create_app(str(tmp_path / "jobs"))
-    return TestClient(app)
+    return TestClient(app, headers={"X-LipRead": "1"})
+
+
+@pytest.fixture
+def bare_client(tmp_path, seen_jobs):
+    """A client WITHOUT the X-LipRead header, like a cross-site page would be."""
+    return TestClient(server.create_app(str(tmp_path / "jobs2")))
+
+
+# --------------------------------------------------------------------------- local-only protection
+
+def test_post_without_custom_header_is_refused(bare_client):
+    resp = bare_client.post("/api/jobs", data={"url": "https://example.com/v"})
+    assert resp.status_code == 403
+    assert bare_client.post("/api/accept-license").status_code == 403
+
+
+def test_get_without_header_still_works(bare_client):
+    assert bare_client.get("/api/health").status_code == 200
+
+
+def test_foreign_host_is_refused(client):
+    resp = client.get("/api/health", headers={"host": "evil.example:8765"})
+    assert resp.status_code == 403
+
+
+def test_loopback_hosts_allowed():
+    for h in ("127.0.0.1:8765", "localhost:8765", "[::1]:8765", "localhost"):
+        assert server._host_allowed(h)
+    for h in ("evil.com", "127.0.0.1.evil.com:80", "192.168.1.4:8765"):
+        assert not server._host_allowed(h)
+
+
+def test_cross_origin_post_is_refused(client):
+    resp = client.post("/api/jobs", data={"url": "https://example.com/v"},
+                       headers={"origin": "https://evil.example"})
+    assert resp.status_code == 403
+
+
+def test_oversized_upload_refused_before_reading(client, monkeypatch):
+    monkeypatch.setenv("LIPREAD_MAX_UPLOAD_MB", "1")
+    resp = client.post("/api/jobs", content=b"x" * 10, headers={
+        "content-length": str(5_000_000), "content-type": "multipart/form-data; boundary=x"})
+    assert resp.status_code == 413
+
+
+def test_private_url_is_refused(tmp_path, seen_jobs):
+    import lipread.ingest as ingest
+    if not hasattr(ingest, "_check_public_url"):
+        pytest.skip("ingest._check_public_url not available")
+    c = TestClient(server.create_app(str(tmp_path / "jobs3")), headers={"X-LipRead": "1"})
+    for url in ("http://127.0.0.1:8765/x", "http://192.168.0.10/clip.mp4", "http://169.254.169.254/latest"):
+        assert c.post("/api/jobs", data={"url": url}).status_code == 400
+
+
+def test_accept_license_persists_marker(client, tmp_path):
+    from lipread import models
+    if not hasattr(models, "accept_license_persist"):
+        pytest.skip("persisted license acceptance not available")
+    assert client.post("/api/accept-license").status_code == 200
+    assert models.license_accepted("vsr")
 
 
 def _wait_done(client: TestClient, job_id: str, timeout: float = 15.0) -> dict:

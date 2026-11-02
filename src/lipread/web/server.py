@@ -25,8 +25,8 @@ from pathlib import Path, PurePosixPath
 from typing import Any
 from urllib.parse import urlparse
 
-from fastapi import FastAPI, File, Form, HTTPException, UploadFile
-from fastapi.responses import FileResponse
+from fastapi import FastAPI, File, Form, HTTPException, Request, UploadFile
+from fastapi.responses import FileResponse, JSONResponse
 from pydantic import BaseModel, Field
 
 from lipread import __version__
@@ -332,6 +332,20 @@ def _max_upload_bytes() -> int:
     return int(mb * 1024 * 1024)
 
 
+_LOOPBACK_HOSTS = {"127.0.0.1", "localhost", "[::1]", "::1", "testserver"}
+
+
+def _host_allowed(host_header: str) -> bool:
+    """True if the Host header names this machine (or a host listed in LIPREAD_ALLOWED_HOSTS)."""
+    host = host_header.strip().lower()
+    if host.startswith("["):                      # [::1]:8765
+        name = host.split("]")[0] + "]"
+    else:
+        name = host.rsplit(":", 1)[0] if host.count(":") == 1 else host
+    extra = {h.strip().lower() for h in os.environ.get("LIPREAD_ALLOWED_HOSTS", "").split(",") if h.strip()}
+    return name in _LOOPBACK_HOSTS or name in extra
+
+
 def _safe_join(base: Path, file_path: str) -> Path | None:
     """Resolve file_path under base, or None if it escapes base or is not a plain relative path."""
     if not file_path or "\x00" in file_path:
@@ -407,6 +421,32 @@ def create_app(work_root: str | None = None) -> FastAPI:
     app = FastAPI(title="LipRead", version=__version__)
     app.state.store = store
 
+    @app.middleware("http")
+    async def local_only(request: Request, call_next):  # type: ignore[no-untyped-def]
+        """Block other websites from driving this local server.
+
+        * Host must be a loopback name (defeats DNS rebinding); extra hosts via LIPREAD_ALLOWED_HOSTS.
+        * State-changing requests must carry the custom header ``X-LipRead: 1``. A cross-site page
+          can't add it without a CORS preflight, which this server never approves (defeats CSRF).
+        * If an Origin header is present it must match the Host.
+        * Oversized uploads are refused from Content-Length before the body is read.
+        """
+        if not _host_allowed(request.headers.get("host", "")):
+            return JSONResponse({"detail": "Host not allowed"}, status_code=403)
+        if request.method not in ("GET", "HEAD", "OPTIONS"):
+            if request.headers.get("x-lipread") != "1":
+                return JSONResponse({"detail": "Missing X-LipRead header"}, status_code=403)
+            origin = request.headers.get("origin")
+            if origin and urlparse(origin).netloc != request.headers.get("host", ""):
+                return JSONResponse({"detail": "Cross-origin request refused"}, status_code=403)
+            try:
+                length = int(request.headers.get("content-length") or 0)
+            except ValueError:
+                length = 0
+            if length > _max_upload_bytes() + 1_000_000:
+                return JSONResponse({"detail": "The video is larger than the upload limit."}, status_code=413)
+        return await call_next(request)
+
     def require_job(job_id: str) -> JobRecord:
         if not JOB_ID_RE.match(job_id):
             raise HTTPException(404, "Unknown job")
@@ -481,6 +521,13 @@ def create_app(work_root: str | None = None) -> FastAPI:
             source, kind, title = str(dest), "file", file.filename[:MAX_TITLE_LEN]
         else:
             parsed = urlparse(url)
+            try:
+                from lipread.ingest import _check_public_url
+                _check_public_url(url)          # no loopback / private / link-local targets (SSRF)
+            except ImportError:
+                pass
+            except Exception as exc:            # LipReadError with a readable reason
+                raise HTTPException(400, str(exc)) from exc
             if parsed.scheme not in ("http", "https") or not parsed.netloc:
                 raise HTTPException(400, "The URL must start with http:// or https://.")
             source, kind, title = url, "url", url[:MAX_TITLE_LEN]
@@ -562,8 +609,15 @@ def create_app(work_root: str | None = None) -> FastAPI:
 
     @app.post("/api/accept-license")
     def accept_license() -> dict[str, Any]:
-        os.environ["LIPREAD_ACCEPT_LICENSE"] = "1"
-        log.info("model license accepted for this process")
+        # Persisted, explicit acceptance (marker file next to the models). Only reachable from the
+        # LipRead page itself thanks to the local_only middleware above.
+        from lipread import models
+        persist = getattr(models, "accept_license_persist", None)
+        if persist is not None:
+            persist()
+        else:  # pragma: no cover - older models module
+            os.environ["LIPREAD_ACCEPT_LICENSE"] = "1"
+        log.info("model license accepted by the user in the web UI")
         return {"ok": True}
 
     @app.get("/files/{job_id}/{file_path:path}")

@@ -431,7 +431,8 @@ dialog::backdrop{background:rgba(3,3,8,.82);backdrop-filter:blur(3px)}
   async function api(path, opts = {}) {
     let res;
     try {
-      res = await fetch(path, opts);
+      const headers = Object.assign({ "X-LipRead": "1" }, opts.headers || {});
+      res = await fetch(path, Object.assign({}, opts, { headers }));
     } catch (_) {
       throw new ApiError(0, "Could not reach LipRead on this computer.");
     }
@@ -446,6 +447,7 @@ dialog::backdrop{background:rgba(3,3,8,.82);backdrop-filter:blur(3px)}
     return new Promise((resolve, reject) => {
       const xhr = new XMLHttpRequest();
       xhr.open("POST", "/api/jobs");
+      xhr.setRequestHeader("X-LipRead", "1");
       xhr.upload.onprogress = (e) => { if (e.lengthComputable && onProgress) onProgress(e.loaded / e.total); };
       xhr.onload = () => {
         let body = null;
@@ -685,7 +687,7 @@ dialog::backdrop{background:rgba(3,3,8,.82);backdrop-filter:blur(3px)}
       for (const u of t.utterances || []) words += (u.words || []).length;
     }
     $("#r-title").textContent = s.title;
-    const model = r.model && r.model.engine ? ` · model ${r.model.engine}` : "";
+    const model = r.model && r.model.name ? ` · model ${r.model.name}` : "";
     $("#r-stats").textContent =
       `${tracks.length} faces · ${counts.readable} readable · ${counts.marginal} marginal · ` +
       `${counts.unreadable} unreadable · ${words} words${model}`;
