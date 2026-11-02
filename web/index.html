@@ -1,0 +1,354 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>LipRead</title>
+  <meta name="description" content="Read what people are saying from lip movements in a video. Runs on your phone. Videos never leave your device.">
+  <meta name="color-scheme" content="light dark">
+  <meta name="theme-color" content="#F2F2F7" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="LipRead">
+  <meta name="format-detection" content="telephone=no">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23007AFF'/%3E%3Cpath d='M12 33c5-10 13-11 20-5 7-6 15-5 20 5-5 9-13 11-20 5-7 6-15 5-20-5z' fill='white'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="apple-touch-icon" href="icons/icon-180.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
+</head>
+<body>
+  <!-- Shared SF-Symbol-like icons. Drawn inline, referenced with <use>. -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+    <symbol id="i-share" viewBox="0 0 24 24"><path d="M12 3v11.5M8 6.5 12 2.5l4 4M7.5 10H6a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7a2 2 0 0 0-2-2h-1.5"/></symbol>
+    <symbol id="i-gear" viewBox="0 0 24 24"><path d="M10.3 3.2h3.4l.5 2.4 1.9.8 2.1-1.3 2.4 2.4-1.3 2.1.8 1.9 2.4.5v3.4l-2.4.5-.8 1.9 1.3 2.1-2.4 2.4-2.1-1.3-1.9.8-.5 2.4h-3.4l-.5-2.4-1.9-.8-2.1 1.3-2.4-2.4 1.3-2.1-.8-1.9-2.4-.5v-3.4l2.4-.5.8-1.9-1.3-2.1 2.4-2.4 2.1 1.3 1.9-.8z"/><circle cx="12" cy="12" r="3"/></symbol>
+    <symbol id="i-chev-left" viewBox="0 0 24 24"><path d="M15 5 8 12l7 7"/></symbol>
+    <symbol id="i-chev-right" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></symbol>
+    <symbol id="i-chev-down" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></symbol>
+    <symbol id="i-play" viewBox="0 0 24 24"><path d="M7.5 4.8v14.4a1 1 0 0 0 1.5.86l11.6-7.2a1 1 0 0 0 0-1.72L9 3.94a1 1 0 0 0-1.5.86z" fill="currentColor" stroke="none"/></symbol>
+    <symbol id="i-pause" viewBox="0 0 24 24"><rect x="6" y="4.5" width="4" height="15" rx="1.2" fill="currentColor" stroke="none"/><rect x="14" y="4.5" width="4" height="15" rx="1.2" fill="currentColor" stroke="none"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5" stroke-width="2.6"/></symbol>
+    <symbol id="i-x" viewBox="0 0 24 24"><path d="M6.5 6.5l11 11M17.5 6.5l-11 11"/></symbol>
+    <symbol id="i-warning" viewBox="0 0 24 24"><path d="M12 3.8 21.2 19.5H2.8z"/><path d="M12 9.8v4.6M12 16.9v.4"/></symbol>
+    <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5.5M12 7.8v.2"/></symbol>
+    <symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="10.5" width="14" height="10" rx="2.5"/><path d="M8 10.5V8a4 4 0 0 1 8 0v2.5"/></symbol>
+    <symbol id="i-sparkle" viewBox="0 0 24 24"><path d="M12 3.5v4M12 16.5v4M3.5 12h4M16.5 12h4M6.3 6.3l2.5 2.5M15.2 15.2l2.5 2.5M6.3 17.7l2.5-2.5M15.2 8.8l2.5-2.5"/></symbol>
+    <symbol id="i-download" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7.5v7M8.8 11.6 12 14.8l3.2-3.2M8.5 17.5h7"/></symbol>
+    <symbol id="i-trash" viewBox="0 0 24 24"><path d="M4.5 7h15M9.5 7V4.8h5V7M6.5 7l.9 12.2h9.2l.9-12.2"/></symbol>
+    <symbol id="i-film" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="M3 9.5h18M3 14.5h18M8 5v14M16 5v14"/></symbol>
+    <symbol id="i-record" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.2"/><circle cx="12" cy="12" r="4.6" fill="currentColor" stroke="none"/></symbol>
+    <symbol id="i-link" viewBox="0 0 24 24"><path d="M14 4.5h5.5V10M19.5 4.5 11 13M17.5 14v4.5a1.5 1.5 0 0 1-1.5 1.5H6a1.5 1.5 0 0 1-1.5-1.5V8A1.5 1.5 0 0 1 6 6.5h4.5"/></symbol>
+    <symbol id="i-lips" viewBox="0 0 64 64"><path d="M8 34c5.5-10.5 14.5-11.5 24-4 9.5-7.5 18.5-6.5 24 4-5.5 10-14.5 11.5-24 4C22.5 45.5 13.5 44 8 34z" fill="currentColor" stroke="none"/><path class="glyph-line" d="M10.5 34.2c6.5 2.3 12.6 1.4 21.5-3.2 8.9 4.6 15 5.5 21.5 3.2" fill="none" stroke="#007AFF" stroke-width="2.2" stroke-linecap="round"/></symbol>
+    <symbol id="i-faces" viewBox="0 0 24 24"><circle cx="12" cy="9" r="4"/><path d="M4.5 20.5c.9-3.9 3.8-6 7.5-6s6.6 2.1 7.5 6"/></symbol>
+    <symbol id="i-distance" viewBox="0 0 24 24"><path d="M3 18h18M5 18v-4M9 18v-7M13 18v-3M17 18v-9" /><path d="M3 6h3M10 4l1.5 2M16 4l-1.5 2"/></symbol>
+  </svg>
+
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="navbar" id="navbar">
+    <div class="navbar__bar">
+      <div class="navbar__side navbar__side--start">
+        <button type="button" class="nav-btn nav-btn--text" id="backBtn" hidden>
+          <svg class="icon" aria-hidden="true"><use href="#i-chev-left"></use></svg>
+          <span id="backLabel">Home</span>
+        </button>
+      </div>
+      <p class="navbar__title" id="navTitle">LipRead</p>
+      <div class="navbar__side navbar__side--end">
+        <button type="button" class="nav-btn" id="shareBtn" hidden aria-label="Share transcript">
+          <svg class="icon" aria-hidden="true"><use href="#i-share"></use></svg>
+        </button>
+        <button type="button" class="nav-btn" id="settingsBtn" aria-label="Settings" aria-haspopup="dialog">
+          <svg class="icon" aria-hidden="true"><use href="#i-gear"></use></svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main id="main" class="content" tabindex="-1">
+
+    <!-- Screen 1: Home -->
+    <section class="screen" id="screen-home" aria-labelledby="largeTitle">
+      <h1 class="large-title" id="largeTitle">LipRead</h1>
+
+      <div class="state card" id="unsupported" role="alert" hidden>
+        <div class="state__icon" data-tone="gray"><svg class="icon" aria-hidden="true"><use href="#i-warning"></use></svg></div>
+        <h2 class="state__title">This browser can’t run LipRead</h2>
+        <p class="state__text">LipRead needs WebAssembly with SIMD, which this browser doesn’t support. Update to a recent version of iOS or Chrome, then try again.</p>
+      </div>
+
+      <div class="hero card" id="heroCard">
+        <div class="hero__art" aria-hidden="true">
+          <svg class="icon" viewBox="0 0 64 64"><use href="#i-lips"></use></svg>
+        </div>
+        <h2 class="hero__title">Choose a video</h2>
+        <p class="hero__text">Pick a clip or record one. Each face gets its own captions, read from lip movements.</p>
+        <div class="hero__actions">
+          <button type="button" class="btn btn--filled" id="chooseBtn">
+            <svg class="icon" aria-hidden="true"><use href="#i-film"></use></svg>
+            Choose Video
+          </button>
+          <button type="button" class="btn btn--tinted" id="recordBtn">
+            <svg class="icon icon--record" aria-hidden="true"><use href="#i-record"></use></svg>
+            Record
+          </button>
+        </div>
+      </div>
+
+      <section class="recent" id="recentSection" aria-labelledby="recentHeading" hidden>
+        <h2 class="section-header" id="recentHeading">Recent</h2>
+        <ul class="inset-group" id="recentList"></ul>
+      </section>
+
+      <p class="footnote footer-note" id="homeFooter">Runs on your iPhone. Videos never leave your device.</p>
+    </section>
+
+    <!-- Screen 2: Processing -->
+    <section class="screen" id="screen-processing" aria-labelledby="procTitle" hidden>
+      <h1 class="sr-only" id="procTitle">Analysing video</h1>
+      <figure class="poster">
+        <img id="posterImg" alt="" hidden>
+        <figcaption class="sr-only" id="posterName"></figcaption>
+      </figure>
+
+      <div id="procProgress">
+        <div class="progress-head">
+          <span class="progress-label" id="procStatus">Preparing model</span>
+          <span class="progress-pct" id="procPct">0%</span>
+        </div>
+        <div class="progressbar" id="procBar" role="progressbar" aria-labelledby="procStatus" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+          <div class="progressbar__fill" id="procFill"></div>
+        </div>
+      </div>
+
+      <ul class="inset-group stage-list" id="stageList" aria-label="Progress">
+        <li class="stage-row" data-stage="0" data-state="pending">
+          <span class="stage-icon" aria-hidden="true"></span>
+          <span class="stage-text">
+            <span class="stage-name">Preparing model</span>
+            <span class="stage-sub"></span>
+          </span>
+        </li>
+        <li class="stage-row" data-stage="1" data-state="pending">
+          <span class="stage-icon" aria-hidden="true"></span>
+          <span class="stage-text">
+            <span class="stage-name">Finding faces</span>
+            <span class="stage-sub"></span>
+          </span>
+        </li>
+        <li class="stage-row" data-stage="2" data-state="pending">
+          <span class="stage-icon" aria-hidden="true"></span>
+          <span class="stage-text">
+            <span class="stage-name">Reading lips</span>
+            <span class="stage-sub"></span>
+          </span>
+        </li>
+      </ul>
+
+      <div class="state card" id="procError" role="alert" hidden>
+        <div class="state__icon" id="errIcon"><svg class="icon" aria-hidden="true"><use href="#i-warning"></use></svg></div>
+        <h2 class="state__title" id="errTitle"></h2>
+        <p class="state__text" id="errText"></p>
+        <div class="state__actions">
+          <button type="button" class="btn btn--filled" id="errPrimary"></button>
+          <button type="button" class="btn btn--plain" id="errSecondary" hidden></button>
+        </div>
+      </div>
+
+      <p class="footnote" id="procFootnote">Keep this screen open until it finishes. Your video stays on this device.</p>
+      <div class="btn-stack" id="procActions">
+        <button type="button" class="btn btn--grouped" id="cancelBtn">Cancel</button>
+      </div>
+      <p class="sr-only" aria-live="polite" id="procLive"></p>
+    </section>
+
+    <!-- Screen 3: Results -->
+    <section class="screen" id="screen-results" aria-labelledby="resTitle" hidden>
+      <h1 class="sr-only" id="resTitle">Results</h1>
+
+      <div class="player">
+        <div class="stage" id="stage">
+          <video id="video" playsinline webkit-playsinline preload="auto" aria-label="Clip being read"></video>
+          <div class="overlay" id="overlay" aria-hidden="true"></div>
+        </div>
+        <div class="transport">
+          <button type="button" class="icon-btn" id="playBtn" aria-label="Play">
+            <svg class="icon icon--solid" aria-hidden="true"><use href="#i-play"></use></svg>
+          </button>
+          <input type="range" id="scrub" min="0" max="1000" step="1" value="0" aria-label="Seek" aria-valuetext="0:00">
+          <span class="time" id="timeLabel" aria-hidden="true">0:00 / 0:00</span>
+        </div>
+      </div>
+
+      <p class="disclaimer">
+        <svg class="icon" aria-hidden="true"><use href="#i-info"></use></svg>
+        <span>AI estimate — don’t treat as a quote.</span>
+      </p>
+
+      <div class="segmented" role="group" aria-label="Which words to show">
+        <button type="button" data-mode="likely" aria-pressed="true">Likely</button>
+        <button type="button" data-mode="all" aria-pressed="false">All</button>
+      </div>
+
+      <h2 class="section-header">Faces</h2>
+      <ul class="inset-group faces" id="facesList"></ul>
+
+      <p class="footnote" id="resultFooter"></p>
+    </section>
+  </main>
+
+  <!-- Overlay: backdrop shared by sheets -->
+  <div class="backdrop" id="backdrop" hidden></div>
+
+  <!-- Sheet 1: first run -->
+  <section class="sheet" id="firstRunSheet" role="dialog" aria-modal="true" aria-labelledby="frTitle" tabindex="-1" hidden>
+    <div class="grabber" aria-hidden="true"></div>
+    <div class="sheet__body">
+      <div class="app-glyph" aria-hidden="true">
+        <svg class="icon" viewBox="0 0 64 64"><use href="#i-lips"></use></svg>
+      </div>
+      <h2 class="sheet__title" id="frTitle" tabindex="-1">Read what people are saying</h2>
+      <p class="sheet__lead">LipRead reads lip movements in a video and shows what each face appears to say.</p>
+
+      <ul class="inset-group">
+        <li class="info-row">
+          <span class="info-icon" aria-hidden="true"><svg class="icon"><use href="#i-lock"></use></svg></span>
+          <span class="info-text">
+            <span class="info-title">Private by design</span>
+            <span class="info-body">Everything runs on this device. Your videos are never uploaded.</span>
+          </span>
+        </li>
+        <li class="info-row">
+          <span class="info-icon" data-tone="orange" aria-hidden="true"><svg class="icon"><use href="#i-warning"></use></svg></span>
+          <span class="info-text">
+            <span class="info-title">Uncertain, so check</span>
+            <span class="info-body">Lip reading is uncertain — about 1 in 3 words can be wrong, more on far-away faces.</span>
+          </span>
+        </li>
+        <li class="info-row">
+          <span class="info-icon" data-tone="gray" aria-hidden="true"><svg class="icon"><use href="#i-info"></use></svg></span>
+          <span class="info-text">
+            <span class="info-title">Non-commercial model</span>
+            <span class="info-body">The lip-reading model is licensed for non-commercial use only.</span>
+          </span>
+        </li>
+      </ul>
+
+      <h3 class="section-header section-header--tight">Model</h3>
+      <div class="inset-group" id="dlGroup">
+        <div class="row row--static">
+          <span class="row__text">One-time download</span>
+          <span class="row__value">203 MB</span>
+        </div>
+        <div class="row row--static row--stack" id="dlProgressRow" hidden>
+          <div class="progressbar progressbar--small" id="dlBar" role="progressbar" aria-labelledby="dlStatus" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+            <div class="progressbar__fill" id="dlFill"></div>
+          </div>
+          <p class="footnote footnote--inline" id="dlStatus" aria-live="polite"></p>
+        </div>
+        <div class="row row--static" id="readyRow" hidden>
+          <span class="row__icon row__icon--ok" aria-hidden="true"><svg class="icon icon--solid-stroke"><use href="#i-check"></use></svg></span>
+          <span class="row__text">Ready offline</span>
+        </div>
+      </div>
+      <p class="footnote footnote--pad">Connect to Wi-Fi first. The model is stored on this device, so LipRead works without a connection afterwards.</p>
+
+      <div class="btn-stack">
+        <button type="button" class="btn btn--filled" id="dlBtn">Download</button>
+        <button type="button" class="btn btn--plain" id="frDone" hidden>Continue</button>
+        <button type="button" class="btn btn--plain" id="notNowBtn">Not Now</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Sheet 2: settings -->
+  <section class="sheet sheet--tall" id="settingsSheet" role="dialog" aria-modal="true" aria-labelledby="setTitle" tabindex="-1" hidden>
+    <div class="grabber" aria-hidden="true"></div>
+    <header class="sheet__nav">
+      <span class="sheet__nav-spacer" aria-hidden="true"></span>
+      <h2 class="sheet__nav-title" id="setTitle" tabindex="-1">Settings</h2>
+      <button type="button" class="nav-btn nav-btn--text nav-btn--end" id="setDone">Done</button>
+    </header>
+    <div class="sheet__body">
+      <h3 class="section-header">Players</h3>
+      <div class="inset-group">
+        <label class="textarea-row">
+          <span class="sr-only">Player names, one per line</span>
+          <textarea id="names" class="textarea" rows="4" placeholder="One name per line" spellcheck="false" autocapitalize="words"></textarea>
+        </label>
+      </div>
+      <p class="footnote">Names you add are favoured when the model is unsure. They’re stored only on this device.</p>
+
+      <h3 class="section-header">Reading</h3>
+      <div class="inset-group">
+        <div class="row row--static">
+          <span class="row__text" id="swLabel">Read unreadable faces too</span>
+          <button type="button" role="switch" class="switch" id="faceSwitch" aria-checked="false" aria-labelledby="swLabel"><span class="switch__thumb"></span></button>
+        </div>
+      </div>
+      <p class="footnote">Faces that are far away or turned away are read less accurately.</p>
+
+      <h3 class="section-header">Storage</h3>
+      <div class="inset-group">
+        <button type="button" class="row row--button row--danger" id="deleteModel">Delete Downloaded Model (203 MB)</button>
+      </div>
+      <p class="footnote">You can download the model again at any time.</p>
+
+      <h3 class="section-header">About</h3>
+      <div class="inset-group">
+        <details class="row-details">
+          <summary class="row"><span class="row__text">About LipRead</span><svg class="icon chev" aria-hidden="true"><use href="#i-chev-right"></use></svg></summary>
+          <div class="row-details__body">
+            <p>LipRead estimates what people say from how their lips move. It is a free, open project, and the code is open source. Results are estimates and can be wrong.</p>
+          </div>
+        </details>
+        <details class="row-details">
+          <summary class="row"><span class="row__text">Privacy</span><svg class="icon chev" aria-hidden="true"><use href="#i-chev-right"></use></svg></summary>
+          <div class="row-details__body">
+            <p>Videos are read on your device and are never uploaded. LipRead keeps nothing in the background. Names you add and this setting are stored only in this browser.</p>
+          </div>
+        </details>
+        <details class="row-details">
+          <summary class="row"><span class="row__text">Licence</span><svg class="icon chev" aria-hidden="true"><use href="#i-chev-right"></use></svg></summary>
+          <div class="row-details__body">
+            <p>The LipRead code is Apache-2.0. The lip-reading model is licensed for research and non-commercial use only, so do not use LipRead commercially.</p>
+          </div>
+        </details>
+        <a class="row row--link" href="https://github.com/" id="repoLink" target="_blank" rel="noopener">
+          <span class="row__text">Source code on GitHub</span>
+          <svg class="icon" aria-hidden="true"><use href="#i-link"></use></svg>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Alert: confirm delete -->
+  <div class="backdrop backdrop--alert" id="alertBackdrop" hidden></div>
+  <section class="alert" id="alert" role="alertdialog" aria-modal="true" aria-labelledby="alertTitle" aria-describedby="alertText" hidden>
+    <h2 class="alert__title" id="alertTitle">Delete the model?</h2>
+    <p class="alert__text" id="alertText">You can download it again later. Your videos aren’t affected.</p>
+    <div class="alert__actions">
+      <button type="button" class="alert__btn" id="alertCancel">Cancel</button>
+      <button type="button" class="alert__btn alert__btn--danger" id="alertOk">Delete</button>
+    </div>
+  </section>
+
+  <!-- Add to Home Screen hint (iOS Safari only, dismissible once) -->
+  <aside class="hint" id="iosHint" aria-label="Add to Home Screen" hidden>
+    <svg class="icon hint__share" aria-hidden="true"><use href="#i-share"></use></svg>
+    <p class="hint__text">Add to Home Screen for an app experience</p>
+    <button type="button" class="icon-btn icon-btn--small" id="hintClose" aria-label="Dismiss">
+      <svg class="icon" aria-hidden="true"><use href="#i-x"></use></svg>
+    </button>
+  </aside>
+
+  <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+
+  <input type="file" id="fileInput" accept="video/*" hidden>
+  <input type="file" id="recordInput" accept="video/*" capture="environment" hidden>
+
+  <script type="module" src="sw-register.js"></script>
+  <script type="module" src="app.js"></script>
+</body>
+</html>

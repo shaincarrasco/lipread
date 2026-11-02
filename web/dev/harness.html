@@ -1,0 +1,29 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>LipRead harness</title></head>
+<body><pre id="log">starting…</pre>
+<script>
+  // Dev-only: use the local copy of the model instead of downloading 203 MB from Hugging Face.
+  self.LIPREAD_CONFIG = { modelUrl: new URL("../dev-model/lipread_ctc.int8.onnx", location.href).href };
+</script>
+<script type="module">
+  import { LipRead } from "../core/lipread.js";
+  const q = new URLSearchParams(location.search);
+  const log = (m) => { document.getElementById("log").textContent += "\n" + m; console.log(m); };
+  const lr = new LipRead({ onProgress: (p) => { window.__progress = p; } });
+  window.__run = async () => {
+    try {
+      log("support " + JSON.stringify(LipRead.support()));
+      let st = await lr.modelStatus();
+      if (!st.cached) { const t = performance.now(); await lr.downloadModel(); log(`model cached in ${((performance.now() - t) / 1000).toFixed(1)}s`); }
+      const blob = await (await fetch("../dev-media/" + q.get("video"))).blob();
+      const t = performance.now();
+      const res = await lr.process(new File([blob], q.get("video"), { type: "video/mp4" }),
+        { names: (q.get("names") || "").split(",").filter(Boolean), faces: q.get("faces") || "readable",
+          start: +(q.get("start") || 0), end: q.get("end") ? +q.get("end") : null });
+      res.wall = (performance.now() - t) / 1000;
+      for (const tr of res.tracks) { tr.thumb = tr.thumb ? tr.thumb.slice(0, 30) : null; }
+      window.__result = res; log("done " + res.wall.toFixed(1) + "s");
+    } catch (e) { window.__error = String(e && e.stack || e); log("ERROR " + window.__error); }
+  };
+  window.__ready = true;
+</script></body></html>
