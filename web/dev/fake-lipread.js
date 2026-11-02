@@ -103,6 +103,28 @@ const SCRIPT = [
   "Yes yes yes that is the one",
 ];
 const CONF_PATTERN = [0.96, 0.93, 0.84, 0.97, 0.66, 0.91, 0.78, 0.94, 0.59, 0.95, 0.88, 0.72, 0.97, 0.52, 0.9, 0.81];
+// Context-aware probability per word (p), spread across the three tiers: Likely, Possible, Unsure.
+const P_PATTERN = [0.91, 0.84, 0.72, 0.95, 0.46, 0.8, 0.63, 0.89, 0.34, 0.87, 0.69, 0.52, 0.93, 0.27, 0.78, 0.6];
+// Lip-read look-alikes the search considered at the same moment, lower case. Words not listed get none.
+const ALT_BANK = {
+  come: ["some", "hum"], on: ["own", "ah"], we: ["be", "me"], need: ["knead", "neat"], this: ["miss", "bliss"],
+  one: ["won", "done"], now: ["know", "mow"], keep: ["kip", "cheap"], it: ["hit", "eat"], tight: ["tide", "right"],
+  you: ["yeah", "dew"], have: ["heave", "half"], got: ["cot", "gut"], space: ["spice", "pace"],
+  switch: ["twitch", "swish"], good: ["could", "gold"], work: ["walk", "wok"], that: ["hat", "than"],
+  was: ["wash", "wars"], big: ["pig", "bag"], hold: ["hole", "gold"], the: ["thee", "be"], line: ["lion", "mine"],
+  watch: ["watt", "wash"], left: ["lift", "let"], side: ["sight", "sigh"], yes: ["yep", "yeast"], is: ["his", "as"],
+};
+// Up to three alternatives, each less probable than the reading the engine chose (p scales with its p).
+function alternativesFor(raw, pw, k) {
+  const bank = ALT_BANK[raw.toLowerCase()];
+  if (!bank || k % 5 === 4) return [];          // some words have no alternatives at all
+  const cap = raw[0] === raw[0].toUpperCase() ? (s) => s[0].toUpperCase() + s.slice(1) : (s) => s;
+  const weights = [0.55, 0.4, 0.25];
+  return bank.slice(0, k % 3 === 0 ? 3 : 2).map((text, j) => ({
+    text: cap(text),
+    p: +Math.max(0.02, pw * weights[j]).toFixed(2),
+  }));
+}
 
 function buildTrack({ id, tier, cx, cy, size, a, b, meta, names, sentenceOffset, confScale, reasons, facePx, yaw }) {
   const W = meta.width, H = meta.height, D = meta.duration;
@@ -140,8 +162,14 @@ function buildTrack({ id, tier, cx, cy, size, a, b, meta, names, sentenceOffset,
         conf = 0.8;
         boostedDone = true;
       }
+      const pw = P_PATTERN[(wi + k) % P_PATTERN.length];
+      let alternatives = alternativesFor(raw, pw, wi + k);
+      if (boosted) alternatives = [{ text: "Rodrigues", p: 0.12 }, { text: "Rodrigo", p: 0.06 }];
       const dur = 0.22 + 0.06 * (raw.length / 6);
-      words.push({ text, start: +t.toFixed(2), end: +(t + dur).toFixed(2), confidence: +conf.toFixed(2), tier: tierOf(conf), boosted, ...(boosted ? { original } : {}) });
+      words.push({
+        text, start: +t.toFixed(2), end: +(t + dur).toFixed(2), confidence: +conf.toFixed(2), tier: tierOf(conf), boosted,
+        ...(boosted ? { original } : {}), p: +pw.toFixed(2), alternatives,
+      });
       t += dur + 0.1;
       k++;
       if (t > end - 0.4) break;
