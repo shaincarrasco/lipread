@@ -1,0 +1,28 @@
+name: Proofs
+# Machine-checks the Lean proofs in proofs/ (Lean 4 core, no Mathlib).
+on:
+  push:
+    paths: ["proofs/**", ".github/workflows/proofs.yml"]
+  pull_request:
+    paths: ["proofs/**"]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  lean:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: proofs
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Lean (version pinned in proofs/lean-toolchain)
+        run: |
+          curl -sSfL https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh \
+            | sh -s -- -y --default-toolchain "$(cat lean-toolchain)"
+          echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+      - name: Check proofs
+        run: |
+          lean --version
+          for f in *.lean; do echo "== $f"; lean "$f"; done
