@@ -236,7 +236,7 @@ PRIVACY.md          privacy notes for the phone app
 #### Rust and Lean
 
 - **Rust (`decoder/`):** the part that weighs several candidate words and picks the most likely one from
-  the words around it. Built to WebAssembly by `scripts/build_wasm.sh` (266 KB, 104 KB gzipped) and used by
+  the words around it. Built to WebAssembly by `scripts/build_wasm.sh` (283 KB, 105 KB gzipped) and used by
   the phone app, with the identical JavaScript decoder as a fallback. It gives exactly the same output as
   the Python reference on every test fixture and runs about 2.5x faster than the JavaScript version at
   beam 16 and 3x faster at beam 64 (desktop Node 22, 20 clips). Test with `cd decoder && cargo test --release`.

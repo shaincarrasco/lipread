@@ -2,7 +2,7 @@
 # Machine-checked proof: long videos are split into windows with no gaps
 
 The lip model takes at most 500 frames at a time (20 s of video). `lipread.engine.stitch_windows`
-(and its JS twin `stitchWindows` in `web/core/lipread.js`) cuts a longer video into overlapping
+(and its JS twin `stitch` in `web/core/worker.js`) cuts a longer video into overlapping
 windows and stitches the model's per-frame outputs back together:
 
 ```python
