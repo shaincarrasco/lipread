@@ -224,12 +224,25 @@ you use. The full policy is in [ETHICS.md](ETHICS.md).
 web/                the phone app: static PWA, runs entirely in the browser (see docs/PHONE.md)
 src/lipread/        the package: ingest, shots, faces, tracker, align, quality, engine, decode, booster, export, render, pipeline, cli
 src/lipread/web/    FastAPI server and the neon web UI
+decoder/            Rust: word language model + context-aware beam search, compiled to WebAssembly for the phone
+proofs/             Lean 4: machine-checked proof that long videos are split with no skipped frames
 eval/               benchmark scripts (LRS3 and Whisper references)
 tests/              unit tests (model tests are marked and need the download)
-scripts/            install_mac.sh, make_mac_launcher.sh, LipRead.command, icon
+scripts/            install_mac.sh, make_mac_launcher.sh, LipRead.command, icon, build_lm.py, build_wasm.sh
 docs/               ARCHITECTURE.md, PHONE.md, ROADMAP.md, PLAN.md
 PRIVACY.md          privacy notes for the phone app
 ```
+
+#### Rust and Lean
+
+- **Rust (`decoder/`):** the part that weighs several candidate words and picks the most likely one from
+  the words around it. Built to WebAssembly by `scripts/build_wasm.sh` (266 KB, 104 KB gzipped) and used by
+  the phone app, with the identical JavaScript decoder as a fallback. It gives exactly the same output as
+  the Python reference on every test fixture and runs about 2.5x faster than the JavaScript version at
+  beam 16 and 3x faster at beam 64 (desktop Node 22, 20 clips). Test with `cd decoder && cargo test --release`.
+- **Lean (`proofs/Windows.lean`):** a proof that the 20-second windows used for long videos cover every
+  frame and stay inside the video, checked by Lean 4 on every change (`.github/workflows/proofs.yml`).
+  It also shows the extra end window in `stitch_windows` is never needed.
 
 Read [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for the desktop pipeline, [docs/PHONE.md](docs/PHONE.md)
 for the phone app, and [docs/ROADMAP.md](docs/ROADMAP.md) for what is next.

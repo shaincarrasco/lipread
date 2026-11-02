@@ -1,0 +1,24 @@
+name: Rust decoder
+# Parity tests: the Rust decoder must match the Python reference on every fixture, natively and as WebAssembly.
+on:
+  push:
+    paths: ["decoder/**", "web/core/wasm/**", "tests_web/**", "web/core/assets/lm.bin", ".github/workflows/rust.yml"]
+  pull_request:
+    paths: ["decoder/**", "web/core/wasm/**", "tests_web/**"]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Native parity tests
+        working-directory: decoder
+        run: cargo test --release --locked
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: WebAssembly and JS tests
+        run: node --test tests_web/*.test.mjs

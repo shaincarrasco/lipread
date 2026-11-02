@@ -61,6 +61,7 @@ These milestones are planned. P3 and P4 are done (see below); the rest are open.
 | P3: `requestVideoFrameCallback` frame capture — **done** | Frames are read by playing and pausing on each 25 fps frame; seeking is the fallback. | Done 2026-11-02: in desktop Chromium, frame waiting fell from 55 s to 9 s for a 12 s clip with the same transcript. Still to confirm on the P1 phones. |
 | P4: threads — **done (desktop-measured)** | The service worker adds the cross-origin isolation headers GitHub Pages can't send. | Done 2026-11-02: lip model 14.1 s → 8.6 s on a 2-core desktop. Falls back to one thread where unsupported; confirm on the P1 phones. |
 | P5: captioned video export | Burn captions into a copy of the clip and save it to the phone (was planned as v1.1 in the phone plan). The AI-estimate label stays on the video. | Export works on the P1 phones, and the label is visible on the exported file. |
+| P7: Rust decoder — **done** | The context-aware decoder runs as Rust compiled to WebAssembly, with the JS decoder as fallback. | Done 2026-11-02: same output as the Python reference on all fixtures; 2.5–3x faster than JS (desktop). Next: use the headroom for beam 64 with 5 suggestions per word, measured on the P1 phones. |
 | P6: sample clip with cleared rights | A sample clip that the owner or the rights holder has cleared for public use, so anyone can try the app. | Written permission is on file, and the clip's license is in the repo. |
 
 ## Path to monetizing
