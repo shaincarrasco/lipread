@@ -136,15 +136,56 @@ def _stretch(u: Utterance) -> Utterance:
     return Utterance(ws[0].start, ws[-1].end, ws)
 
 
+_LM_CACHE: dict = {}
+
+
+def load_lm():
+    """The word language model for context-aware decoding, or None if it isn't available.
+
+    Looked up in $LIPREAD_LM, the repository's web/core/assets/lm.bin, then the models folder."""
+    import os
+    from pathlib import Path
+    if "lm" in _LM_CACHE:
+        return _LM_CACHE["lm"]
+    here = Path(__file__).resolve()
+    candidates = [os.environ.get("LIPREAD_LM"), here.parents[2] / "web" / "core" / "assets" / "lm.bin"]
+    try:
+        from .models import models_dir
+        candidates.append(Path(models_dir()) / "lm.bin")
+    except Exception:  # pragma: no cover
+        pass
+    lm = None
+    for c in candidates:
+        if c and Path(c).is_file():
+            from .lm import NgramLM
+            lm = NgramLM(str(c))
+            log.info("context-aware decoding with LM %s", c)
+            break
+    _LM_CACHE["lm"] = lm
+    return lm
+
+
 def decode_track(
     logprobs: np.ndarray,
     vocab: Sequence[str],
     blank: int,
     t0: float,
     names: Sequence[str] = (),
+    context: bool = True,
 ) -> list[Utterance]:
-    """Greedy decode, then the roster booster if names are given, then segment into utterances."""
-    words = greedy_words(logprobs, vocab, blank, t0)
+    """Decode one track into utterances.
+
+    With ``context`` (and a language model available) the beam-search decoder weighs several candidate
+    words using the surrounding words and attaches alternatives; otherwise greedy decoding is used.
+    The roster booster then runs if names are given."""
+    lm = load_lm() if context else None
+    if lm is not None:
+        from .beam import BeamDecoder, DecodeOptions
+        words, alts = BeamDecoder(vocab, lm, DecodeOptions(names=tuple(names)), blank).decode(logprobs, t0)
+        for w, a in zip(words, alts):
+            w.p, w.alternatives = a["p"], a["alternatives"]
+    else:
+        words = greedy_words(logprobs, vocab, blank, t0)
     if names:
         from .booster import Booster  # local import: booster depends on this module
 

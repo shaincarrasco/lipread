@@ -180,6 +180,7 @@ def _cmd_run(args: argparse.Namespace) -> int:
         faces=args.faces,
         names=names,
         render_video=not args.no_video,
+        context=not getattr(args, "no_context", False),
         force_unreadable=args.force_unreadable,
     )
     engine = None
@@ -268,6 +269,8 @@ def build_parser() -> argparse.ArgumentParser:
     run.add_argument("--names", metavar="A,B", help="comma-separated names/hotwords for the roster booster")
     run.add_argument("--roster", metavar="FILE", help="file of names (one per line, or a JSON list)")
     run.add_argument("--no-video", action="store_true", help="do not render the annotated MP4")
+    run.add_argument("--no-context", action="store_true",
+                     help="greedy decoding only (skip the beam search with the word language model)")
     run.add_argument("--force-unreadable", action="store_true", help="also decode UNREADABLE tracks (labelled)")
     run.add_argument("--accept-license", action="store_true",
                      help="accept the research / non-commercial licence of the lip-reading model")

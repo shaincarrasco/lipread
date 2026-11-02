@@ -106,6 +106,8 @@ class Word:
     tier: Confidence
     boosted: bool = False     # True if the roster booster replaced the model's word
     original: Optional[str] = None   # the model's word before boosting
+    p: Optional[float] = None        # context-aware decoder: share of strong hypotheses backing this word
+    alternatives: list = field(default_factory=list)   # [{"text", "p"}] other words considered here
 
 
 @dataclass
@@ -147,6 +149,7 @@ class Job:
     render_video: bool = True
     min_track_frames: int = 13           # ignore tracks shorter than ~0.5 s
     force_unreadable: bool = False       # decode even UNREADABLE tracks (labelled as such)
+    context: bool = True                 # context-aware decoding (beam search + word language model)
 
 
 @dataclass

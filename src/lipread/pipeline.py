@@ -386,7 +386,7 @@ def run(job: Job, engine: Engine | None = None, progress: ProgressFn | None = No
             lp = _logprobs(engine, p.crops, tid, os.path.join(out_dir, "cache"))
         with timer.stage("decode"):
             t0 = job.start + p.track.start_frame / FPS
-            by_id[tid].utterances = decode.decode_track(lp, engine.vocab, engine.blank, t0, names=job.names)
+            by_id[tid].utterances = decode.decode_track(lp, engine.vocab, engine.blank, t0, names=job.names, context=job.context)
         log.info("track %d (%s): %s", tid, reports[tid].tier.value,
                  " ".join(u.text for u in by_id[tid].utterances) or "-")
 
