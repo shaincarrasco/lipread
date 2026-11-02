@@ -34,3 +34,10 @@ lipread_out/
 !src/lipread/assets/*.npy
 .env
 eval/reports/
+
+# Small ONNX models shipped with the web app (MIT YuNet)
+!web/core/assets/*.onnx
+
+# local dev only
+web/dev-model
+web/dev-media/

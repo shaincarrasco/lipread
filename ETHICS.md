@@ -51,4 +51,17 @@ This policy is part of the project. If you use LipRead, you agree to it.
 - Accuracy drops for side views, small faces, covered mouths, blur, and low frame rates. Measured numbers are in the README.
 - The model reads lips only. It does not use the audio, so it can confuse words that look alike.
 
+## 9. The public phone app
+
+The phone app is open to anyone with a link. These rules apply to it in addition to sections 1 to 8.
+
+- **Do not identify private people in crowds.** Fan sections, stands and street footage show private
+  people. Do not run the app on them to find out what they said, and do not add their names to a roster.
+- **Keep the AI-estimate label on everything you share.** Every transcript, caption file or video from
+  the app is an AI estimate from lip movements, not a verified transcript. Keep this label with the words
+  wherever you copy or post them.
+- **Do not attribute estimated words to named people as fact.** Do not caption a named person with words
+  the app estimated, and do not put them in a headline, post or caption that names the person. Get the
+  original audio or a human transcript first.
+
 If you find a misuse of LipRead, or output that is being shared as fact, open an issue. Do not wait for a fix to take the output down.

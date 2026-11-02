@@ -4,8 +4,90 @@
 
 <h1 align="center">LipRead</h1>
 
-<p align="center"><b>Read the lips in any video.</b><br>
-Built for sports clips: coaches on the touchline, players in close-up, the bench.</p>
+<p align="center"><b>Read the lips in a video, right on your phone.</b><br>
+Built for sports clips: see what a coach, a player or a referee appears to say.</p>
+
+> **Status: pre-release.** The phone app has been checked in desktop Chromium at phone size only.
+> It has **not yet been tested on a real iPhone or Android phone.** The desktop app (below) is
+> v0.1, early, and has measured results.
+
+## Open on your phone
+
+**[Open LipRead](https://YOUR-USERNAME.github.io/lipread/)**
+
+> **Placeholder link.** `YOUR-USERNAME` is not a real address, so the link above does not open the
+> app yet. After the first GitHub Pages deploy, replace `YOUR-USERNAME` with your GitHub user or
+> organization name everywhere it appears (`grep -r YOUR-USERNAME .` shows every place).
+
+### How to use it
+
+1. **Open the link** in Safari on an iPhone, or Chrome on an Android phone.
+2. **Add it to your Home Screen.** In Safari: Share, then *Add to Home Screen*. In Chrome: the menu,
+   then *Add to Home screen* or *Install app*. It then opens full screen, like an app.
+3. **Pick a clip** from your videos. Optionally type the names you expect (players, coaches) so the
+   app can check for them. Tap **Read**.
+
+The first run downloads the lip-reading model: **about 203 MB**. Use Wi-Fi. After that the model
+stays on the phone.
+
+## How accurate is it?
+
+The phone app runs the same kind of lip-reading model as the desktop app. It is usable on clear,
+face-on speakers and unreliable elsewhere. The confidence on each word tells you which words to doubt.
+
+- **Confidence tiers.** Every word is marked **high**, **medium** or **low**. In the desktop
+  measurements, high-confidence words were right 96% of the time, medium 74%, and low 32% to 50%.
+  Treat low words as guesses.
+- **Phone pipeline, 8-clip check.** **31.8% word error rate.** On the same clips the desktop pipeline
+  scored 31.4%, and raw face detection without the correction scored 32.2%. The phone correction was
+  fitted on those same 8 clips, so expect the phone figure to be slightly optimistic. Eight clips
+  cannot tell these three apart.
+- **Phone speed and accuracy on real phones have not been measured.** The test checklist is in
+  [docs/PHONE.md](docs/PHONE.md).
+
+The full desktop measurements, and what each one means, are in
+[the accuracy table](#how-accurate-is-it) under *Desktop and command line*.
+
+## Privacy
+
+- **Your video stays on your phone.** The app reads the frames on your device. Nothing you process
+  is uploaded.
+- **No accounts and no analytics.** The app does not track you.
+- **Network use is limited to downloads.** The app files come from GitHub Pages, and the model comes
+  from Hugging Face. Both see the request. Details are in [PRIVACY.md](PRIVACY.md).
+
+## Supported browsers
+
+These are **targets**. They have not been tested on real devices yet.
+
+- **iPhone:** Safari on iOS 16.4 or later
+- **Android:** recent Chrome
+
+Other browsers are not supported yet.
+
+## Known limits on the phone
+
+- **Not tested on real phones.** Checks so far used desktop Chromium at phone size.
+- **Speed and memory are unmeasured on phones.** Long clips will take longer. No clip-length limit
+  has been tested.
+- **Keep the app open while it works.** The app asks the phone to keep the screen on where the
+  browser allows it. What happens when you switch apps mid-run is untested.
+- **Some videos may not open.** Many phone recordings use HEVC (H.265), and not every browser can
+  read them. The app should say so rather than fail silently. That message is untested on devices.
+- **English speech only.** Names are boosted only if you type them in the roster.
+- **Not in the phone app yet:** captioned video export, live captions, a sample clip.
+- **The limits below still apply:** side views, small faces, covered mouths, blur and low frame rates
+  all hurt accuracy.
+
+## Responsible use
+
+LipRead gives **estimates, not quotes**. Check the output against the video before you share it. Do
+not use it to read the lips of private people in crowds, and do not put words in a named person's
+mouth. The full policy is in [ETHICS.md](ETHICS.md).
+
+---
+
+## Desktop and command line
 
 LipRead takes a video, finds the faces, decides which faces are readable, and writes out what
 each person appears to say. You get word-level timestamps, a confidence score on every word,
@@ -15,7 +97,7 @@ and an annotated video you can check. It uses the picture only (no audio) and is
 > tuned for sports**. That is on the roadmap. The default model is **research and non-commercial
 > only** (see [MODEL_LICENSES.md](MODEL_LICENSES.md)).
 
-## What it does
+### What it does
 
 - Finds shot cuts and the faces in each shot (up to 20 per frame), including small ones.
 - Tracks each person across the shot and rates each track: `readable`, `marginal` or `unreadable`, with reasons.
@@ -25,7 +107,7 @@ and an annotated video you can check. It uses the picture only (no audio) and is
 - Writes JSON, SRT, WebVTT, TXT, an annotated MP4 with a neon overlay, and face thumbnails.
 - Ships a local web UI and a CLI. Both run the same pipeline.
 
-## How accurate is it?
+### How accurate is it?
 
 Short answer: **usable on clear, frontal faces, unreliable elsewhere, and the confidence score
 tells you which words to doubt.** The numbers below are the ones we measured. Nothing else here is
@@ -45,7 +127,7 @@ Published numbers, not measured here: the Auto-AVSR paper reports **19.1% WER** 
 speech with beam search and a language model (Ma et al., ICASSP 2023). LipRead v0.1 uses greedy
 decoding and a different test subset, so the two are not directly comparable.
 
-### What makes it fail
+#### What makes it fail
 
 - **Side views.** A face turned away from the camera loses the lips. The readability gate checks yaw and marks these down.
 - **Tiny faces.** MediaPipe alone lost the face at 120 px and below in our test. LipRead pairs it with YuNet, which finds smaller faces. In a face-size study accuracy held steady down to about 40 px and collapsed at 20 px; faces under 32 px are marked unreadable and not decoded unless you force it.
@@ -58,9 +140,9 @@ decoding and a different test subset, so the two are not directly comparable.
 
 **Treat every word as an estimate until a person has checked it.**
 
-## Quickstart (macOS, Apple Silicon)
+### Quickstart (macOS, Apple Silicon)
 
-### One-click setup
+#### One-click setup
 
 ```bash
 bash scripts/install_mac.sh          # installs ffmpeg and Python 3.12 if needed, sets up .venv, asks before downloading the model
@@ -72,7 +154,7 @@ http://127.0.0.1:8765 in your browser. The first time, macOS asks whether LipRea
 Allow it. Install iTerm2 with `brew install --cask iterm2`. If iTerm2 is missing, the launcher falls
 back to Terminal.app so it still starts.
 
-### By hand
+#### By hand
 
 ```bash
 brew install ffmpeg                                   # video decoding
@@ -83,7 +165,7 @@ lipread models download --accept-license              # prints the license, reco
 lipread serve                                         # then open http://127.0.0.1:8765
 ```
 
-## Command line
+### Command line
 
 ```bash
 lipread scan game.mp4                                  # list shots and faces, no lip reading
@@ -102,7 +184,7 @@ lipread models list                                    # show the models and the
 `SOURCE` can be a file or an http(s) URL. URLs need the `url` extra. Only download video you have
 the right to use (see [ETHICS.md](ETHICS.md)).
 
-## Output files
+### Output files
 
 Everything goes to the output folder (`-o`):
 
@@ -113,7 +195,7 @@ Everything goes to the output folder (`-o`):
 - **`thumbs/` and `crops/`:** a face thumbnail and a mouth-crop strip per track, so you can see exactly what the model was given.
 - **`source/` and `cache/`:** the downloaded input and cached model output. Delete them to free disk space once you are done.
 
-## Known limits (v0.1)
+### Known limits (desktop, v0.1)
 
 - **Names the model never considered can't be boosted.** The roster booster fixes near-misses only (see the table above).
 - **URL safety:** links to private or local network addresses are refused, but redirects after the first URL are not re-checked. The web app only accepts requests from its own page on 127.0.0.1.
@@ -121,27 +203,30 @@ Everything goes to the output folder (`-o`):
 - **Not yet run on a Mac.** Everything was built and tested in a Linux sandbox; the Mac installer and Desktop launcher are untested.
 - **No sports benchmark yet.** Use the web app's "Edit / correct" button to build your own labelled set (`eval/labels_bench.py` scores it).
 
-## Responsible use
+### Responsible use
 
 LipRead outputs are **estimates, not quotes**. Check them against the video before you publish
 anything. Do not use it to read the lips of private people in crowds, do not attach invented words
 to a named person, and do not use it to harass or profile anyone. Respect the terms of the footage
 you use. The full policy is in [ETHICS.md](ETHICS.md).
 
-## Project layout
+### Project layout
 
 ```
+web/                the phone app: static PWA, runs entirely in the browser (see docs/PHONE.md)
 src/lipread/        the package: ingest, shots, faces, tracker, align, quality, engine, decode, booster, export, render, pipeline, cli
 src/lipread/web/    FastAPI server and the neon web UI
 eval/               benchmark scripts (LRS3 and Whisper references)
 tests/              unit tests (model tests are marked and need the download)
 scripts/            install_mac.sh, make_mac_launcher.sh, LipRead.command, icon
-docs/               ARCHITECTURE.md, ROADMAP.md, PLAN.md
+docs/               ARCHITECTURE.md, PHONE.md, ROADMAP.md, PLAN.md
+PRIVACY.md          privacy notes for the phone app
 ```
 
-Read [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for the pipeline, and [docs/ROADMAP.md](docs/ROADMAP.md) for what is next.
+Read [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for the desktop pipeline, [docs/PHONE.md](docs/PHONE.md)
+for the phone app, and [docs/ROADMAP.md](docs/ROADMAP.md) for what is next.
 
-## License
+### License
 
-- **Code:** Apache-2.0. See [LICENSE](LICENSE) and [NOTICE](NOTICE). Auto-AVSR preprocessing is ported with attribution.
-- **Model weights:** not included. Downloaded at runtime under research and non-commercial terms (LRS3). See [MODEL_LICENSES.md](MODEL_LICENSES.md).
+- **Code:** Apache-2.0, including the phone app in `web/`. See [LICENSE](LICENSE) and [NOTICE](NOTICE). Auto-AVSR preprocessing is ported with attribution.
+- **Model weights:** not included. The desktop app downloads them at runtime under research and non-commercial terms (LRS3), and the phone app downloads the lip-reading model from Hugging Face on first run. See [MODEL_LICENSES.md](MODEL_LICENSES.md).
