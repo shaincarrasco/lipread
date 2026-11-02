@@ -16,9 +16,11 @@ export const CONFIG = {
   // Face detector shipped with the app (OpenCV Zoo YuNet 2023mar, MIT, 230 KB, fixed 640x640 input).
   yunetUrl: new URL("./assets/face_detection_yunet_2023mar.onnx", import.meta.url).href,
 
-  // onnxruntime-web (pinned). The worker imports this module and loads its .wasm from the same folder.
-  ortModule: "https://cdn.jsdelivr.net/npm/onnxruntime-web@1.31.1/dist/ort.wasm.min.mjs",
-  ortWasmPaths: "https://cdn.jsdelivr.net/npm/onnxruntime-web@1.31.1/dist/",
+  // onnxruntime-web 1.31.1 (pinned). The worker imports this module and loads its .wasm from the same folder.
+  // Vendored at build time (scripts/vendor_ort.sh) so the app works offline and no third-party
+  // script runs next to the user's video.
+  ortModule: new URL("../vendor/ort/ort.wasm.min.mjs", import.meta.url).href,
+  ortWasmPaths: new URL("../vendor/ort/", import.meta.url).href,
 
   fps: 25,               // model frame rate
   maxSeconds: 30,        // longest window processed on a phone

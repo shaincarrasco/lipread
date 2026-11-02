@@ -25,8 +25,8 @@ export class LipRead {
   // ---------------------------------------------------------------- model
   modelStatus() { return store.modelStatus(); }
   async downloadModel(onBytes, signal) {
-    self.__lipreadBusy = true;
-    try { return await store.downloadModel(onBytes, signal); } catch (err) { throw coded(err); } finally { self.__lipreadBusy = false; }
+    busy(+1);
+    try { return await store.downloadModel(onBytes, signal); } catch (err) { throw coded(err); } finally { busy(-1); }
   }
   async deleteModel() { await this._call("dispose").catch(() => {}); return store.deleteModel(); }
   get model() { return { name: CONFIG.modelName, license: CONFIG.modelLicense, bytes: CONFIG.modelBytes }; }
@@ -53,11 +53,17 @@ export class LipRead {
       this._pending.delete(id);
       ok ? p.resolve(result) : p.reject(new Error(error));
     };
-    this._worker.onerror = (e) => {
-      for (const p of this._pending.values()) p.reject(new Error(`WORKER_CRASHED: ${e.message || "out of memory?"}`));
-      this._pending.clear(); this._worker = null;
-    };
+    this._worker.onerror = (e) => this._killWorker(new Error(`WORKER_CRASHED: ${(e && e.message) || "out of memory?"}`));
+    this._worker.onmessageerror = () => this._killWorker(new Error("WORKER_CRASHED: bad message"));
     this._call("config", { overrides: JSON.parse(JSON.stringify(this.overrides)) });
+  }
+
+  /** Stop the worker immediately (cancel or crash): frees the model's memory, rejects pending calls. */
+  _killWorker(err) {
+    if (this._worker) { try { this._worker.terminate(); } catch { /* ignore */ } }
+    this._worker = null;
+    for (const p of this._pending.values()) p.reject(err);
+    this._pending.clear();
   }
 
   _call(type, args = {}, transfer = []) {
@@ -83,37 +89,46 @@ export class LipRead {
 
   // ---------------------------------------------------------------- main entry
   async process(file, opts = {}) {
-    self.__lipreadBusy = true;
-    try { return await this._process(file, opts); } catch (err) { throw coded(err); } finally { self.__lipreadBusy = false; }
+    busy(+1);
+    // Cancelling really stops the work: the worker (and its 200+ MB model session) is terminated.
+    const onAbort = () => this._killWorker(new DOMException("Cancelled", "AbortError"));
+    opts.signal?.addEventListener("abort", onAbort, { once: true });
+    try { return await this._process(file, opts); } catch (err) { throw coded(err); }
+    finally { busy(-1); opts.signal?.removeEventListener("abort", onAbort); }
   }
 
   async _process(file, { names = [], faces = "readable", start = 0, end = null, signal } = {}) {
+    const token = (this._runToken = Symbol("run"));
+    const report = (stage, fraction, message) => {
+      if (token === this._runToken && !signal?.aborted) this._progress(stage, fraction, message);
+    };
     const timings = {}; let tick = performance.now();
     const lap = (k) => { const n = performance.now(); timings[k] = (timings[k] || 0) + (n - tick) / 1000; tick = n; };
     const check = () => { if (signal && signal.aborted) throw new DOMException("Cancelled", "AbortError"); };
     names = names.map((n) => n.trim()).filter(Boolean);
 
-    this._progress("model", 0, "Preparing");
-    const status = await store.modelStatus();
-    if (!status.cached) throw new Error("MODEL_MISSING");
-    const assets = await this._loadAssets(names.length > 0);
-    await this._call("initYunet");
-    lap("setup");
-
+    report("model", 0, "Preparing");
+    // Open the video first, as close to the user's tap as possible (iOS playback rules).
     const vid = await openVideo(file);
     let result;
     try {
-      result = await this._run(vid, assets, { names, faces, start, end, check, lap });
+      const status = await store.modelStatus();
+      if (!status.cached) throw new Error("MODEL_MISSING");
+      const assets = await this._loadAssets(names.length > 0);
+      await this._call("initYunet");
+      check();
+      lap("setup");
+      result = await this._run(vid, assets, { names, faces, start, end, check, lap, signal, report });
     } finally {
       vid.close();
     }
     result.timings = timings;
     result.profile = Object.fromEntries(Object.entries(this.prof || {}).map(([k, v]) => [k, Math.round(v)]));
-    this._progress("done", 1, "Done");
+    report("done", 1, "Done");
     return result;
   }
 
-  async _run(vid, assets, { names, faces, start, end, check, lap }) {
+  async _run(vid, assets, { names, faces, start, end, check, lap, signal, report }) {
     const fps = CONFIG.fps, stride = CONFIG.detectStride;
     start = Math.max(0, start || 0);
     const stop = Math.min(vid.duration, end ?? vid.duration, start + CONFIG.maxSeconds);
@@ -193,10 +208,10 @@ export class LipRead {
         td.crops.set(f, { data: g, cx: mx, cy: my, k, size: S });
         prof.crop += performance.now() - qc;
       }
-      if (f % 5 === 0) this._progress("faces", f / N, `Frame ${f + 1} of ${N}`);
+      if (f % 5 === 0) report("faces", f / N, `Frame ${f + 1} of ${N}`);
       qWait = performance.now();
     };
-    await stepFrames(vid.video, start, N, fps, onFrame, check);
+    await stepFrames(vid, start, N, fps, onFrame, check, signal);
     lap("faces");
 
     // ---- per track: alignment, readability, selection
@@ -218,7 +233,7 @@ export class LipRead {
 
     const wanted = tracks.filter((t) => faces === "all" || t.q.tier !== "unreadable");
     if (wanted.length) {
-      this._progress("lips", 0, "Loading lip-reading model");
+      report("lips", 0, "Loading lip-reading model");
       await this._call("initLips");
       lap("modelLoad");
     }
@@ -234,7 +249,7 @@ export class LipRead {
                      coverage: t.q.coverage, start: t0, end: tEnd, boxes: t.td.boxes, thumb: t.td.thumb,
                      skipped: !wanted.includes(t), utterances: [] };
       if (!item.skipped) {
-        this._progress("lips", done / wanted.length, `Reading face ${done + 1} of ${wanted.length}`);
+        report("lips", done / wanted.length, `Reading face ${done + 1} of ${wanted.length}`);
         const crops = t.crops;
         const { logprobs, T, V } = await this._call("lips", { crops, T: t.T }, [crops.buffer]);
         let words = greedyWords(logprobs, T, V, assets.tokens, t0);
@@ -274,15 +289,20 @@ export class LipRead {
   }
 }
 
+/** Busy counter read by sw-register.js: never reload the page while work is running. */
+function busy(d) { self.__lipreadBusy = Math.max(0, (self.__lipreadBusy | 0) + d); }
+
 /** Attach the short error code the UI keys its messages on. */
 function coded(err) {
   const msg = String((err && err.message) || err);
   const code = err?.name === "AbortError" ? "aborted"
+    : /^VIDEO_AUTOPLAY_BLOCKED/.test(msg) ? "autoplay"
+    : /^VIDEO_STALLED/.test(msg) ? "stalled"
     : /^VIDEO_/.test(msg) ? "decode"
     : /^MODEL_MISSING/.test(msg) ? "model"
     : /^(DOWNLOAD_FAILED|CHECKSUM_MISMATCH)/.test(msg) ? "download"
     : /^STORAGE_FULL/.test(msg) || err?.name === "QuotaExceededError" ? "storage"
-    : /^WORKER_CRASHED/.test(msg) ? "memory"
+    : /^WORKER_CRASHED|out of memory|memory access out of bounds|Aborted\(|RangeError|alloc/i.test(msg) ? "memory"
     : /^CLIP_TOO_SHORT/.test(msg) ? "short" : "";
   const e = err instanceof Error ? err : new Error(msg);
   if (code && !e.code) e.code = code;
