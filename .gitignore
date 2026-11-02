@@ -41,3 +41,4 @@ eval/reports/
 # local dev only
 web/dev-model
 web/dev-media/
+web/vendor/ort/

@@ -22,8 +22,17 @@ jobs:
       - name: Check out
         uses: actions/checkout@v4
 
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
       - name: Check service worker syntax
         run: node --check web/sw.js
+
+      # Pinned onnxruntime-web is fetched here, checked against the registry hash, and never committed.
+      - name: Vendor ONNX Runtime Web
+        run: bash scripts/vendor_ort.sh
 
       # Development-only harness and sample media never ship to the public site.
       - name: Leave out development files
@@ -32,6 +41,13 @@ jobs:
       # Give every deploy its own service-worker cache so clients pick up new files.
       - name: Stamp service worker build id
         run: sed -i "s/__BUILD_ID__/${GITHUB_SHA::12}/" web/sw.js
+
+      - name: Check the build id was stamped
+        run: |
+          if grep -q "__BUILD_ID__" web/sw.js; then
+            echo "::error file=web/sw.js::build id placeholder is still present"
+            exit 1
+          fi
 
       - name: Configure Pages
         uses: actions/configure-pages@v5
