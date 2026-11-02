@@ -1,0 +1,125 @@
+{
+ "description": "Python lipread.booster.ctc_log_likelihood on a seeded float32 random log-prob matrix",
+ "seed": 12345,
+ "T": 40,
+ "V": 9,
+ "blank": 0,
+ "logprobs_f32_base64": "clduwCSthL9r8ErAy80jwOwJGMAnokLAasFqwBNg07/YN/i/0LSewNTHKL8QcgLAtwdxwE2wBsB6UF7AQVBEwH7xDcCVbYjABkELwAEmrb+w9ra/I0pDwOOk7L/x8YvApjs6wIhXE8C4DIPAH/5YwDrDyr9PzzC/dwMiwG27HsDokYjAL5WQwF8Tl8AMGzHAj4Lcvy+KSMCqA23AOuUNwHRaCsBGwCbATTOavyZUJMDfnCLAWpVuwNn0HsCv46K/lb4jwIAeI8Be5wvAEuYVwLW4BcC6TgXA4PTEvw3vPMCOs+2/JaBwwIH08b/ty1rAL50OwE5t179zmiTAaknrv03iZMAGwzLAxbGfv4LJRcBdiaS/lcBUwED4NcAkAULAsqggwKLV/b/3U2XABbsswNg+Zb/rbTXAFVRVwA9gCMDfbS/AXX9SwOpBjMDUbuK/qiJKwP6JJcCVqWnAJI+kv2xz679hoM2/OcIjwH19/b/UYse/RnC2vwizCMBepyDA1rIzwOiaTMCHe1rAp+P5v2KjI8Bg3InANuwdwKnNn78MmSXA2EyFwNrxG8A5f8O/NaBDwFPza8DGhrS/2emtv1naVsBDfhzAIG83wJeKHsC0Fue/wAjXv1dlGsBX1UnAQvhTwLmkIcA4xau/ksYMwAadHMAriw/AxVgWwOg467/7gGDAa4aLwArYM8DOLGLA1A9Fv93GIsB10SjAcd91wKBgAcCWVzvAx0SXv4Uvu7+bFkXAS0ryvzLVoMDAhT7AAY6/v6fs+b9PUCTAD2kxwDUxhcBkSYPAuDwhwGgge796PJ3ANXHOv4Dv0b8TMaW/fhNHwAFNMcBEhQzAKjVRwG4eXsCz+kfA0DQawJt1+789PhfAdLkQwIdwQcB/zUPABOabv14tGcCP8RrAnKADwD6H4L+pJNy/rY0lwFfAQsCiAy3AEQ40wPsuzL/r1izA7McXwHlsQsB+yNG/YQKiwExJKMA9SxDAV2mFwIQTXL+WQUrAH7UvwDB6asADaNq/7gYXwEVBS8CE6RbAYfTyv/BDr7+wkBfAZy1bwDINQcBCQ5jAK0hMwNqW3L/dPv+/LVUkwNRHM8DvEmC/bWIOwFF5zL/QKQfAu0lLwAGec79WsG/AxgBtwNrpO8BqJU/ADSQ4wB3cOsCcnKq/jv4QwKnh+7/GF3rA76pKwMQZnr/6gWHAbg65v7LqacDfzRTAEB1ewNdeG8Duh2HAfWA4wPikc7+v+D/AmC2Qv4TOZ8C62IrA/KNFwIqeZMA/DbS/SFgTwE2v/b9cBCLAiG80v9lqGMAEPynAySqAwF65gsAudj/AwmULwHHEA8Ca1YPATjMcwBfWMcDA44LAy3MdwGrDp8AzXi3AfC8Av6x7f8ChAj3ADEuAwGqsN8DZ6a2/KhJKwMGLCcCLFR7Ao5IfwMJN9r89tNC/a/bnv4doDcDs32bAE1vQvyeo5b/cPpPAvyQYwF7hDcDA3wTACl0PwIGzgsDigkPAHXCbwN98PMAPH0K/GsMGwDS7+b/zPlPAxLM9wEExQcCBh+m/jBYwwPaAJcAUyk2/ebZlwJLKUMCNWx3A07AOwIqWEMBRsGHAqcr3vwmTEMDVOeO/fZpNwDw/8b+MVfS/uJ0qwKxVDsCu7iPA/Cgmv24ApMDY/1zAyIRtwE+MGMCjxSvAu4odwCZpqr8UtGvAuVg5wCaAEcAGKlDA/xXXv2c03L/WsDDAt2+NwAcjhr8jXwvA4WYOwLHlJMD7/SnAh6rov0qFKsBh5lHAByAJwHS2MsC++GfAUohwwJPi179rJQ7AamZgvzg9WMCrHmbAVfEcwPIEvb98mRDA5REbwAwZeL9kXmbAiVSDwIByZsAPEkvAUpMswIIQA8DMgirArPTFvzNuecBXCZW/eXB4wO4V87/3PoDA",
+ "cases": [
+  {
+   "a": 0,
+   "b": 40,
+   "target": [
+    1,
+    2,
+    3
+   ],
+   "ll": -78.11430120478445
+  },
+  {
+   "a": 0,
+   "b": 40,
+   "target": [
+    2,
+    2,
+    3
+   ],
+   "ll": -79.51198221259038
+  },
+  {
+   "a": 5,
+   "b": 12,
+   "target": [
+    1,
+    1,
+    1,
+    2
+   ],
+   "ll": -16.60595380682607
+  },
+  {
+   "a": 3,
+   "b": 5,
+   "target": [
+    4
+   ],
+   "ll": -3.558933240599233
+  },
+  {
+   "a": 3,
+   "b": 4,
+   "target": [
+    1,
+    1
+   ],
+   "ll": "-Infinity"
+  },
+  {
+   "a": 10,
+   "b": 10,
+   "target": [],
+   "ll": 0.0
+  },
+  {
+   "a": 0,
+   "b": 40,
+   "target": [],
+   "ll": -101.34579646587372
+  },
+  {
+   "a": 0,
+   "b": 3,
+   "target": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8
+   ],
+   "ll": "-Infinity"
+  },
+  {
+   "a": 7,
+   "b": 20,
+   "target": [
+    5,
+    1,
+    5
+   ],
+   "ll": -22.209420144901095
+  },
+  {
+   "a": 0,
+   "b": 6,
+   "target": [
+    8,
+    8,
+    8
+   ],
+   "ll": -14.36398761727167
+  },
+  {
+   "a": 2,
+   "b": 30,
+   "target": [
+    6,
+    6,
+    7,
+    7,
+    8
+   ],
+   "ll": -44.72817566105189
+  },
+  {
+   "a": 0,
+   "b": 1,
+   "target": [
+    3
+   ],
+   "ll": -2.5594356060028076
+  }
+ ]
+}

@@ -1,0 +1,144 @@
+{
+ "description": "LRS3 test clip 3 (label: i would love to hear from you\n); Python engine logprobs + greedy_words + Booster.apply",
+ "source": "lrs3_test_0.parquet row 3, video[:,4:92,4:92]",
+ "label": "i would love to hear from you\n",
+ "T": 34,
+ "V": 5049,
+ "t0": 0.0,
+ "logprobs_file": "booster_case3.logprobs.bin",
+ "names": [
+  "HUMILITY"
+ ],
+ "weight": 3.0,
+ "pad": 3,
+ "greedy": [
+  {
+   "text": "I",
+   "start": 0.08,
+   "end": 0.12,
+   "confidence": 0.993874192237854,
+   "tier": "high",
+   "boosted": false,
+   "original": null
+  },
+  {
+   "text": "WOULD",
+   "start": 0.24,
+   "end": 0.28,
+   "confidence": 0.9743931293487549,
+   "tier": "high",
+   "boosted": false,
+   "original": null
+  },
+  {
+   "text": "LOVE",
+   "start": 0.4,
+   "end": 0.44,
+   "confidence": 0.9997683763504028,
+   "tier": "high",
+   "boosted": false,
+   "original": null
+  },
+  {
+   "text": "TO",
+   "start": 0.56,
+   "end": 0.6,
+   "confidence": 0.999518871307373,
+   "tier": "high",
+   "boosted": false,
+   "original": null
+  },
+  {
+   "text": "HEAR",
+   "start": 0.72,
+   "end": 0.76,
+   "confidence": 0.9970015287399292,
+   "tier": "high",
+   "boosted": false,
+   "original": null
+  },
+  {
+   "text": "FROM",
+   "start": 0.92,
+   "end": 0.96,
+   "confidence": 0.9966956377029419,
+   "tier": "high",
+   "boosted": false,
+   "original": null
+  },
+  {
+   "text": "YOU",
+   "start": 1.08,
+   "end": 1.12,
+   "confidence": 0.9986976385116577,
+   "tier": "high",
+   "boosted": false,
+   "original": null
+  }
+ ],
+ "expected": [
+  {
+   "text": "I",
+   "start": 0.08,
+   "end": 0.12,
+   "confidence": 0.993874192237854,
+   "tier": "high",
+   "boosted": false,
+   "original": null
+  },
+  {
+   "text": "WOULD",
+   "start": 0.24,
+   "end": 0.28,
+   "confidence": 0.9743931293487549,
+   "tier": "high",
+   "boosted": false,
+   "original": null
+  },
+  {
+   "text": "LOVE",
+   "start": 0.4,
+   "end": 0.44,
+   "confidence": 0.9997683763504028,
+   "tier": "high",
+   "boosted": false,
+   "original": null
+  },
+  {
+   "text": "TO",
+   "start": 0.56,
+   "end": 0.6,
+   "confidence": 0.999518871307373,
+   "tier": "high",
+   "boosted": false,
+   "original": null
+  },
+  {
+   "text": "HEAR",
+   "start": 0.72,
+   "end": 0.76,
+   "confidence": 0.9970015287399292,
+   "tier": "high",
+   "boosted": false,
+   "original": null
+  },
+  {
+   "text": "FROM",
+   "start": 0.92,
+   "end": 0.96,
+   "confidence": 0.9966956377029419,
+   "tier": "high",
+   "boosted": false,
+   "original": null
+  },
+  {
+   "text": "YOU",
+   "start": 1.08,
+   "end": 1.12,
+   "confidence": 0.9986976385116577,
+   "tier": "high",
+   "boosted": false,
+   "original": null
+  }
+ ]
+}

@@ -1,0 +1,126 @@
+{
+ "description": "LRS3 test clip 0 (label: the first lesson is about humility\n); Python engine logprobs + greedy_words + Booster.apply",
+ "source": "lrs3_test_0.parquet row 0, video[:,4:92,4:92]",
+ "label": "the first lesson is about humility\n",
+ "T": 65,
+ "V": 5049,
+ "t0": 0.0,
+ "logprobs_file": "booster_case0.logprobs.bin",
+ "names": [
+  "HUMILITY"
+ ],
+ "weight": 3.0,
+ "pad": 3,
+ "greedy": [
+  {
+   "text": "THE",
+   "start": 0.2,
+   "end": 0.24,
+   "confidence": 0.9974441528320312,
+   "tier": "high",
+   "boosted": false,
+   "original": null
+  },
+  {
+   "text": "FIRST",
+   "start": 0.4,
+   "end": 0.44,
+   "confidence": 0.9995431303977966,
+   "tier": "high",
+   "boosted": false,
+   "original": null
+  },
+  {
+   "text": "LESSON",
+   "start": 0.64,
+   "end": 0.68,
+   "confidence": 0.8807926177978516,
+   "tier": "medium",
+   "boosted": false,
+   "original": null
+  },
+  {
+   "text": "IS",
+   "start": 1.28,
+   "end": 1.32,
+   "confidence": 0.9963439702987671,
+   "tier": "high",
+   "boosted": false,
+   "original": null
+  },
+  {
+   "text": "ABOUT",
+   "start": 1.6,
+   "end": 1.64,
+   "confidence": 0.9979831576347351,
+   "tier": "high",
+   "boosted": false,
+   "original": null
+  },
+  {
+   "text": "HUMAN",
+   "start": 2.04,
+   "end": 2.08,
+   "confidence": 0.6913145780563354,
+   "tier": "low",
+   "boosted": false,
+   "original": null
+  }
+ ],
+ "expected": [
+  {
+   "text": "THE",
+   "start": 0.2,
+   "end": 0.24,
+   "confidence": 0.9974441528320312,
+   "tier": "high",
+   "boosted": false,
+   "original": null
+  },
+  {
+   "text": "FIRST",
+   "start": 0.4,
+   "end": 0.44,
+   "confidence": 0.9995431303977966,
+   "tier": "high",
+   "boosted": false,
+   "original": null
+  },
+  {
+   "text": "LESSON",
+   "start": 0.64,
+   "end": 0.68,
+   "confidence": 0.8807926177978516,
+   "tier": "medium",
+   "boosted": false,
+   "original": null
+  },
+  {
+   "text": "IS",
+   "start": 1.28,
+   "end": 1.32,
+   "confidence": 0.9963439702987671,
+   "tier": "high",
+   "boosted": false,
+   "original": null
+  },
+  {
+   "text": "ABOUT",
+   "start": 1.6,
+   "end": 1.64,
+   "confidence": 0.9979831576347351,
+   "tier": "high",
+   "boosted": false,
+   "original": null
+  },
+  {
+   "text": "HUMILITY",
+   "start": 2.04,
+   "end": 2.08,
+   "confidence": 0.652328124855224,
+   "tier": "low",
+   "boosted": true,
+   "original": "HUMAN"
+  }
+ ]
+}
