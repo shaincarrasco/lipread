@@ -1,6 +1,8 @@
 // DEV ONLY. Fake of web/core/lipread.js with the same API, for ?fake=1.
-// Simulates a model download and processing. Honours ?fail=download|storage|decode|nofaces|small
+// Simulates a model download and processing. Honours ?fail=download|storage|decode|autoplay|stalled|nofaces|small
 // (read from location.search) so the UI error states can be exercised.
+// ?slow=1 paces the download and processing about 3x slower, and makes a cancelled process() reject late
+// (about 900 ms after the abort), like a real engine that is still winding down.
 
 const MODEL_BYTES = 203 * 1000 * 1000;
 const MODEL = { name: "LipRead phone model (fake)", license: "Non-commercial research licence (LRS3 terms)" };
@@ -8,9 +10,14 @@ const LS_CACHED = "fake.cached";
 const LS_FAILED_ONCE = "fake.downloadFailedOnce";
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
-const FAIL = (() => {
-  try { return new URLSearchParams(location.search).get("fail") || ""; } catch { return ""; }
+const QS = (() => {
+  try { return new URLSearchParams(location.search); } catch { return new URLSearchParams(); }
 })();
+const FAIL = QS.get("fail") || "";
+const SLOW = QS.get("slow") === "1";
+const pace = (ms) => (SLOW ? ms * 3 : ms);
+// Bytes downloaded in this page session. Kept across calls, so a second downloadModel resumes from here.
+let dlLoaded = 0;
 
 function coded(code, message) {
   const e = new Error(message);
@@ -176,17 +183,18 @@ export class LipRead {
     return { cached, bytes: cached ? MODEL_BYTES : 0 };
   }
 
-  async downloadModel(onBytes) {
+  async downloadModel(onBytes, signal) {
     if (lsGet(LS_CACHED) === "1") { onBytes?.(MODEL_BYTES, MODEL_BYTES); return; }
     if (FAIL === "storage") { await sleep(400); throw coded("storage", "Not enough storage"); }
-    let loaded = 0;
     const steps = 50;
     const failAt = FAIL === "download" && lsGet(LS_FAILED_ONCE) !== "1" ? MODEL_BYTES * 0.4 : Infinity;
-    while (loaded < MODEL_BYTES) {
-      await sleep(55);
-      loaded = Math.min(MODEL_BYTES, loaded + MODEL_BYTES / steps);
-      onBytes?.(loaded, MODEL_BYTES);
-      if (loaded >= failAt) {
+    while (dlLoaded < MODEL_BYTES) {
+      if (signal?.aborted) throw abortError();
+      await sleep(pace(55));
+      if (signal?.aborted) throw abortError();
+      dlLoaded = Math.min(MODEL_BYTES, dlLoaded + MODEL_BYTES / steps);
+      onBytes?.(dlLoaded, MODEL_BYTES);
+      if (dlLoaded >= failAt) {
         lsSet(LS_FAILED_ONCE, "1");
         throw coded("download", "Network connection lost");
       }
@@ -195,6 +203,15 @@ export class LipRead {
   }
 
   async process(file, opts = {}) {
+    try {
+      return await this._run(file, opts);
+    } catch (err) {
+      if (SLOW && err?.name === "AbortError") { await sleep(900); console.info("fake: late AbortError after cancel"); } // late rejection after cancel
+      throw err;
+    }
+  }
+
+  async _run(file, opts = {}) {
     const t0 = performance.now();
     const names = (opts.names || []).map((s) => s.trim()).filter(Boolean);
     const faces = opts.faces || "readable";
@@ -207,22 +224,24 @@ export class LipRead {
     emit("frames", 0, "Opening video");
     const meta = await readMeta(file);
     if (FAIL === "decode") throw coded("decode", "Cannot decode video");
+    if (FAIL === "autoplay") throw coded("autoplay", "VIDEO_AUTOPLAY_BLOCKED");
+    if (FAIL === "stalled") throw coded("stalled", "Video stalled");
     check();
 
     for (let i = 1; i <= 16; i++) {
       check();
       emit("frames", i / 16, "Reading frames");
-      await sleep(70);
+      await sleep(pace(70));
     }
     for (let i = 1; i <= 20; i++) {
       check();
       emit("faces", i / 20, "Finding faces");
-      await sleep(80);
+      await sleep(pace(80));
     }
     for (let i = 1; i <= 30; i++) {
       check();
       emit("lips", i / 30, "Reading lips");
-      await sleep(70);
+      await sleep(pace(70));
     }
     emit("done", 1, "Done");
 
@@ -286,5 +305,6 @@ export class LipRead {
   async deleteModel() {
     lsSet(LS_CACHED, null);
     lsSet(LS_FAILED_ONCE, null);
+    dlLoaded = 0;
   }
 }

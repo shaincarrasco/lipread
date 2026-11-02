@@ -70,7 +70,7 @@
 
     <!-- Screen 1: Home -->
     <section class="screen" id="screen-home" aria-labelledby="largeTitle">
-      <h1 class="large-title" id="largeTitle">LipRead</h1>
+      <h1 class="large-title" id="largeTitle" tabindex="-1">LipRead</h1>
 
       <div class="state card" id="unsupported" role="alert" hidden>
         <div class="state__icon" data-tone="gray"><svg class="icon" aria-hidden="true"><use href="#i-warning"></use></svg></div>
@@ -101,12 +101,20 @@
         <ul class="inset-group" id="recentList"></ul>
       </section>
 
+      <aside class="hint hint--inline" id="iosHint" aria-label="Add to Home Screen" hidden>
+        <svg class="icon hint__share" aria-hidden="true"><use href="#i-share"></use></svg>
+        <p class="hint__text">Tap Share, then Add to Home Screen.</p>
+        <button type="button" class="icon-btn icon-btn--small" id="hintClose" aria-label="Dismiss">
+          <svg class="icon" aria-hidden="true"><use href="#i-x"></use></svg>
+        </button>
+      </aside>
+
       <p class="footnote footer-note" id="homeFooter">Runs on your iPhone. Videos never leave your device.</p>
     </section>
 
     <!-- Screen 2: Processing -->
     <section class="screen" id="screen-processing" aria-labelledby="procTitle" hidden>
-      <h1 class="sr-only" id="procTitle">Analysing video</h1>
+      <h1 class="sr-only" id="procTitle" tabindex="-1">Analyzing video</h1>
       <figure class="poster">
         <img id="posterImg" alt="" hidden>
         <figcaption class="sr-only" id="posterName"></figcaption>
@@ -120,6 +128,7 @@
         <div class="progressbar" id="procBar" role="progressbar" aria-labelledby="procStatus" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
           <div class="progressbar__fill" id="procFill"></div>
         </div>
+        <p class="progress-eta" id="procEta">Step 1 of 3 · Estimating time left…</p>
       </div>
 
       <ul class="inset-group stage-list" id="stageList" aria-label="Progress">
@@ -165,7 +174,7 @@
 
     <!-- Screen 3: Results -->
     <section class="screen" id="screen-results" aria-labelledby="resTitle" hidden>
-      <h1 class="sr-only" id="resTitle">Results</h1>
+      <h1 class="sr-only" id="resTitle" tabindex="-1">Results</h1>
 
       <div class="player">
         <div class="stage" id="stage">
@@ -190,6 +199,7 @@
         <button type="button" data-mode="likely" aria-pressed="true">Likely</button>
         <button type="button" data-mode="all" aria-pressed="false">All</button>
       </div>
+      <p class="footnote mode-note" id="modeNote"></p>
 
       <h2 class="section-header">Faces</h2>
       <ul class="inset-group faces" id="facesList"></ul>
@@ -202,14 +212,16 @@
   <div class="backdrop" id="backdrop" hidden></div>
 
   <!-- Sheet 1: first run -->
-  <section class="sheet" id="firstRunSheet" role="dialog" aria-modal="true" aria-labelledby="frTitle" tabindex="-1" hidden>
-    <div class="grabber" aria-hidden="true"></div>
+  <section class="sheet sheet--welcome" id="firstRunSheet" role="dialog" aria-modal="true" aria-labelledby="frTitle" tabindex="-1" hidden>
+    <div class="grabber" data-drag-handle aria-hidden="true"></div>
     <div class="sheet__body">
-      <div class="app-glyph" aria-hidden="true">
-        <svg class="icon" viewBox="0 0 64 64"><use href="#i-lips"></use></svg>
+      <div class="sheet__head" data-drag-handle>
+        <div class="app-glyph" aria-hidden="true">
+          <svg class="icon" viewBox="0 0 64 64"><use href="#i-lips"></use></svg>
+        </div>
+        <h2 class="sheet__title" id="frTitle" tabindex="-1">Read what people are saying</h2>
+        <p class="sheet__lead">LipRead reads lip movements in a video and shows what each face appears to say.</p>
       </div>
-      <h2 class="sheet__title" id="frTitle" tabindex="-1">Read what people are saying</h2>
-      <p class="sheet__lead">LipRead reads lip movements in a video and shows what each face appears to say.</p>
 
       <ul class="inset-group">
         <li class="info-row">
@@ -223,7 +235,7 @@
           <span class="info-icon" data-tone="orange" aria-hidden="true"><svg class="icon"><use href="#i-warning"></use></svg></span>
           <span class="info-text">
             <span class="info-title">Uncertain, so check</span>
-            <span class="info-body">Lip reading is uncertain — about 1 in 3 words can be wrong, more on far-away faces.</span>
+            <span class="info-body">Lip reading is uncertain — about 1 in 3 words can be wrong even on clear footage, and more on far-away faces.</span>
           </span>
         </li>
         <li class="info-row">
@@ -256,7 +268,7 @@
 
       <div class="btn-stack">
         <button type="button" class="btn btn--filled" id="dlBtn">Download</button>
-        <button type="button" class="btn btn--plain" id="frDone" hidden>Continue</button>
+        <button type="button" class="btn btn--filled" id="frDone" hidden>Continue</button>
         <button type="button" class="btn btn--plain" id="notNowBtn">Not Now</button>
       </div>
     </div>
@@ -264,8 +276,8 @@
 
   <!-- Sheet 2: settings -->
   <section class="sheet sheet--tall" id="settingsSheet" role="dialog" aria-modal="true" aria-labelledby="setTitle" tabindex="-1" hidden>
-    <div class="grabber" aria-hidden="true"></div>
-    <header class="sheet__nav">
+    <div class="grabber" data-drag-handle aria-hidden="true"></div>
+    <header class="sheet__nav" data-drag-handle>
       <span class="sheet__nav-spacer" aria-hidden="true"></span>
       <h2 class="sheet__nav-title" id="setTitle" tabindex="-1">Settings</h2>
       <button type="button" class="nav-btn nav-btn--text nav-btn--end" id="setDone">Done</button>
@@ -278,7 +290,7 @@
           <textarea id="names" class="textarea" rows="4" placeholder="One name per line" spellcheck="false" autocapitalize="words"></textarea>
         </label>
       </div>
-      <p class="footnote">Names you add are favoured when the model is unsure. They’re stored only on this device.</p>
+      <p class="footnote">Names you add are favored when the model is unsure. They’re stored only on this device.</p>
 
       <h3 class="section-header">Reading</h3>
       <div class="inset-group">
@@ -306,11 +318,11 @@
         <details class="row-details">
           <summary class="row"><span class="row__text">Privacy</span><svg class="icon chev" aria-hidden="true"><use href="#i-chev-right"></use></svg></summary>
           <div class="row-details__body">
-            <p>Videos are read on your device and are never uploaded. LipRead keeps nothing in the background. Names you add and this setting are stored only in this browser.</p>
+            <p>Videos are read on your device and are never uploaded. LipRead keeps no copy of your videos. The model, the app’s files, names you add and this setting are stored only in this browser.</p>
           </div>
         </details>
         <details class="row-details">
-          <summary class="row"><span class="row__text">Licence</span><svg class="icon chev" aria-hidden="true"><use href="#i-chev-right"></use></svg></summary>
+          <summary class="row"><span class="row__text">License</span><svg class="icon chev" aria-hidden="true"><use href="#i-chev-right"></use></svg></summary>
           <div class="row-details__body">
             <p>The LipRead code is Apache-2.0. The lip-reading model is licensed for research and non-commercial use only, so do not use LipRead commercially.</p>
           </div>
@@ -333,15 +345,6 @@
       <button type="button" class="alert__btn alert__btn--danger" id="alertOk">Delete</button>
     </div>
   </section>
-
-  <!-- Add to Home Screen hint (iOS Safari only, dismissible once) -->
-  <aside class="hint" id="iosHint" aria-label="Add to Home Screen" hidden>
-    <svg class="icon hint__share" aria-hidden="true"><use href="#i-share"></use></svg>
-    <p class="hint__text">Add to Home Screen for an app experience</p>
-    <button type="button" class="icon-btn icon-btn--small" id="hintClose" aria-label="Dismiss">
-      <svg class="icon" aria-hidden="true"><use href="#i-x"></use></svg>
-    </button>
-  </aside>
 
   <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
 

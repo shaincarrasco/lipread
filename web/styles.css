@@ -122,6 +122,7 @@ body {
 }
 
 h1, h2, h3, p, figure, ul { margin: 0; }
+h1[tabindex="-1"]:focus { outline: none; }   /* screen headings take focus after a screen change; no ring on them */
 ul { padding: 0; list-style: none; }
 button { font: inherit; color: inherit; }
 button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visible, summary:focus-visible {
@@ -460,6 +461,12 @@ button.row:active, a.row:active, .row--pressable:active { background: var(--pres
   margin: 0 0.25rem 1.25rem;
 }
 .progressbar--small { margin: 0.25rem 0 0.25rem; height: 0.3125rem; }
+.progress-eta {
+  margin: -0.75rem 0.25rem 1.25rem;
+  font-size: 0.8125rem;
+  color: var(--secondary-label);
+  font-variant-numeric: tabular-nums;
+}
 .progressbar__fill {
   height: 100%;
   width: 0%;
@@ -657,7 +664,7 @@ input[type="range"]::-moz-range-thumb {
 }
 .segmented button {
   appearance: none;
-  min-height: 2.5rem;
+  min-height: 2.75rem;
   border: 0;
   border-radius: 7px;
   background: transparent;
@@ -676,6 +683,7 @@ input[type="range"]::-moz-range-thumb {
 }
 :root[data-theme="dark"] .segmented button[aria-pressed="true"] { background: #636366; }
 .segmented button:active { opacity: 0.6; }
+.mode-note { padding: 0.5rem 0.25rem 0; }
 
 /* ---------- Faces ---------- */
 .faces { margin-top: 0; }
@@ -817,6 +825,18 @@ input[type="range"]::-moz-range-thumb {
   box-shadow: 0 6px 24px rgba(0, 0, 0, 0.16);
   animation: sheet-up 0.45s var(--ease-sheet) both;
 }
+.hint--inline {
+  position: relative;
+  left: auto; right: auto; bottom: auto;
+  z-index: auto;
+  margin-top: 1.25rem;
+  padding: 0.5rem 0.5rem 0.5rem 1rem;
+  background: var(--card);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  box-shadow: var(--shadow);
+  animation: none;
+}
 .hint__share { width: 1.25rem; height: 1.25rem; color: var(--blue); flex: none; }
 .hint__text { flex: 1; font-size: 0.9375rem; line-height: 1.3; }
 
@@ -843,11 +863,25 @@ input[type="range"]::-moz-range-thumb {
   background: var(--sheet-bg);
   border-radius: 14px 14px 0 0;
   box-shadow: 0 -6px 30px rgba(0, 0, 0, 0.14);
-  animation: sheet-up 0.5s var(--ease-sheet) both;
+  animation: sheet-up 0.5s var(--ease-sheet) backwards;
   outline: none;
 }
 .sheet--tall { max-height: 94vh; max-height: 94dvh; }
 .sheet.is-closing { animation: sheet-down 0.3s ease-in both; }
+.sheet.is-dragging { transition: none; }
+[data-drag-handle] { touch-action: none; cursor: grab; }
+
+/* First-run sheet: the primary and secondary actions stay pinned at the bottom, so Cancel is always in reach */
+.sheet--welcome { padding-bottom: 0; }
+.sheet--welcome .sheet__body { padding-bottom: 0; }
+.sheet--welcome .btn-stack {
+  position: sticky;
+  bottom: 0;
+  z-index: 2;
+  margin-top: 0.75rem;
+  padding: 0.5rem 0 calc(1rem + env(safe-area-inset-bottom));
+  background: var(--sheet-bg);
+}
 
 @keyframes sheet-up { from { transform: translateY(100%); } to { transform: translateY(0); } }
 @keyframes sheet-down { from { transform: translateY(0); } to { transform: translateY(100%); } }
@@ -943,10 +977,9 @@ input[type="range"]::-moz-range-thumb {
   font-size: 1.0625rem;
   line-height: 1.4;
   resize: none;
-  outline: none;
 }
 .textarea::placeholder { color: var(--tertiary-label); opacity: 1; }
-.textarea:focus-visible { outline: none; }
+.textarea-row:focus-within, .textarea:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; }
 
 .switch {
   appearance: none;

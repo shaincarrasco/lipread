@@ -34,6 +34,20 @@ const store = {
   },
 };
 
+/* Busy holds. sw-register.js reloads the page once (first visit) only when window.__lipreadBusy is falsy, so it
+   must never reload during a picker, the first-run sheet, a download or a run. Each hold is counted once and
+   released once, so a repeated or late release can never take the count below zero. */
+const busyHolds = new Set();
+function hold(key) {
+  if (busyHolds.has(key)) return;
+  busyHolds.add(key);
+  window.__lipreadBusy = (window.__lipreadBusy | 0) + 1;
+}
+function release(key) {
+  if (!busyHolds.delete(key)) return;
+  window.__lipreadBusy = Math.max(0, (window.__lipreadBusy | 0) - 1);
+}
+
 const state = {
   engine: null,
   modelCached: false,
@@ -166,6 +180,8 @@ function classify(err) {
   if (code === "model") return "model";
   if (code === "memory") return "memory";
   if (code === "short") return "short";
+  if (code === "autoplay") return "autoplay";
+  if (code === "stalled") return "stalled";
   return "generic";
 }
 
@@ -177,7 +193,9 @@ const SCREENS = {
   results: $("#screen-results"),
 };
 
-function showScreen(name, { animate = true } = {}) {
+const HEADINGS = { home: "#largeTitle", processing: "#procTitle", results: "#resTitle" };
+
+function showScreen(name, { animate = true, focus = true } = {}) {
   for (const [key, node] of Object.entries(SCREENS)) {
     const on = key === name;
     node.hidden = !on;
@@ -203,6 +221,9 @@ function showScreen(name, { animate = true } = {}) {
     nav.classList.add("show-title");
     nav.classList.toggle("is-scrolled", window.scrollY > 4);
   }
+
+  // Move focus to the new screen's heading so screen readers announce it.
+  if (focus) $(HEADINGS[name])?.focus({ preventScroll: true });
 }
 
 function updateNavTitle() {
@@ -214,7 +235,13 @@ function updateNavTitle() {
   nav.classList.toggle("is-scrolled", window.scrollY > 4);
 }
 
-function goHome() {
+/* Back to Home. `back` removes the Results or processing history entry (the in-app Back button does that);
+   `keep` leaves it for the caller, which replaces it (see openLayer). */
+function goHome({ back = true, keep = false } = {}) {
+  if (back && !keep) {
+    const lr = history.state?.lr;
+    if (lr === "results" || lr === "processing") dropLayer(lr);
+  }
   pauseVideo();
   state.current = null;
   showScreen("home");
@@ -268,11 +295,29 @@ function requestPick(kind) {
     openFirstRun();
     return;
   }
-  inputFor(kind).click();
+  openPicker(kind);
 }
 
 function inputFor(kind) {
   return kind === "record" ? $("#recordInput") : $("#fileInput");
+}
+
+/* The file picker. Called synchronously inside a tap, so iOS allows it to open. */
+let picker = null; // { input, key } while the system picker may be open
+
+function openPicker(kind) {
+  endPicker();
+  const input = inputFor(kind);
+  picker = { input, key: `picker:${kind}` };
+  hold(picker.key);
+  input.click();
+}
+
+function endPicker() {
+  if (!picker) return;
+  const { key } = picker;
+  picker = null;
+  release(key);
 }
 
 $("#chooseBtn").addEventListener("click", () => requestPick("file"));
@@ -282,9 +327,20 @@ for (const input of [$("#fileInput"), $("#recordInput")]) {
   input.addEventListener("change", () => {
     const file = input.files?.[0];
     input.value = "";
+    endPicker();
     if (file) startRun(file, { faces: store.get(KEYS.readAll) === "1" ? "all" : "readable" });
   });
+  // Supported on recent iOS and Chrome: the picker was dismissed without a file.
+  input.addEventListener("cancel", endPicker);
 }
+
+// Fallback for browsers without the 'cancel' event: when focus returns and no file arrived, the picker is closed.
+window.addEventListener("focus", () => {
+  if (!picker) return;
+  setTimeout(() => {
+    if (picker && !picker.input.files?.length) endPicker();
+  }, 600);
+});
 
 $("#backBtn").addEventListener("click", goHome);
 $("#settingsBtn").addEventListener("click", () => openSettings($("#settingsBtn")));
@@ -296,31 +352,46 @@ const SHEETS = {
   settings: $("#settingsSheet"),
 };
 
+/* While a sheet or the alert is up, the page behind it is inert: no focus, no taps, hidden from screen readers. */
+function syncInert() {
+  const alertOpen = !$("#alert").hidden;
+  const modal = !!state.openSheet || alertOpen;
+  $("#navbar").inert = modal;
+  $("#main").inert = modal;
+  for (const [name, sheet] of Object.entries(SHEETS)) sheet.inert = alertOpen && state.openSheet === name;
+}
+
 function openSheet(name, opener = null) {
+  openLayer("sheet");
   const sheet = SHEETS[name];
   sheet.classList.remove("is-closing");
   sheet.hidden = false;
   $("#backdrop").hidden = false;
   state.openSheet = name;
   state.sheetOpener = opener;
+  hold(`sheet:${name}`);
   $("#iosHint").hidden = true;
+  syncInert();
   const focusTarget = sheet.querySelector("[data-autofocus]") || sheet.querySelector(".sheet__title, .sheet__nav-title") || sheet;
   focusTarget.focus({ preventScroll: true });
 }
 
-function closeSheet(name) {
+function closeSheet(name, { instant = false } = {}) {
   const sheet = SHEETS[name];
   if (state.openSheet !== name) return;
   state.openSheet = null;
+  release(`sheet:${name}`);
+  syncInert();
   const finish = () => {
     if (state.openSheet) return; // another sheet opened meanwhile
     sheet.hidden = true;
-    sheet.classList.remove("is-closing");
+    sheet.classList.remove("is-closing", "is-dragging");
+    sheet.style.transform = "";
+    sheet.style.transition = "";
     $("#backdrop").hidden = true;
     maybeShowHint();
   };
-  if (REDUCE_MOTION) {
-    sheet.hidden = true;
+  if (REDUCE_MOTION || instant) {
     finish();
   } else {
     sheet.classList.add("is-closing");
@@ -338,6 +409,71 @@ document.addEventListener("keydown", (e) => {
   else if (state.openSheet === "settings") closeSettings();
 });
 
+/* Sheets can be dragged down to dismiss, as on iOS. The drag starts on a handle (the grabber, the header, or the
+   top of the first-run sheet). A sheet closes when it is dragged past a third of its height or flicked down. */
+function bindSheetDrag(name) {
+  const sheet = SHEETS[name];
+  for (const handle of sheet.querySelectorAll("[data-drag-handle]")) {
+    let pid = null, startY = 0, lastY = 0, lastT = 0, speed = 0, dragging = false;
+
+    // Moves and the release are tracked on the window: the finger crosses other handles on its way down.
+    const onMove = (e) => {
+      if (e.pointerId !== pid) return;
+      const dy = e.clientY - startY;
+      if (!dragging) {
+        if (dy < 8) return; // a small wobble is not a drag
+        dragging = true;
+        try { handle.setPointerCapture(pid); } catch { /* ignore */ }
+        sheet.classList.add("is-dragging");
+      }
+      const dt = e.timeStamp - lastT;
+      if (dt > 0) speed = (e.clientY - lastY) / dt;
+      lastY = e.clientY;
+      lastT = e.timeStamp;
+      sheet.style.transform = `translateY(${Math.max(0, dy)}px)`;
+    };
+
+    const onEnd = (e) => {
+      if (e.pointerId !== pid) return;
+      pid = null;
+      window.removeEventListener("pointermove", onMove);
+      window.removeEventListener("pointerup", onEnd);
+      window.removeEventListener("pointercancel", onEnd);
+      if (!dragging) return;
+      dragging = false;
+      sheet.classList.remove("is-dragging");
+      const dy = Math.max(0, e.clientY - startY);
+      if (dy > Math.min(160, sheet.offsetHeight / 3) || speed > 0.7) {
+        dismissDragged(name);
+      } else {
+        sheet.style.transition = "transform 0.3s var(--ease-sheet)";
+        sheet.style.transform = "";
+        setTimeout(() => { sheet.style.transition = ""; }, 320);
+      }
+    };
+
+    handle.addEventListener("pointerdown", (e) => {
+      if (!e.isPrimary || state.openSheet !== name) return;
+      if (name === "firstRun" && dl.phase === "downloading") return; // closing would stop the download
+      if (e.target.closest("button, a, input, textarea, select, label")) return;
+      pid = e.pointerId; startY = lastY = e.clientY; lastT = e.timeStamp; speed = 0; dragging = false;
+      window.addEventListener("pointermove", onMove);
+      window.addEventListener("pointerup", onEnd);
+      window.addEventListener("pointercancel", onEnd);
+    });
+  }
+}
+
+function dismissDragged(name) {
+  const sheet = SHEETS[name];
+  sheet.style.transition = REDUCE_MOTION ? "none" : "transform 0.25s ease-in";
+  sheet.style.transform = "translateY(100%)";
+  setTimeout(() => {
+    if (name === "firstRun") closeFirstRun({ instant: true });
+    else closeSettings({ instant: true });
+  }, REDUCE_MOTION ? 0 : 250);
+}
+
 $("#backdrop").addEventListener("click", () => {
   if (state.openSheet === "firstRun") closeFirstRun();
   else if (state.openSheet === "settings") closeSettings();
@@ -345,8 +481,15 @@ $("#backdrop").addEventListener("click", () => {
 
 /* First-run sheet */
 
+// Phases: idle | downloading | paused | failed | ready.
+// `interrupted` is set once an attempt has stopped part way in this page session. The engine picks up where it
+// stopped when downloadModel is called again in the same page session, so the button then reads "Resume download".
 const dl = {
-  phase: "idle", // idle | downloading | failed | ready
+  phase: "idle",
+  interrupted: false,
+  abort: null,     // AbortController for the attempt in progress
+  loaded: 0,       // bytes so far, from the last progress callback
+  total: 0,
 };
 
 function openFirstRun() {
@@ -354,23 +497,37 @@ function openFirstRun() {
   openSheet("firstRun", document.activeElement);
 }
 
-function closeFirstRun() {
+function closeFirstRun({ instant = false, history: useHistory = true } = {}) {
+  // Closing the sheet during a download is the same as Not Now: the download stops.
+  if (dl.phase === "downloading") dl.abort?.abort();
   store.set(KEYS.firstRunDismissed, "1");
-  closeSheet("firstRun");
+  closeSheet("firstRun", { instant });
+  if (useHistory) dropLayer("sheet");
+}
+
+// "Not Now" becomes "Cancel" while a download runs, and stops it without closing the sheet.
+function onNotNow() {
+  if (dl.phase === "downloading") dl.abort?.abort();
+  else closeFirstRun();
 }
 
 function renderFirstRun(message = "") {
   const ready = dl.phase === "ready";
   const downloading = dl.phase === "downloading";
+  const showProgress = downloading || dl.phase === "paused" || dl.phase === "failed";
   $("#readyRow").hidden = !ready;
-  $("#dlProgressRow").hidden = !(downloading || dl.phase === "failed");
+  $("#dlProgressRow").hidden = !showProgress;
   $("#dlBtn").hidden = ready;
   $("#frDone").hidden = !ready;
   $("#notNowBtn").hidden = ready;
+  $("#notNowBtn").textContent = downloading ? "Cancel" : "Not Now";
   $("#dlGroup").querySelector(".row").hidden = ready; // "One-time download 203 MB" row
   const btn = $("#dlBtn");
   btn.disabled = downloading;
-  btn.textContent = downloading ? "Downloading…" : dl.phase === "failed" ? "Try Again" : "Download";
+  btn.textContent = downloading ? "Downloading…"
+    : dl.interrupted ? "Resume Download"
+    : dl.phase === "failed" ? "Try Again"
+    : "Download";
   const status = $("#dlStatus");
   status.classList.toggle("dl-error", dl.phase === "failed");
   if (message) status.textContent = message;
@@ -378,26 +535,51 @@ function renderFirstRun(message = "") {
 
 async function downloadModel() {
   if (dl.phase === "downloading") return;
+  const controller = new AbortController();
+  dl.abort = controller;
   dl.phase = "downloading";
-  renderFirstRun("Starting download…");
-  setDownloadProgress(0, 1);
+  progressTextAt = 0;
+  progressTextPct = -100;
+  hold("download");
+  renderFirstRun();
+  setDownloadProgress(dl.loaded, dl.total); // a resumed download starts where it stopped
   try {
     const engine = await getEngine();
-    await engine.downloadModel((loaded, total) => setDownloadProgress(loaded, total));
+    await engine.downloadModel((loaded, total) => {
+      dl.loaded = loaded;
+      dl.total = total;
+      setDownloadProgress(loaded, total);
+    }, controller.signal);
     state.modelCached = true;
     dl.phase = "ready";
+    dl.interrupted = false;
     renderFirstRun();
     $("#frDone").focus({ preventScroll: true });
   } catch (err) {
     const kind = classify(err);
-    dl.phase = "failed";
-    if (kind === "storage") {
-      renderFirstRun("Not enough space. LipRead needs about 250 MB free for its model.");
+    if (controller.signal.aborted || kind === "aborted") {
+      dl.phase = "paused";
+      dl.interrupted = true;
+      renderFirstRun("Download paused. Tap Resume Download to pick up where it stopped.");
+    } else if (kind === "storage") {
+      dl.phase = "failed";
+      dl.interrupted = false;
+      renderFirstRun("Not enough space. The model needs about 210 MB free on this device.");
     } else {
-      renderFirstRun("Download paused. Check your connection, then try again. LipRead picks up where it stopped.");
+      dl.phase = "failed";
+      dl.interrupted = true;
+      renderFirstRun("Download paused. Check your connection, then resume. Keep this page open to pick up where it stopped.");
     }
+  } finally {
+    dl.abort = null;
+    release("download");
   }
 }
+
+// The bar moves on every chunk. The text (and the aria-live status) updates at most once a second, and only
+// after a 5-point change, plus once at 100%.
+let progressTextAt = 0;
+let progressTextPct = -100;
 
 function setDownloadProgress(loaded, total) {
   if (dl.phase !== "downloading") return;
@@ -405,18 +587,23 @@ function setDownloadProgress(loaded, total) {
   const pct = Math.round(frac * 100);
   $("#dlFill").style.width = `${pct}%`;
   $("#dlBar").setAttribute("aria-valuenow", String(pct));
+  const now = Date.now();
+  const due = now - progressTextAt >= 1000 && Math.abs(pct - progressTextPct) >= 5;
+  const finishing = pct === 100 && progressTextPct !== 100;
+  if (!due && !finishing) return;
+  progressTextAt = now;
+  progressTextPct = pct;
   $("#dlStatus").textContent = `Downloading ${fmtMB(loaded)} of ${fmtMB(total || MODEL_MB * 1e6)}`;
 }
 
 $("#dlBtn").addEventListener("click", downloadModel);
-$("#notNowBtn").addEventListener("click", closeFirstRun);
+$("#notNowBtn").addEventListener("click", onNotNow);
 $("#frDone").addEventListener("click", () => {
   const pick = state.pendingPick;
   state.pendingPick = null;
-  store.set(KEYS.firstRunDismissed, "1");
-  closeSheet("firstRun");
+  closeFirstRun();
   // Called synchronously inside the click, so iOS allows the file picker to open.
-  if (pick) inputFor(pick).click();
+  if (pick) openPicker(pick);
 });
 
 /* Settings sheet */
@@ -427,8 +614,9 @@ function openSettings(opener) {
   openSheet("settings", opener);
 }
 
-function closeSettings() {
-  closeSheet("settings");
+function closeSettings({ instant = false, history: useHistory = true } = {}) {
+  closeSheet("settings", { instant });
+  if (useHistory) dropLayer("sheet");
 }
 
 function renderSettings() {
@@ -444,7 +632,7 @@ function parseNames() {
   return store.get(KEYS.names, "").split(/\r?\n/).map((s) => s.trim()).filter(Boolean);
 }
 
-$("#setDone").addEventListener("click", closeSettings);
+$("#setDone").addEventListener("click", () => closeSettings());
 $("#names").addEventListener("input", (e) => store.set(KEYS.names, e.target.value));
 $("#faceSwitch").addEventListener("click", () => {
   const next = store.get(KEYS.readAll) !== "1";
@@ -452,18 +640,26 @@ $("#faceSwitch").addEventListener("click", () => {
   renderSettings();
 });
 $("#repoLink").href = REPO_URL;
+// The whole row toggles the switch, as on iOS, not only the small switch.
+$("#faceSwitch").closest(".row").addEventListener("click", (e) => {
+  if (!e.target.closest("#faceSwitch")) $("#faceSwitch").click();
+});
 
 /* Confirm delete alert */
 
 function openAlert() {
+  openLayer("alert");
   $("#alertBackdrop").hidden = false;
   $("#alert").hidden = false;
+  syncInert();
   $("#alertCancel").focus({ preventScroll: true });
 }
 
-function closeAlert(confirmed) {
+function closeAlert(confirmed, { history: useHistory = true } = {}) {
   $("#alert").hidden = true;
   $("#alertBackdrop").hidden = true;
+  if (useHistory) dropLayer("alert");
+  syncInert();
   if (confirmed) deleteModel();
   else $("#deleteModel").focus({ preventScroll: true });
 }
@@ -474,6 +670,9 @@ async function deleteModel() {
     await engine.deleteModel();
     state.modelCached = false;
     dl.phase = "idle";
+    dl.interrupted = false;
+    dl.loaded = 0;
+    dl.total = 0;
     toast("Model deleted");
   } catch {
     toast("Couldn’t delete the model. Try again.");
@@ -492,6 +691,7 @@ function maybeShowHint() {
   if (!IS_IOS_SAFARI || IS_STANDALONE) return;
   if (store.get(KEYS.hintDismissed) === "1") return;
   if (state.openSheet || state.screen !== "home") return;
+  if (!state.recent.length) return; // only after the user has got a result
   $("#iosHint").hidden = false;
 }
 
@@ -525,7 +725,7 @@ const ERRORS = {
   decode: {
     tone: "orange",
     title: "Can’t open this video",
-    text: "This format isn’t supported here. Some Android phones record HEVC, which browsers often can’t read. Re-save the clip as H.264 (on iPhone: Settings > Camera > Formats > Most Compatible), then try again.",
+    text: "This format isn’t supported here. Some Android phones record HEVC, which browsers often can’t read. Share or export the clip in a more compatible format (H.264), then try again. On iPhone, Settings > Camera > Formats > Most Compatible makes future recordings compatible.",
     primary: "Choose Another Video", action: "pick",
   },
   download: {
@@ -537,7 +737,7 @@ const ERRORS = {
   storage: {
     tone: "red",
     title: "Not enough storage",
-    text: "LipRead needs about 250 MB free to keep its model on this device. Free up some space, then try again.",
+    text: "The model needs about 210 MB free on this device. Free up some space, then try again.",
     primary: "Try Again", action: "redownload",
   },
   unsupported: {
@@ -549,13 +749,13 @@ const ERRORS = {
   memory: {
     tone: "orange",
     title: "Your phone ran out of memory",
-    text: "This clip was too much to read in one go. Close other tabs and apps, or trim the clip to a shorter moment (under 15 seconds), then try again.",
+    text: "This clip was too much to read in one go. Close other tabs and apps, or trim the clip to a shorter moment, then try again.",
     primary: "Choose Another Video", action: "pick",
   },
   short: {
     tone: "gray",
     title: "Clip is too short",
-    text: "LipRead needs at least half a second of someone talking. Choose a longer clip.",
+    text: "LipRead needs at least half a second of video. Choose a longer clip.",
     primary: "Choose Another Video", action: "pick",
   },
   model: {
@@ -563,6 +763,19 @@ const ERRORS = {
     title: "Model not downloaded",
     text: "LipRead needs its one-time model download before it can read lips.",
     primary: "Download", action: "redownload",
+  },
+  autoplay: {
+    tone: "orange",
+    title: "Tap to start",
+    text: "iPhone blocked automatic video playback. This can happen in Low Power Mode. Tap Start to read the clip.",
+    primary: "Start", action: "retry",
+  },
+  stalled: {
+    tone: "orange",
+    title: "Video stopped loading",
+    text: "This clip stopped decoding partway through. Try again, or re-save the clip and choose it once more.",
+    primary: "Try Again", action: "retry",
+    secondary: "Choose Another Video", secondaryAction: "pick",
   },
   generic: {
     tone: "orange",
@@ -573,7 +786,8 @@ const ERRORS = {
 };
 
 function resetProcessingView(name) {
-  $("#procTitle").textContent = `Analysing ${name}`;
+  $("#procEta").textContent = "Step 1 of 3 · Estimating time left…";
+  $("#procTitle").textContent = `Analyzing ${name}`;
   $("#posterName").textContent = name;
   $("#posterImg").hidden = true;
   $("#posterImg").removeAttribute("src");
@@ -615,33 +829,74 @@ function onEngineProgress(p, run) {
   const overall = idx >= 3 ? 1 : (idx + frac) / 3;
   run.progress = Math.max(run.progress || 0, overall);
 
+  // One progress measure only: the bar and its percentage. The rows show which step is done, active or waiting.
   const rows = $$(".stage-row");
   rows.forEach((row, i) => {
     const next = i < idx ? "done" : i === idx ? "active" : "pending";
     if (row.dataset.state !== next) row.dataset.state = next;
-    const sub = row.querySelector(".stage-sub");
-    sub.textContent = next === "active" ? `${Math.round(frac * 100)}%` : "";
   });
 
   const active = STAGE_COPY[Math.min(idx, 2)];
   setOverall(run.progress, idx >= 3 ? "Finishing" : active.short);
+  run.idx = idx;
+  updateEta(run, idx);
   if (idx !== lastLiveStage && idx < 3) {
     lastLiveStage = idx;
     $("#procLive").textContent = active.name;
   }
 }
 
+/* Time left, from the recent rate of progress (the last 15 s), so a stall makes the estimate grow instead of
+   freezing. Smoothed, and shown in steps of 5 s so it does not jitter. Called on every progress event and once a second. */
+function updateEta(run, idx) {
+  const now = performance.now();
+  const p = run.progress;
+  const samples = run.samples;
+  if (!samples.length || now - samples[samples.length - 1].t >= 500) samples.push({ t: now, p });
+  while (samples.length > 2 && now - samples[0].t > 15000) samples.shift();
+  if (p > run.lastP + 0.002) { run.lastP = p; run.lastMove = now; }
+  const first = samples[0];
+  const span = (now - first.t) / 1000;
+  const stalled = now - run.lastMove > 4000;
+  if (stalled) {
+    run.eta = null; // no progress for a few seconds: say so rather than keep an old figure
+  } else if (span >= 3 && p > first.p + 0.01) {
+    const rate = (p - first.p) / span;
+    const remaining = (1 - p) / rate;
+    run.eta = run.eta == null ? remaining : run.eta * 0.6 + remaining * 0.4;
+  }
+  let left;
+  if (idx >= 3 || (run.eta != null && run.eta < 8)) left = "Almost done";
+  else if (run.eta == null) left = "Estimating time left…";
+  else if (run.eta < 90) left = `About ${Math.round(run.eta / 5) * 5} s left`;
+  else left = `About ${Math.round(run.eta / 60)} min left`;
+  $("#procEta").textContent = `Step ${Math.min(idx + 1, 3)} of 3 · ${left}`;
+}
+
+let wakeWanted = false;   // a run is using the screen-wake lock
+let wakePending = false;  // a request is in flight
+
 async function acquireWakeLock() {
+  wakeWanted = true;
+  if (state.wakeLock || wakePending) return;
+  if (!("wakeLock" in navigator && navigator.wakeLock?.request)) return;
+  wakePending = true;
   try {
-    if ("wakeLock" in navigator && navigator.wakeLock?.request) {
-      state.wakeLock = await navigator.wakeLock.request("screen");
-      state.wakeLock.addEventListener?.("release", () => { state.wakeLock = null; });
+    const sentinel = await navigator.wakeLock.request("screen");
+    // Released while the request was pending: let go of the sentinel as soon as it arrives.
+    if (!wakeWanted) {
+      try { sentinel.release()?.catch?.(() => {}); } catch { /* ignore */ }
+      return;
     }
+    state.wakeLock = sentinel;
+    sentinel.addEventListener?.("release", () => { if (state.wakeLock === sentinel) state.wakeLock = null; });
   } catch { /* not allowed or not supported */ }
+  finally { wakePending = false; }
 }
 
 function releaseWakeLock() {
-  try { state.wakeLock?.release?.(); } catch { /* ignore */ }
+  wakeWanted = false;
+  try { state.wakeLock?.release?.()?.catch?.(() => {}); } catch { /* ignore */ }
   state.wakeLock = null;
 }
 
@@ -688,24 +943,40 @@ function makeFrame(url, at = 0.5, maxWidth = 640) {
   });
 }
 
+let runSeq = 0;
+
+/* Frees a run's object URL for a run that produced no result. The poster frame may still be loading from the URL,
+   so the revoke waits until that has settled (makeFrame always settles, within its 5 s timeout). */
+function revokeRunUrl(run) {
+  const url = run?.url;
+  if (!url) return;
+  run.url = null;
+  Promise.resolve(run.framing).then(() => {
+    try { URL.revokeObjectURL(url); } catch { /* ignore */ }
+  });
+}
+
 async function startRun(file, { faces = "readable" } = {}) {
   if (state.run) return;
   state.lastRun = { file, faces };
   const name = file.name || "Video";
   const url = URL.createObjectURL(file);
   const abort = new AbortController();
-  const run = { file, url, name, faces, poster: null, progress: 0, abort };
+  const run = { id: ++runSeq, file, url, name, faces, poster: null, progress: 0, abort, eta: null, samples: [], idx: 0, timer: 0, lastP: 0, lastMove: performance.now() };
   state.run = run;
+  run.timer = setInterval(() => { if (state.run === run) updateEta(run, run.idx); }, 1000);
+  hold(`run:${run.id}`);
   state.onProgress = (p) => onEngineProgress(p, run);
   lastLiveStage = -1;
 
+  openLayer("processing");
   resetProcessingView(baseName(name));
-  $("#navTitle").textContent = "Analysing";
+  $("#navTitle").textContent = "Analyzing";
   showScreen("processing");
   window.scrollTo(0, 0);
   acquireWakeLock();
 
-  makeFrame(url, 0.5).then((poster) => {
+  run.framing = makeFrame(url, 0.5).then((poster) => {
     if (state.run !== run || !poster) return;
     run.poster = poster;
     const img = $("#posterImg");
@@ -716,26 +987,31 @@ async function startRun(file, { faces = "readable" } = {}) {
   try {
     const engine = await getEngine();
     const result = await engine.process(file, { names: parseNames(), faces, signal: abort.signal });
-    if (abort.signal.aborted || state.run !== run) return;
+    // Canceled or replaced while it ran: its result is dropped and the UI is left alone.
+    if (state.run !== run) { revokeRunUrl(run); return; }
     releaseWakeLock();
     finishRun(run, result);
   } catch (err) {
+    // A late rejection from a canceled run must not touch the UI, so this check comes first.
+    if (state.run !== run) { revokeRunUrl(run); return; }
     releaseWakeLock();
     const kind = classify(err);
+    state.run = null;
+    revokeRunUrl(run);
     if (kind === "aborted" || abort.signal.aborted) {
-      if (state.run === run) state.run = null;
       goHome();
       return;
     }
     if (kind === "model") {
-      if (state.run === run) state.run = null;
-      goHome();
+      goHome({ keep: true });
       state.pendingPick = "file";
       openFirstRun();
       return;
     }
-    if (state.run === run) state.run = null;
     showProcessingError(kind);
+  } finally {
+    clearInterval(run.timer);
+    release(`run:${run.id}`);
   }
 }
 
@@ -801,7 +1077,7 @@ function showProcessingError(kind, item = null) {
   card.hidden = false;
   $("#procTitle").textContent = copy.title;
   $("#procLive").textContent = copy.title;
-  $("#navTitle").textContent = "Analysing";
+  $("#navTitle").textContent = "Analyzing";
   showScreen("processing", { animate: false });
 }
 
@@ -809,12 +1085,12 @@ function runErrorAction(action, kind, item) {
   if (action === "pick") {
     // Still inside the tap, so the picker can open.
     goHome();
-    inputFor("file").click();
+    openPicker("file");
   } else if (action === "readAll") {
     const file = item?.file || state.lastRun?.file;
     if (file) startRun(file, { faces: "all" });
   } else if (action === "redownload") {
-    goHome();
+    goHome({ keep: true });
     state.pendingPick = null;
     dl.phase = "failed";
     openFirstRun();
@@ -828,12 +1104,20 @@ function runErrorAction(action, kind, item) {
   }
 }
 
-$("#cancelBtn").addEventListener("click", () => {
-  if (state.run?.abort) state.run.abort.abort();
-  state.run = null;
-  releaseWakeLock();
+$("#cancelBtn").addEventListener("click", cancelRun);
+
+function cancelRun() {
+  const run = state.run;
+  if (run) {
+    state.run = null;          // from here on, this run's late rejection is ignored
+    clearInterval(run.timer);
+    run.abort.abort();
+    releaseWakeLock();
+    revokeRunUrl(run);
+    release(`run:${run.id}`);
+  }
   goHome();
-});
+}
 
 /* ---------- Results ---------- */
 
@@ -842,6 +1126,7 @@ const stage = $("#stage");
 const overlay = $("#overlay");
 
 function openResults(item) {
+  openLayer("results");
   state.current = {
     item,
     result: item.result,
@@ -871,8 +1156,8 @@ function openResults(item) {
   const secs = totalS > 0 ? Math.max(1, Math.round(totalS)) : null;
   const partial = result.end != null && result.duration != null && result.end < result.duration - 0.5;
   $("#resultFooter").textContent = (secs
-    ? `Analysed on this ${DEVICE} in ${secs} s. Results are estimates; check them against the video.`
-    : `Analysed on this ${DEVICE}. Results are estimates; check them against the video.`)
+    ? `Analyzed on this ${DEVICE} in ${secs} s. Results are estimates; check them against the video.`
+    : `Analyzed on this ${DEVICE}. Results are estimates; check them against the video.`)
     + (partial ? ` Only the first ${Math.round(result.end - (result.start || 0))} seconds were read — trim the clip to read a different moment.` : "");
 
   showScreen("results");
@@ -1010,6 +1295,9 @@ function setMode(mode) {
   for (const btn of $$(".segmented button")) {
     btn.setAttribute("aria-pressed", String(btn.dataset.mode === mode));
   }
+  $("#modeNote").textContent = mode === "likely"
+    ? "Uncertain words show as “…”. Choose All to see every guess."
+    : "Every word the model read, including its guesses.";
   for (const chip of cur.chips) {
     chip._text.textContent = displayWord(chip._word);
   }
@@ -1077,14 +1365,17 @@ video.addEventListener("error", () => {
   toast("This clip can’t play in this browser. Results are still shown below.");
 });
 
-$("#playBtn").addEventListener("click", () => {
+// Tapping the clip or the play button toggles playback, as in Photos and the system video player.
+function togglePlayback() {
   if (video.paused || video.ended) {
     const p = video.play();
     if (p && p.catch) p.catch(() => {});
   } else {
     video.pause();
   }
-});
+}
+$("#playBtn").addEventListener("click", togglePlayback);
+video.addEventListener("click", togglePlayback);
 
 $("#scrub").addEventListener("input", (e) => {
   const dur = isFinite(video.duration) ? video.duration : 0;
@@ -1253,13 +1544,57 @@ async function shareCurrent() {
 
 $("#shareBtn").addEventListener("click", shareCurrent);
 
+/* ---------- Back, as on the system ---------- */
+
+/* Android Back, the iOS edge swipe and the browser's back button close the top layer (a sheet, the alert,
+   Results or a run that is being read) instead of leaving the page. Each layer has a history entry. Closing a layer
+   from the UI removes its entry; histSkip counts the popstate events our own history.back() calls cause, so they
+   are not handled twice. */
+let histSkip = 0;
+
+function openLayer(lr) {
+  const cur = history.state?.lr || "home";
+  if (cur === lr) return;
+  try {
+    // The processing entry becomes whatever the run leads to: Results, or a sheet after an error.
+    if (cur === "processing") history.replaceState({ lr }, "");
+    else history.pushState({ lr }, "");
+  } catch { /* no history API */ }
+}
+
+function dropLayer(lr) {
+  if ((history.state?.lr || "home") !== lr) return;
+  histSkip++;
+  try { history.back(); } catch { histSkip--; }
+}
+
+window.addEventListener("popstate", (e) => {
+  if (histSkip > 0) { histSkip--; return; }
+  const lr = e.state?.lr || "home";
+  // A run or a model download cannot be left with Back. The screen stays and says how to stop it.
+  const busy = state.run ? { lr: "processing", msg: "Tap Cancel to stop reading." }
+    : (state.openSheet === "firstRun" && dl.phase === "downloading") ? { lr: "sheet", msg: "Tap Cancel to stop the download." }
+    : null;
+  if (busy && lr !== busy.lr) {
+    history.pushState({ lr: busy.lr }, "");
+    toast(busy.msg);
+    return;
+  }
+  if (!$("#alert").hidden && lr !== "alert") closeAlert(false, { history: false });
+  if (state.openSheet && lr !== "sheet" && lr !== "alert") {
+    if (state.openSheet === "firstRun") closeFirstRun({ history: false });
+    else closeSettings({ history: false });
+  }
+  if (lr === "home" && state.screen !== "home") goHome({ back: false });
+});
+
 /* ---------- Boot ---------- */
 
 async function init() {
   const supported = renderHomeSupport();
   renderRecent();
   window.scrollTo(0, 0);
-  showScreen("home", { animate: false });
+  showScreen("home", { animate: false, focus: false });
   updateNavTitle();
   if (!supported) return;
 
@@ -1282,4 +1617,7 @@ async function init() {
   }
 }
 
+bindSheetDrag("firstRun");
+bindSheetDrag("settings");
+try { history.replaceState({ lr: "home" }, ""); } catch { /* no history API */ }
 init();
