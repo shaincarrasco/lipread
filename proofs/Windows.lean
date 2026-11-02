@@ -36,10 +36,10 @@ def baseStarts (T chunk overlap : Nat) : List Nat :=
 
 /-- All window starts, exactly as `stitch_windows` computes them. -/
 def starts (T chunk overlap : Nat) : List Nat :=
-  let b := baseStarts T chunk overlap
-  match b.getLast? with
-  | some l => if l + chunk < T then b ++ [T - chunk] else b
-  | none   => b
+  match (baseStarts T chunk overlap).getLast? with
+  | some l => if l + chunk < T then baseStarts T chunk overlap ++ [T - chunk]
+              else baseStarts T chunk overlap
+  | none   => baseStarts T chunk overlap
 
 /-- Window `s` covers frame `t`. -/
 def Covers (T chunk s t : Nat) : Prop := s ≤ t ∧ t < min (s + chunk) T
@@ -77,7 +77,7 @@ theorem range_alone_suffices (T chunk overlap t : Nat)
   have ⟨hlo, hhi⟩ := ceil_div_bounds (T - overlap) step hstep
   rw [hm] at hlo hhi
   have hq := Nat.div_add_mod t step
-  have hr := Nat.mod_lt t step hstep
+  have hr := Nat.mod_lt t hstep
   rw [Nat.mul_comm] at hq
   have hm1 : 1 ≤ m := by
     rcases Nat.eq_zero_or_pos m with h0 | h0
