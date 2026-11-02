@@ -42,3 +42,9 @@ eval/reports/
 web/dev-model
 web/dev-media/
 web/vendor/ort/
+
+# Rust build output
+decoder/target/
+
+# Rust decoder build output
+decoder/target/
