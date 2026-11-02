@@ -29,5 +29,9 @@ test("every relative import in core/ resolves to a precached file", () => {
 });
 
 test("every precached path exists", () => {
-  for (const p of required) assert.doesNotThrow(() => readFileSync(new URL(p, web)), p);
+  // vendor/ is filled at deploy time by scripts/vendor_ort.sh, so it is absent in a fresh checkout.
+  for (const p of required) {
+    if (p.startsWith("vendor/")) continue;
+    assert.doesNotThrow(() => readFileSync(new URL(p, web)), p);
+  }
 });
