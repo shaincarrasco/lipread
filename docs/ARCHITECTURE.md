@@ -47,7 +47,7 @@ never holds all full-resolution frames of a clip in memory.
 | Pass | Reads video for | Keeps in memory |
 |---|---|---|
 | 1 | Shot cuts, face detection, keypoint refinement | Small per-frame detections and keypoints |
-| 2 | Cutting 88x88 mouth crops per track, quality gate, model run | Crops for one track at a time |
+| 2 | Cutting 88x88 mouth crops for every kept track (quality gate and model run follow, outside the frame loop) | Crops for all kept tracks (~7.7 KB per frame per track); full frames are never stored |
 | 3 | Rendering the annotated video | One frame at a time |
 
 ## Module responsibilities
@@ -98,7 +98,7 @@ windowing and export can be tested without the model download.
 ## Design decisions
 
 - **Visual only in v0.1.** The model reads lips from pixels. Audio is not used yet.
-- **Detection finds small faces.** YuNet is kept for small faces. MediaPipe alone misses faces
+- **Detection finds small faces.** YuNet is kept for small faces. MediaPipe alone lost faces at 120 px and below in our test, missing faces
   below about 150 px, so it refines keypoints on an upscaled crop instead of finding faces.
 - **Stitch on posteriors, not text.** Overlapping windows are merged before decoding, so words
   are not duplicated or cut at a seam.

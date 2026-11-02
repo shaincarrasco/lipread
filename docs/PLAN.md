@@ -34,10 +34,10 @@ license is research and non-commercial only (see MODEL_LICENSES.md).
 
 - **LRS3 test set, 150 clips, greedy decoding:** 31.6% word error rate (WER). Speed: 7.9x real time on 2 CPU cores.
 - **Confidence tracks accuracy:** the top third of clips by confidence had 8% WER; the bottom third had 64% WER.
-- **Raw talking-head clips against Whisper transcripts:** 6% to 45% WER on frontal speakers. The reference is an automatic transcript, not a human.
+- **Raw talking-head clips against Whisper transcripts:** 6% to 45% WER on 6 of 8 frontal clips (69% and 76% on the two hardest). The reference is an automatic transcript, not a human.
 - **Beam search without a language model:** no gain over greedy decoding.
 - **Small faces:** on one clip, a 120 px face read at 6% WER and an 80 px face at 13% WER.
-- **Detection:** MediaPipe alone fails on faces below about 150 px. The YuNet plus MediaPipe hybrid is the reason small faces work.
+- **Detection:** MediaPipe alone lost the face at 120 px and below in our test. The YuNet plus MediaPipe hybrid is the reason small faces work.
 
 ## Design rules
 

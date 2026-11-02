@@ -15,7 +15,7 @@ fine-tune a model, or redistribute anything it produces.
 | `tokens.json` | Output token table | Comes from the ONNX export; follows the model terms below | Yes (`src/lipread/assets`) |
 | Auto-AVSR LRS3 visual-only weights, int8 ONNX | The lip-reading model | **Research / non-commercial only** (LRS3 terms; see below) | **No**, downloaded at runtime |
 | YuNet face detector (OpenCV Zoo; Hugging Face `opencv/face_detection_yunet`) | Face detection | MIT | **No**, downloaded at runtime |
-| MediaPipe BlazeFace short-range model | Face detection and refinement | Apache-2.0 | **No**, downloaded at runtime |
+| MediaPipe BlazeFace short-range model | Face detection and refinement | Distributed by Google MediaPipe (MediaPipe code is Apache-2.0; check the model card for the model's own terms) | **No**, downloaded at runtime |
 | LRS3 dataset | Training data of the lip-reading model | See below | **No** |
 | Whisper (faster-whisper) | Reference transcripts for the `eval/` suite only | MIT (upstream; not re-checked for this build) | **No**, optional `eval` extra |
 
@@ -32,12 +32,12 @@ fine-tune a model, or redistribute anything it produces.
   accept the terms before it runs.
 - **Before any commercial use:** get your own rights to the weights, or replace the engine with a
   model whose license allows it. The `Engine` interface in `src/lipread/engine.py` is built for that swap.
-- **Not verified here:** I have not checked the Hugging Face model card of the int8 export for its own
-  license text. Check the card before you rely on it.
+- The Hugging Face model card of the int8 export states the license `lrs3-research-non-commercial`:
+  the quantized copy inherits the LRS3 terms (research and non-commercial use only).
 
 ## LRS3 dataset
 
-- LRS3 (TED and TEDx talks, BBC) is the training and test data of the lip-reading model.
+- LRS3 (TED and TEDx talks) is the training and test data of the lip-reading model.
 - The KAIST mirror of the dataset lists **CC BY 4.0** for the download and **CC BY-NC-ND 4.0** for the
   content (https://mm.kaist.ac.kr/datasets/lip_reading/files/license.txt).
 - **BY-NC-ND means no commercial use and no derivatives.** Do not fine-tune on LRS3, and do not
@@ -47,7 +47,7 @@ fine-tune a model, or redistribute anything it produces.
 ## Other components
 
 - **YuNet (OpenCV Zoo):** MIT. Downloaded at runtime.
-- **MediaPipe BlazeFace:** Apache-2.0. Downloaded at runtime.
+- **MediaPipe BlazeFace:** distributed by Google MediaPipe (code Apache-2.0; see the model card for the model's terms). Downloaded at runtime.
 - **MediaPipe (Python package):** Apache-2.0.
 - **ffmpeg:** installed with Homebrew on your Mac. Its license depends on how it was built (LGPL or GPL).
   LipRead does not ship ffmpeg.

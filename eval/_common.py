@@ -22,8 +22,11 @@ REPO = EVAL_DIR.parent
 if (REPO / "src").is_dir() and str(REPO / "src") not in sys.path:
     sys.path.insert(0, str(REPO / "src"))   # allow running the scripts without `pip install -e .`
 
-DEFAULT_MODEL = os.environ.get("LIPREAD_MODEL", "/home/claude/models/lipread_ctc.int8.onnx")
-DEFAULT_PARQUET = "/home/claude/data/lrs3_test_0.parquet"
+DEFAULT_MODEL = os.environ.get(
+    "LIPREAD_MODEL",
+    os.path.join(os.environ.get("LIPREAD_HOME", os.path.expanduser("~/.cache/lipread/models")), "lipread_ctc.int8.onnx"),
+)
+DEFAULT_PARQUET = os.environ.get("LIPREAD_LRS3_PARQUET", "data/lrs3_test_0.parquet")
 FPS = 25
 SR = 16000
 # word-confidence bins used for calibration: [lo, hi) except the last bin, which includes 1.0

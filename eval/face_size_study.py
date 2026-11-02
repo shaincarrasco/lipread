@@ -238,7 +238,7 @@ def main(argv=None) -> int:
     ap.add_argument("--max-seconds", type=float, default=8.0)
     ap.add_argument("--whisper", default="small.en")
     ap.add_argument("--model", default=C.DEFAULT_MODEL)
-    ap.add_argument("--models-dir", default=os.environ.get("LIPREAD_MODELS_DIR", "/home/claude/models"))
+    ap.add_argument("--models-dir", default=os.environ.get("LIPREAD_HOME", os.path.expanduser("~/.cache/lipread/models")))
     ap.add_argument("--blur", type=int, default=0, help="horizontal motion-blur kernel in canvas px (0 = off)")
     ap.add_argument("--fps", type=int, default=25, choices=[25, 50, 75, 100], help="source rate to read at")
     ap.add_argument("--limit", type=int, default=0)

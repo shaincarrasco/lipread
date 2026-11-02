@@ -65,7 +65,7 @@ cat > "$APP/Contents/Info.plist" <<'PLIST'
 <dict>
     <key>CFBundleName</key><string>LipRead</string>
     <key>CFBundleDisplayName</key><string>LipRead</string>
-    <key>CFBundleIdentifier</key><string>dev.liplread.launcher</string>
+    <key>CFBundleIdentifier</key><string>dev.lipread.launcher</string>
     <key>CFBundleExecutable</key><string>LipRead</string>
     <key>CFBundleIconFile</key><string>AppIcon</string>
     <key>CFBundlePackageType</key><string>APPL</string>

@@ -47,7 +47,7 @@ This policy is part of the project. If you use LipRead, you agree to it.
 
 ## 8. Known limits (do not hide these)
 
-- The default model was trained on English (LRS3: TED and BBC talks). Output for other languages is not reliable.
+- The default model was trained on English (LRS3: TED and TEDx talks). Output for other languages is not reliable.
 - Accuracy drops for side views, small faces, covered mouths, blur, and low frame rates. Measured numbers are in the README.
 - The model reads lips only. It does not use the audio, so it can confuse words that look alike.
 

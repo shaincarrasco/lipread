@@ -51,7 +51,7 @@ if [ ! -f "$REPO/.venv/bin/activate" ]; then
     exit 1
 fi
 
-SERVE_CMD="cd $(printf %q "$REPO") && LIPREAD_REPO=$(printf %q "$REPO") /bin/bash $(printf %q "$SELF") --serve"
+SERVE_CMD="cd $(printf %q "$REPO") && LIPREAD_REPO=$(printf %q "$REPO") LIPREAD_PORT=$(printf %q "$PORT") /bin/bash $(printf %q "$SELF") --serve"
 CMD_AS="$(as_escape "$SERVE_CMD")"
 
 if [ -d "/Applications/iTerm.app" ] || [ -d "$HOME/Applications/iTerm.app" ]; then

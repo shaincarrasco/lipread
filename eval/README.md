@@ -9,7 +9,7 @@ There is no labelled sports lip-reading set, so the engine is measured three way
 | `face_size_study.py` | How WER and detection rate fall as the face shrinks in a wide shot | Whisper transcript of the original clip |
 | `labels_bench.py` | Your own hand labels (from the web UI) scored against a cached pipeline result | Your labels |
 
-All scripts print a table and write a JSON report to `eval/reports/` (git-ignored) unless `--out` says otherwise.
+All scripts print a table. `lrs3_bench`, `audio_bench` and `face_size_study` also write a JSON report to `eval/reports/` (git-ignored, change with `--out`); `labels_bench` writes JSON only with `--out`.
 Run them from the repo root with the project venv (`pip install -e ".[eval]"`).
 
 Text is normalised the same way everywhere: lowercase, keep `a-z` and apostrophes, drop digits and punctuation.
@@ -19,7 +19,7 @@ Numbers are not converted to words, so a spoken "two" against a Whisper "2" coun
 
 ```
 python eval/lrs3_bench.py --n 200 --model /path/to/lipread_ctc.int8.onnx
-python eval/lrs3_bench.py --parquet /path/to/lrs3_test_0.parquet --n 0    # all 661 clips
+python eval/lrs3_bench.py --parquet /path/to/lrs3_test_0.parquet --n 0    # every clip in the file
 ```
 
 Prints corpus WER, mean per-clip WER, speed in x real time, and two tables:
@@ -29,7 +29,7 @@ Prints corpus WER, mean per-clip WER, speed in x real time, and two tables:
   Use the bins to choose the threshold for "show as confident" and the tier boundaries.
 - **Threshold**: for `t` in 0.5, 0.7, 0.9, the share of words kept and the precision of the kept words.
 
-Speed depends on machine load. Other jobs on the same cores cut it by about 3.5x in our runs (1.7x under load, 6.1x idle), so benchmark on an idle machine.
+Speed depends on machine load, so benchmark on an idle machine.
 
 ## audio_bench.py
 
@@ -97,12 +97,4 @@ result score as an empty hypothesis (100% WER), so check the `[track not in resu
 
 ## Current numbers
 
-Measured in this repo on the 2-core dev machine (other builders' jobs were running, so speed is noisy):
-
-| Bench | Setup | Result |
-|---|---|---|
-| lrs3_bench | 100 LRS3 clips, greedy | corpus WER 28.6%, 6.1x real time, 761 hyp words |
-| audio_bench | 2 clips, 8 s, Whisper small.en | one clip (426 px face): WER 59%; one clip with no face (voiceover graphic) excluded |
-| face_size_study | 1 clip with a face, 8 s, all 7 targets | WER 41% at 200 px, 59% at 120 px, 41% at 80 px, 50% at 56 px, 55% at 40 px, 41% at 28 px, 86% at 20 px (detection 94% at 20 px) |
-
-These are one or two clips. They show that the scripts work, not what the engine's accuracy is on sports footage.
+See the accuracy table in the top-level README.md. Those are the numbers measured for this release; the scripts here reproduce them.

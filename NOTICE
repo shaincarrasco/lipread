@@ -17,8 +17,9 @@ This product includes code and data derived from third-party projects:
    MIT License. Downloaded at runtime from Hugging Face (opencv/face_detection_yunet).
 
 3. MediaPipe BlazeFace short-range face detector model
-   (https://github.com/google-ai-edge/mediapipe), Apache License 2.0. Downloaded at
-   runtime; used in the face detection and refinement stage.
+   (https://github.com/google-ai-edge/mediapipe). MediaPipe's code is Apache License 2.0;
+   see the model card for the model's own terms. Downloaded at runtime; used in the face
+   detection and refinement stage.
 
 4. The lip-reading model weights (Auto-AVSR, LRS3 visual-only, int8 ONNX export
    at https://huggingface.co/eschmechel/auto-avsr-lrs3-vsr-int8-onnx) are NOT part

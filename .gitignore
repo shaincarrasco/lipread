@@ -24,3 +24,13 @@ out/
 # macOS
 .DS_Store
 *.iconset/
+
+# Default CLI output and other media
+lipread_out/
+*.mov
+*.webm
+*.mkv
+*.npy
+!src/lipread/assets/*.npy
+.env
+eval/reports/
