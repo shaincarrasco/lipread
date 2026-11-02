@@ -34,12 +34,13 @@ def _lse(a: float, b: float) -> float:
 @dataclass
 class DecodeOptions:
     beam: int = 16
-    alpha: float = 0.6          # LM weight (tuned on LRS2, see eval/beam_tune.py)
+    alpha: float = 0.3          # LM weight (tuned on LRS2 + half of LRS3; see docs, measurements 25-27)
     beta: float = 1.0           # word insertion bonus
     unk_penalty: float = -4.0   # extra log-penalty for words outside the LM vocabulary
     prune: float = 10.0         # per frame, ignore pieces this far (nats) below the best
     topk: int = 24              # per frame, at most this many pieces
     n_alternatives: int = 3
+    posterior_scale: float = 0.2    # calibrated on dev data: p≈0.57 -> 57% correct, p≈0.82 -> 83% (measurement 28)
     temperature: float = 1.0    # >1 softens the model's (over-confident) posteriors so context can weigh in
     names: Sequence[str] = ()   # roster names: treated as in-vocabulary with a flat probability
     name_logp: float = math.log(1e-4)
@@ -159,7 +160,7 @@ class BeamDecoder:
     def _words(self, finals, t0):
         if not finals:
             return [], []
-        scores = np.array([s for s, _ in finals])
+        scores = np.array([sc for sc, _ in finals]) * self.o.posterior_scale
         post = np.exp(scores - scores.max()); post /= post.sum()
         best = finals[0][1]
         words, alts = [], []
@@ -167,15 +168,23 @@ class BeamDecoder:
             if not text:
                 continue
             conf = csum / max(cn, 1)
-            # alternatives: words other hypotheses place at (about) the same moment
+            # For every hypothesis, the word it puts at this moment: same text first, then the largest
+            # time overlap, then the nearest start (words are time-ordered within a hypothesis).
             options: dict[str, float] = {}
             for p, (_, h) in zip(post, finals):
+                match = None
                 for (wt, wa, wb, *_r) in h.words:
-                    if abs(wa - a) <= 3 or (wa < b and wb > a and abs(wa - a) <= 6):
-                        options[wt] = options.get(wt, 0.0) + p
+                    if wb <= a - 3:
+                        continue
+                    if wa >= b + 3:
                         break
-            ranked = sorted(options.items(), key=lambda kv: -kv[1])
-            alt = [{"text": w, "p": round(float(pp), 4)} for w, pp in ranked if w != text][: self.o.n_alternatives]
+                    key = (wt == text, min(b, wb) - max(a, wa), -abs(wa - a))
+                    if match is None or key > match[0]:
+                        match = (key, wt)
+                if match is not None:
+                    options[match[1]] = options.get(match[1], 0.0) + float(p)
+            ranked = sorted(options.items(), key=lambda kv: (-kv[1], kv[0]))
+            alt = [{"text": w, "p": round(pp, 4)} for w, pp in ranked if w != text and pp >= 0.01][: self.o.n_alternatives]
             words.append(Word(text=text, start=t0 + a / FPS, end=t0 + b / FPS, confidence=conf, tier=tier_for(conf)))
             alts.append({"p": round(float(options.get(text, 0.0)), 4), "alternatives": alt})
         return words, alts
