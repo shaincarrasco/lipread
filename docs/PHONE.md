@@ -31,14 +31,13 @@ Each stage:
    this cut frame waiting from 55 s to 9 s for a 12 s clip (seeking: 183 ms per frame). Browsers without
    `requestVideoFrameCallback` fall back to seeking.
 3. **Detection.** YuNet runs on every 2nd frame, on a 640 x 640 letterbox of the whole frame. When the
-   long side is over 960 px, two zoomed half-frame tiles are also searched on every 3rd detector run
+   long side is over 960 px, two zoomed tiles (each 55% of the frame, overlapping) are also searched on every 3rd detector run
    (every 6th frame), so small faces in wide shots are found (a 29 px fan face in a 720p test clip was
    only found this way). The YuNet decode matches OpenCV's output exactly on the test frames.
 4. **Tracking.** An IoU tracker links detections into one track per person. A cut resets the tracks,
    so a track never crosses a change of shot.
 5. **Keypoint correction.** A learned correction maps YuNet's five face points to the four keypoints
-   used for alignment. It replaces the MediaPipe refinement used on the desktop. It was fitted on 8
-   clips.
+   used for alignment. It replaces the MediaPipe refinement used on the desktop. It was fitted on 13 clips (1,234 face detections).
 6. **Readability gate.** Face size, yaw (from the YuNet points), how often the face was found,
    mouth sharpness and mouth motion set each track to `readable`,
    `marginal` or `unreadable`, with reasons. Thresholds: 56 px and above readable, 32 to 56 px marginal,
@@ -60,7 +59,7 @@ Each stage:
 
 ```js
 import { LipRead } from "./core/lipread.js";
-const lr = new LipRead({ modelUrl?, onProgress? });
+const lr = new LipRead({ onProgress?, config? });   // config overrides web/core/config.js
 await lr.modelStatus();              // { cached, bytes }
 await lr.downloadModel(onBytes);     // resolves once cached and SHA-256 verified
 const result = await lr.process(file, { names, faces: "readable" | "all", start?, end?, signal? });
@@ -68,7 +67,7 @@ lr.toSRT(result);  lr.toText(result);
 await lr.deleteModel();
 ```
 
-Progress stages are `model`, `frames`, `faces`, `lips` and `done`.
+Progress stages are `model`, `faces`, `lips` and `done`.
 
 ## 2. Why there is no MediaPipe on the phone
 
@@ -77,7 +76,7 @@ Progress stages are `model`, `frames`, `faces`, `lips` and `done`.
   own terms to check (see `MODEL_LICENSES.md`).
 - **The correction closes the gap.** On the 8-clip check, the corrected YuNet scored 31.8% word error
   rate. The desktop MediaPipe hybrid scored 31.4% on the same clips, so the difference is within what
-  8 clips can show.
+  8 clips can show (the correction was fitted on 13 clips that include them).
 - **MediaPipe alone was weak on small faces.** In the desktop tests it lost faces at 120 px and below.
 
 ## 3. Memory strategy
@@ -114,7 +113,8 @@ Progress stages are `model`, `frames`, `faces`, `lips` and `done`.
   total 38 s vs 31 s. Phone numbers are not measured.
 - If a browser does not honour the service-worker headers (possible on iPhone Safari, untested), the app
   runs single-threaded automatically.
-- The processing runs in a Web Worker, so the UI stays responsive while a clip is read.
+- The two neural networks (face detector and lip model) run in a Web Worker. Frame drawing, crops,
+  tracking and alignment run on the main thread between frames.
 
 ## 6. Privacy model
 
@@ -123,7 +123,7 @@ Progress stages are `model`, `frames`, `faces`, `lips` and `done`.
   Both see the request. Their logs are not controlled by this project.
 - **No accounts, no analytics, no tracking code.**
 - **Stored on the phone:** the model (Cache Storage), the app's files (service worker cache), and the
-  roster names the user types. The exact storage used for the roster needs confirming in code.
+  roster names the user types, kept in the browser's `localStorage` on the device.
 - **Shared only by the user.** Transcript text and SRT leave the phone only through the share sheet,
   and only when the user chooses to send them.
 
@@ -138,7 +138,7 @@ The full plain-language version is in `PRIVACY.md`.
   - corrected YuNet (the shipped path): **31.8%**
   - MediaPipe hybrid (desktop path): **31.4%**
   - raw YuNet with no correction: **32.2%**
-  - The correction was fitted on the same 8 clips, so the 31.8% figure is slightly optimistic.
+  - The correction was fitted on 13 clips that include these 8, so the 31.8% figure is slightly optimistic.
 - **Desktop Chromium with iPhone-size emulation.** The app was exercised at phone size in this browser.
 
 ### Not done
@@ -151,9 +151,11 @@ The full plain-language version is in `PRIVACY.md`.
 - **No HEVC (H.265) decoding on any real device.**
 - **No tests of** airplane-mode reopen, backgrounding mid-run, long clips, or the first download on a
   real connection.
-- **No automated browser tests on the phone path.** The Playwright suite is planned as a separate work
-  package and is not reported here.
-- **Booster parity** between the phone port and the Python booster is not reported here.
+- **Automated browser tests:** `tests_web/e2e_phone.py` walks the real UI with the real engine in headless
+  Chromium at iPhone size; `node --test tests_web/*.test.mjs` runs the JS unit tests (booster and decoder
+  parity with Python, SHA-256).
+- **Booster parity:** the JS booster matches the Python booster on real model output, and its name
+  tokenizer matches SentencePiece on 400 random names.
 
 ## 8. Real-device test checklist
 
@@ -198,9 +200,9 @@ Record the device model, OS version, browser version, date, clip length, and the
   when it cannot.
 - **Background runs.** Mobile browsers may pause or kill a tab that is in the background. Behaviour is
   untested.
-- **Speed on phones.** Desktop Chromium needs about 3x the clip length (12 s clip: 31-46 s). Phones are
+- **Speed on phones.** Desktop Chromium needs about 3x the clip length (12 s single-face clip: 31-39 s; 12 s three-face 720p clip: 46 s). Phones are
   likely slower; only a real-device test will tell.
 - **Clip length.** Only the first 30 seconds of a clip are read; the results screen says so.
-- **Accuracy claims.** The 31.8% figure is from 8 clips and is optimistic. Phone accuracy needs a larger,
+- **Accuracy claims.** The 31.8% figure is from 8 clips (correction fitted on 13 clips that include them) and is optimistic. Phone accuracy needs a larger,
   labelled set.
 - **Roster storage.** Roster names are saved in the browser's `localStorage` on the device only.

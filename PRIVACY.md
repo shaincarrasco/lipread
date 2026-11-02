@@ -16,8 +16,9 @@ a draft and not legal advice. Have it reviewed before any paid or ad-supported r
 - It reads your video on the phone. It reads the picture frame by frame, finds faces, and cuts out a
   small grayscale image of each mouth (144 by 144 pixels) for the lip-reading model.
 - The app does not send the video, the snapshots, the mouth images or the words it reads to any server.
-- The app does not keep the video or the mouth images in storage. They exist in your phone's memory
-  while a job runs. (Confirm this in the code before release.)
+- The app does not keep the video or the mouth images in storage. They exist only in the page's memory
+  while you use it (checked in the code: crops are held in memory and released after each job; the video
+  is opened from your phone with a temporary in-memory link).
 - The words the app reads are shown on your screen. They leave your phone only if you send them with
   the share sheet.
 
@@ -26,8 +27,8 @@ a draft and not legal advice. Have it reviewed before any paid or ad-supported r
 | What | Why | How to remove it |
 |---|---|---|
 | The lip-reading model (about 203 MB) | So you do not download it every time | Use the app's option to remove the model, or clear the site's data (see below) |
-| The app's own files | So the app opens without a connection | Clear the site's data, or remove the Home Screen icon |
-| Roster names you type | So the app can look for those names | Clear the roster in the app, or clear the site's data |
+| The app's own files, including its on-device AI runtime | So the app opens without a connection | Clear the site's data, or remove the Home Screen icon |
+| Roster names you type | So the app can look for those names | Delete the names in Settings, or clear the site's data |
 
 The browser keeps this data for the app's web address. Nothing is kept for us, because we do not
 receive it.
@@ -47,7 +48,7 @@ receive it.
 
 - **Remove the model:** use the app's option to remove the model. It will download again the next time
   you need it.
-- **Remove roster names:** clear the roster in the app.
+- **Remove roster names:** delete them in Settings.
 - **Remove everything the app stored:** clear the site's data in your browser.
   - iPhone: Settings, then Safari, then Advanced, then Website Data. Find the app's address and remove it.
   - Android (Chrome): the Chrome menu, then Settings, then Site settings, then Storage. Find the app's

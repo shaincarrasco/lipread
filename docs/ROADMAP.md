@@ -52,14 +52,14 @@ claim about LipRead unless it is in the README's measured table.
 ## Phone app milestones
 
 The phone app (`web/`, see `docs/PHONE.md`) is free and non-commercial, like the rest of the project.
-These milestones are planned. None is done yet.
+These milestones are planned. P3 and P4 are done (see below); the rest are open.
 
 | Milestone | What it means | Done when |
 |---|---|---|
 | P1: real-device test | Run the checklist in `docs/PHONE.md` on at least one real iPhone (Safari) and one real Android phone (Chrome). | Results for every checklist item are recorded, with device and OS versions. |
 | P2: speed and memory tuning | Use the P1 numbers to tune frame reading, detection stride and crop storage. Record the memory limit found on each device. | Each device has a measured speed and memory figure in `docs/PHONE.md`. |
-| P3: `requestVideoFrameCallback` frame capture | Read frames with `requestVideoFrameCallback` where the browser supports it, instead of seeking. | Output on the test clips matches the seek path, and the change is faster on the P1 phones. |
-| P4: threads, only if measured faster | Multi-thread WASM needs cross-origin isolation, which GitHub Pages cannot send. Any workaround needs its own review. | Threads are measured faster on the same phones, and the hosting change is decided. |
+| P3: `requestVideoFrameCallback` frame capture — **done** | Frames are read by playing and pausing on each 25 fps frame; seeking is the fallback. | Done 2026-11-02: in desktop Chromium, frame waiting fell from 55 s to 9 s for a 12 s clip with the same transcript. Still to confirm on the P1 phones. |
+| P4: threads — **done (desktop-measured)** | The service worker adds the cross-origin isolation headers GitHub Pages can't send. | Done 2026-11-02: lip model 14.1 s → 8.6 s on a 2-core desktop. Falls back to one thread where unsupported; confirm on the P1 phones. |
 | P5: captioned video export | Burn captions into a copy of the clip and save it to the phone (was planned as v1.1 in the phone plan). The AI-estimate label stays on the video. | Export works on the P1 phones, and the label is visible on the exported file. |
 | P6: sample clip with cleared rights | A sample clip that the owner or the rights holder has cleared for public use, so anyone can try the app. | Written permission is on file, and the clip's license is in the repo. |
 

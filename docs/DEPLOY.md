@@ -35,7 +35,9 @@ The first run starts on the push in step 1. Watch it under the **Actions** tab. 
 ## 3. Install on the phone
 
 - **iPhone (Safari):** open the URL, tap Share, then **Add to Home Screen**. Open it once while
-  online so the app shell and the on-device runtime are cached. After that it works offline.
+  online: the app and its on-device AI runtime are cached on that first visit, and after the model
+  download it can read clips without a connection (checked in desktop Chromium's offline mode; not yet
+  on a real phone).
 - **Android (Chrome):** open the URL, tap the menu, then **Install app** (or **Add to Home screen**).
 
 The lip-reading model (about 203 MB) is downloaded by the app on first use. It is stored in the

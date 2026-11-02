@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="scripts/icon_1024.png" width="152" alt="LipRead icon: neon lips with a cyan waveform">
+  <img src="web/icons/icon-512.png" width="152" alt="LipRead app icon">
 </p>
 
 <h1 align="center">LipRead</h1>
@@ -13,19 +13,18 @@ Built for sports clips: see what a coach, a player or a referee appears to say.<
 
 ## Open on your phone
 
-**[Open LipRead](https://YOUR-USERNAME.github.io/lipread/)**
+**[Open LipRead → shaincarrasco.github.io/lipread](https://shaincarrasco.github.io/lipread/)**
 
-> **Placeholder link.** `YOUR-USERNAME` is not a real address, so the link above does not open the
-> app yet. After the first GitHub Pages deploy, replace `YOUR-USERNAME` with your GitHub user or
-> organization name everywhere it appears (`grep -r YOUR-USERNAME .` shows every place).
+> The link goes live after the repository is published with GitHub Pages ([docs/DEPLOY.md](docs/DEPLOY.md)).
+> If you publish under a different account, change `shaincarrasco` here and in `web/app.js` (`REPO_URL`).
 
 ### How to use it
 
 1. **Open the link** in Safari on an iPhone, or Chrome on an Android phone.
 2. **Add it to your Home Screen.** In Safari: Share, then *Add to Home Screen*. In Chrome: the menu,
    then *Add to Home screen* or *Install app*. It then opens full screen, like an app.
-3. **Pick a clip** from your videos. Optionally type the names you expect (players, coaches) so the
-   app can check for them. Tap **Read**.
+3. **Tap Choose Video** (or Record) and pick a clip. Reading starts straight away and shows its progress.
+   Optional: in **Settings**, type the names you expect (players, coaches) so the app can check for them.
 
 The first run downloads the lip-reading model: **about 203 MB**. Use Wi-Fi. After that the model
 stays on the phone.
@@ -40,8 +39,11 @@ face-on speakers and unreliable elsewhere. The confidence on each word tells you
   Treat low words as guesses.
 - **Phone pipeline, 8-clip check.** **31.8% word error rate.** On the same clips the desktop pipeline
   scored 31.4%, and raw face detection without the correction scored 32.2%. The phone correction was
-  fitted on those same 8 clips, so expect the phone figure to be slightly optimistic. Eight clips
-  cannot tell these three apart.
+  fitted on 13 clips (1,234 face detections) that include these 8, so expect the phone figure to be
+  slightly optimistic. Eight clips cannot tell these three apart.
+- **Phone app in a desktop browser.** The phone app's engine running in desktop Chromium (iPhone-size
+  emulation, 2-core machine) gave the same transcripts as the desktop app on the test clips. A 12 s
+  single-face clip took 31–39 s; a 12 s three-face 720p clip took 46 s.
 - **Phone speed and accuracy on real phones have not been measured.** The test checklist is in
   [docs/PHONE.md](docs/PHONE.md).
 
@@ -53,8 +55,9 @@ The full desktop measurements, and what each one means, are in
 - **Your video stays on your phone.** The app reads the frames on your device. Nothing you process
   is uploaded.
 - **No accounts and no analytics.** The app does not track you.
-- **Network use is limited to downloads.** The app files come from GitHub Pages, and the model comes
-  from Hugging Face. Both see the request. Details are in [PRIVACY.md](PRIVACY.md).
+- **Network use is limited to downloads.** The app (including its on-device AI runtime) comes from
+  GitHub Pages, and the model comes from Hugging Face. Both see the request. Details are in
+  [PRIVACY.md](PRIVACY.md).
 
 ## Supported browsers
 
@@ -68,8 +71,8 @@ Other browsers are not supported yet.
 ## Known limits on the phone
 
 - **Not tested on real phones.** Checks so far used desktop Chromium at phone size.
-- **Speed and memory are unmeasured on phones.** Long clips will take longer. No clip-length limit
-  has been tested.
+- **Speed and memory are unmeasured on phones.** In a desktop browser, reading takes about 3x the
+  clip length. Only the **first 30 seconds** of a clip are read; the results screen says so.
 - **Keep the app open while it works.** The app asks the phone to keep the screen on where the
   browser allows it. What happens when you switch apps mid-run is untested.
 - **Some videos may not open.** Many phone recordings use HEVC (H.265), and not every browser can
@@ -117,11 +120,11 @@ a result.
 |---|---|---|
 | LRS3 test set, 150 clips, greedy decoding | **31.6% word error rate (WER)** (28.6% on a 100-clip rerun with the packaged decoder) | LRS3 is clean TED and TEDx talking heads. This is the standard benchmark. |
 | Word confidence vs. correctness (LRS3, 761 words) | conf ≥ 0.9: **96% correct** (59% of words) · 0.7–0.9: **74%** · 0.5–0.7: **50%** · < 0.5: **32%** | This is why words show as high / medium / low. Low words get a "?". |
-| Raw talking-head clips, scored against Whisper transcripts | **6% to 45% WER** on 6 of 8 frontal clips (69% and 76% on the two hardest, full of names) | The reference is an automatic transcript, not a human. Treat it as a rough guide. |
+| Raw talking-head clips, scored against Whisper transcripts | **6% to 39% WER** on 5 of 7 frontal clip segments (69% and 76% on the two hardest, one full of names) | The reference is an automatic transcript, not a human. Treat it as a rough guide. |
 | Synthetic "sideline" wide shot (3 people + a camera cut) | 182 px face: near-perfect sentence · 85 px face: partly right, low confidence · 29 px face: flagged **unreadable** (confidence 0.10) | The readability gate stops it inventing words for tiny faces. |
 | Face-size study (faces shrunk into a 1280x720 frame, 2 clips) | Accuracy roughly flat from 200 px down to ~40 px, worse at 28 px, collapses at 20 px | Thresholds: **56 px+ readable, 32–56 px marginal, < 32 px unreadable**. Set conservatively because real broadcast footage is blurrier. |
 | Name booster, 50-name sports roster on 100 LRS3 clips | **1 false boost in 761 words (0.13%)**; fixes near-misses (HUMAN → HUMILITY, RADIOIL → RADIO) | It cannot rescue a name the model never considered (GENERAL YOUNG BLOOD stayed, not GERALD YOUNGBLOOD). Every boost is flagged. |
-| Speed | LRS3 model only: **7.9x real time**. Full pipeline: 9 s single-face clip in **16 s**; 12 s three-face 720p clip in **31 s** on an idle machine, 53 s while busy (incl. rendering) | Measured on a 2-core cloud sandbox, not a Mac. Speed on Apple Silicon has not been measured yet. |
+| Speed | LRS3 model only: **7.9x real time**. Full pipeline: 9 s single-face clip in **16 s**; 12 s three-face 720p clip in **31 s** (incl. rendering) | Measured on a 2-core cloud sandbox, not a Mac. Speed on Apple Silicon has not been measured yet. |
 
 Published numbers, not measured here: the Auto-AVSR paper reports **19.1% WER** on LRS3 visual
 speech with beam search and a language model (Ma et al., ICASSP 2023). LipRead v0.1 uses greedy

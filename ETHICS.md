@@ -55,8 +55,9 @@ This policy is part of the project. If you use LipRead, you agree to it.
 
 The phone app is open to anyone with a link. These rules apply to it in addition to sections 1 to 8.
 
-- **Do not identify private people in crowds.** Fan sections, stands and street footage show private
-  people. Do not run the app on them to find out what they said, and do not add their names to a roster.
+- **Do not identify private people in crowds.** Seeing what fans in a broadcast appear to say is fine.
+  Using the app to find out who a private person is, to name them, or to single someone out to expose or
+  harass them is not. Do not add private people's names to a roster.
 - **Keep the AI-estimate label on everything you share.** Every transcript, caption file or video from
   the app is an AI estimate from lip movements, not a verified transcript. Keep this label with the words
   wherever you copy or post them.
